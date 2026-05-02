@@ -15,6 +15,10 @@ from decimal import Decimal
 # Add project root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+# Load .env into actual environment variables (needed by TradingAgents/LangChain)
+from dotenv import load_dotenv
+load_dotenv(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), ".env"))
+
 from sqlalchemy import select
 from app.database import async_session
 from app.models import Ticker, WatchlistEntry, Run, CronLog
