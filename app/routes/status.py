@@ -80,8 +80,7 @@ async def status_page(request: Request, db: AsyncSession = Depends(get_db)):
     )
     today_runs_count = today_runs_result.scalar() or 0
 
-    return templates.TemplateResponse("status.html", {
-        "request": request,
+    return templates.TemplateResponse(request, "status.html", context={
         "active_page": "status",
         "daily_cost": float(daily_cost),
         "monthly_cost": float(monthly_cost),

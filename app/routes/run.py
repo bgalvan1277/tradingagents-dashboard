@@ -47,8 +47,7 @@ async def run_page(request: Request, db: AsyncSession = Depends(get_db)):
     )
     recent = list(recent_result.scalars().all())
 
-    return templates.TemplateResponse("run.html", {
-        "request": request,
+    return templates.TemplateResponse(request, "run.html", context={
         "active_page": "run",
         "tickers": tickers,
         "queue": queue,

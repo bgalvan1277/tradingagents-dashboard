@@ -38,8 +38,7 @@ async def watchlist_page(request: Request, db: AsyncSession = Depends(get_db)):
             groups[group] = []
         groups[group].append({"ticker": ticker, "watchlist": wl})
 
-    return templates.TemplateResponse("watchlist.html", {
-        "request": request,
+    return templates.TemplateResponse(request, "watchlist.html", context={
         "active_page": "watchlist",
         "groups": groups,
         "total_tickers": len(items),

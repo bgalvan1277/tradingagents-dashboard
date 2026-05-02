@@ -67,8 +67,7 @@ async def ticker_detail(
     if run:
         past_runs = [r for r in past_runs if r.id != run.id]
 
-    return templates.TemplateResponse("ticker_detail.html", {
-        "request": request,
+    return templates.TemplateResponse(request, "ticker_detail.html", context={
         "ticker_symbol": symbol,
         "run": run,
         "details": details,

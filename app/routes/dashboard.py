@@ -77,8 +77,7 @@ async def dashboard(request: Request, db: AsyncSession = Depends(get_db)):
     cost_result = await db.execute(cost_query)
     daily_cost = cost_result.scalar() or Decimal("0")
 
-    return templates.TemplateResponse("dashboard.html", {
-        "request": request,
+    return templates.TemplateResponse(request, "dashboard.html", context={
         "runs": runs,
         "grouped_runs": grouped_runs if len(grouped_runs) > 1 else None,
         "current_date": today.strftime("%A, %B %d, %Y"),

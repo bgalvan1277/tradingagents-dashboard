@@ -51,8 +51,7 @@ async def history_page(
     ticker_result = await db.execute(ticker_query)
     available_tickers = [r[0] for r in ticker_result.all()]
 
-    return templates.TemplateResponse("history.html", {
-        "request": request,
+    return templates.TemplateResponse(request, "history.html", context={
         "active_page": "history",
         "runs": runs,
         "available_tickers": available_tickers,

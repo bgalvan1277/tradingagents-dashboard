@@ -15,7 +15,7 @@ async def login_page(request: Request):
     """Show the login form. Redirect to dashboard if already authenticated."""
     if get_current_user(request):
         return RedirectResponse(url="/", status_code=303)
-    return templates.TemplateResponse("login.html", {"request": request})
+    return templates.TemplateResponse(request, "login.html")
 
 
 @router.post("/login", response_class=HTMLResponse)
@@ -27,8 +27,9 @@ async def login_submit(request: Request, password: str = Form(...)):
         return response
 
     return templates.TemplateResponse(
+        request,
         "login.html",
-        {"request": request, "error": "Incorrect password."},
+        context={"error": "Incorrect password."},
         status_code=401,
     )
 
