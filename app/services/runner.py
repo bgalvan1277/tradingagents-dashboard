@@ -23,8 +23,7 @@ logger = logging.getLogger(__name__)
 def build_ta_config() -> dict:
     """Build the TradingAgents config dict from our settings."""
     return {
-        "llm_provider": "openai",
-        "backend_url": settings.deepseek_base_url,
+        "llm_provider": "deepseek",
         "deep_think_llm": settings.deep_think_model,
         "quick_think_llm": settings.quick_think_model,
         "max_debate_rounds": settings.max_debate_rounds,
