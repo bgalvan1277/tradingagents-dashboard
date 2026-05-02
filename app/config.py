@@ -22,7 +22,8 @@ class Settings(BaseSettings):
 
     # --- DeepSeek / LLM ---
     openai_api_key: str = Field(default="")
-    deepseek_base_url: str = Field(default="https://api.deepseek.com/v1")
+    deepseek_api_key: str = Field(default="")
+    deepseek_base_url: str = Field(default="https://api.deepseek.com")
     deep_think_model: str = Field(default="deepseek-v4-pro")
     quick_think_model: str = Field(default="deepseek-v4-flash")
 
