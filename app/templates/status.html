@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% set active_page = 'status' %}
+
+{% block title %}System Status{% endblock %}
+
+{% block content %}
+<div class="mb-6">
+    <h1 class="text-lg font-semibold text-slate-200">System Status</h1>
+    <p class="text-xs text-slate-500 mt-0.5">{{ current_date }}</p>
+</div>
+
+<!-- Cost Cards -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+    <!-- Daily Cost -->
+    <div class="rounded-xl border border-surface-600/50 bg-surface-800/60 p-4">
+        <p class="text-xs text-slate-500 uppercase tracking-wider mb-1">Daily Spend</p>
+        <div class="flex items-baseline gap-1">
+            <span class="text-2xl font-semibold font-mono
+                {% if daily_cost > daily_cap * 0.8 %}text-rating-sell{% elif daily_cost > daily_cap * 0.5 %}text-rating-hold{% else %}text-slate-200{% endif %}">
+                ${{ "%.2f"|format(daily_cost) }}
+            </span>
+            <span class="text-xs text-slate-600">/ ${{ "%.2f"|format(daily_cap) }}</span>
+        </div>
+        <div class="mt-2 h-1.5 rounded-full bg-surface-600 overflow-hidden">
+            {% set pct = (daily_cost / daily_cap * 100) if daily_cap > 0 else 0 %}
+            <div class="h-full rounded-full transition-all duration-500
+                {% if pct > 80 %}bg-rating-sell{% elif pct > 50 %}bg-rating-hold{% else %}bg-accent-blue{% endif %}"
+                 style="width: {{ [pct, 100]|min }}%"></div>
+        </div>
+    </div>
+
+    <!-- Monthly Cost -->
+    <div class="rounded-xl border border-surface-600/50 bg-surface-800/60 p-4">
+        <p class="text-xs text-slate-500 uppercase tracking-wider mb-1">Monthly Spend</p>
+        <div class="flex items-baseline gap-1">
+            <span class="text-2xl font-semibold font-mono text-slate-200">${{ "%.2f"|format(monthly_cost) }}</span>
+            <span class="text-xs text-slate-600">/ ${{ "%.2f"|format(monthly_cap) }}</span>
+        </div>
+        <div class="mt-2 h-1.5 rounded-full bg-surface-600 overflow-hidden">
+            {% set mpct = (monthly_cost / monthly_cap * 100) if monthly_cap > 0 else 0 %}
+            <div class="h-full rounded-full bg-accent-blue transition-all duration-500" style="width: {{ [mpct, 100]|min }}%"></div>
+        </div>
+    </div>
+
+    <!-- Today's Runs -->
+    <div class="rounded-xl border border-surface-600/50 bg-surface-800/60 p-4">
+        <p class="text-xs text-slate-500 uppercase tracking-wider mb-1">Runs Today</p>
+        <span class="text-2xl font-semibold text-slate-200">{{ today_runs_count }}</span>
+    </div>
+
+    <!-- Token Usage -->
+    <div class="rounded-xl border border-surface-600/50 bg-surface-800/60 p-4">
+        <p class="text-xs text-slate-500 uppercase tracking-wider mb-1">Tokens Today</p>
+        <div class="text-sm text-slate-300">
+            <span class="font-mono">{{ "{:,}".format(daily_input_tokens) }}</span>
+            <span class="text-slate-600">in</span>
+            <span class="mx-1 text-slate-600">/</span>
+            <span class="font-mono">{{ "{:,}".format(daily_output_tokens) }}</span>
+            <span class="text-slate-600">out</span>
+        </div>
+    </div>
+</div>
+
+<!-- Cron History -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Recent Cron Runs -->
+    <div class="rounded-xl border border-surface-600/50 bg-surface-800/60">
+        <div class="p-4 border-b border-surface-600/30 flex items-center justify-between">
+            <h2 class="text-xs font-semibold text-slate-300 uppercase tracking-wider">Cron History</h2>
+            {% if last_cron %}
+            <span class="text-xs text-slate-500">
+                Last: {{ last_cron.timestamp.strftime('%b %d, %I:%M %p') }}
+            </span>
+            {% endif %}
+        </div>
+        {% if recent_crons %}
+        <div class="divide-y divide-surface-600/20">
+            {% for cron in recent_crons %}
+            <div class="px-4 py-3 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    {% if cron.status == 'success' %}
+                    <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                    {% elif cron.status == 'partial' %}
+                    <span class="w-2 h-2 rounded-full bg-yellow-500"></span>
+                    {% else %}
+                    <span class="w-2 h-2 rounded-full bg-red-500"></span>
+                    {% endif %}
+                    <div>
+                        <p class="text-sm text-slate-300">{{ cron.timestamp.strftime('%b %d, %Y %I:%M %p') }}</p>
+                        <p class="text-xs text-slate-500">
+                            {{ cron.tickers_succeeded }}/{{ cron.tickers_attempted }} succeeded
+                            {% if cron.duration_seconds %}&middot; {{ "%.1f"|format(cron.duration_seconds) }}s{% endif %}
+                        </p>
+                    </div>
+                </div>
+                <span class="text-xs text-slate-500 font-mono">${{ "%.4f"|format(cron.total_cost_usd) }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="p-8 text-center text-sm text-slate-500">No cron runs recorded yet.</div>
+        {% endif %}
+    </div>
+
+    <!-- Recent Failures -->
+    <div class="rounded-xl border border-surface-600/50 bg-surface-800/60">
+        <div class="p-4 border-b border-surface-600/30">
+            <h2 class="text-xs font-semibold text-slate-300 uppercase tracking-wider">Recent Failures</h2>
+        </div>
+        {% if recent_failures %}
+        <div class="divide-y divide-surface-600/20">
+            {% for fail in recent_failures %}
+            <div class="px-4 py-3">
+                <div class="flex items-center justify-between mb-1">
+                    <span class="text-sm font-medium text-slate-300">{{ fail.ticker_symbol }}</span>
+                    <span class="text-xs text-slate-500">{{ fail.run_timestamp.strftime('%b %d, %I:%M %p') if fail.run_timestamp else '' }}</span>
+                </div>
+                <p class="text-xs text-red-400/80 line-clamp-2">{{ fail.error_message or 'Unknown error' }}</p>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="p-8 text-center text-sm text-slate-500">No failures recorded. All systems operational.</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

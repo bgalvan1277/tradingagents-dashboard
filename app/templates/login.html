@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% set hide_nav = true %}
+
+{% block title %}Login{% endblock %}
+{% block meta_description %}TradingAgents Dashboard Login{% endblock %}
+
+{% block content %}
+<div class="min-h-[calc(100vh-3rem)] flex items-center justify-center">
+    <div class="w-full max-w-sm">
+        <!-- Logo -->
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-accent-blue to-accent-cyan mb-4 shadow-lg shadow-blue-500/20">
+                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                </svg>
+            </div>
+            <h1 class="text-xl font-semibold text-slate-200">TradingAgents</h1>
+            <p class="text-sm text-slate-500 mt-1">Multi-agent stock analysis dashboard</p>
+        </div>
+
+        <!-- Login Form -->
+        <form method="POST" action="/login" class="space-y-4">
+            <div class="rounded-xl border border-surface-600/50 bg-surface-800/80 backdrop-blur-sm p-6 shadow-xl">
+                {% if error %}
+                <div class="mb-4 px-3 py-2 rounded-lg border border-red-500/30 bg-red-500/10 text-red-400 text-sm">
+                    {{ error }}
+                </div>
+                {% endif %}
+
+                <div>
+                    <label for="password" class="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-wider">Password</label>
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        required
+                        autofocus
+                        autocomplete="current-password"
+                        class="w-full px-4 py-2.5 rounded-lg border border-surface-600 bg-surface-900 text-slate-200
+                               text-sm placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-accent-blue/50
+                               focus:border-accent-blue/50 transition-all"
+                        placeholder="Enter dashboard password"
+                    >
+                </div>
+
+                <button
+                    type="submit"
+                    id="login-submit"
+                    class="w-full mt-4 px-4 py-2.5 rounded-lg bg-gradient-to-r from-accent-blue to-blue-600
+                           text-white text-sm font-medium hover:from-blue-500 hover:to-blue-700
+                           focus:outline-none focus:ring-2 focus:ring-accent-blue/50
+                           transition-all duration-200 shadow-lg shadow-blue-500/20"
+                >
+                    Access Dashboard
+                </button>
+            </div>
+        </form>
+
+        <p class="text-center text-xs text-slate-600 mt-6">Single-user research tool. Not financial advice.</p>
+    </div>
+</div>
+{% endblock %}

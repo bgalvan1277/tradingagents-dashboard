@@ -1,0 +1,82 @@
+<!-- Ticker card partial: used on the dashboard grid -->
+<!-- Expects: run (Run ORM object with optional .details relationship) -->
+
+{% set rec = run.final_recommendation or 'Pending' %}
+{% set rec_lower = rec|lower %}
+
+{% set color_map = {
+    'buy': 'border-rating-buy/30 hover:border-rating-buy/60',
+    'overweight': 'border-green-300/20 hover:border-green-300/40',
+    'hold': 'border-rating-hold/30 hover:border-rating-hold/60',
+    'underweight': 'border-orange-400/30 hover:border-orange-400/60',
+    'sell': 'border-rating-sell/30 hover:border-rating-sell/60',
+    'pending': 'border-surface-600 hover:border-surface-500',
+    'running': 'border-accent-blue/30 hover:border-accent-blue/60',
+    'failed': 'border-red-500/30 hover:border-red-500/60',
+} %}
+
+{% set badge_map = {
+    'buy': 'bg-rating-buy/15 text-rating-buy',
+    'overweight': 'bg-green-300/15 text-green-300',
+    'hold': 'bg-rating-hold/15 text-rating-hold',
+    'underweight': 'bg-orange-400/15 text-orange-400',
+    'sell': 'bg-rating-sell/15 text-rating-sell',
+    'pending': 'bg-slate-500/15 text-slate-400',
+    'running': 'bg-accent-blue/15 text-accent-blue',
+    'failed': 'bg-red-500/15 text-red-400',
+} %}
+
+<a href="/ticker/{{ run.ticker_symbol }}"
+   class="ticker-card block rounded-xl border bg-surface-800/60 backdrop-blur-sm p-4
+          {{ color_map.get(rec_lower, color_map['pending']) }}">
+
+    <!-- Top row: Symbol + Rating badge -->
+    <div class="flex items-start justify-between mb-2.5">
+        <div>
+            <span class="text-sm font-semibold text-slate-200 tracking-wide">{{ run.ticker_symbol }}</span>
+            <span class="text-xs text-slate-600 ml-1.5">{{ run.run_date.strftime('%b %d') if run.run_date else '' }}</span>
+        </div>
+        <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold uppercase tracking-wider
+                     {{ badge_map.get(rec_lower, badge_map['pending']) }}
+                     {% if run.status == 'complete' %}rating-new{% endif %}">
+            {% if run.status == 'running' %}
+                <svg class="animate-spin -ml-0.5 mr-1 h-3 w-3" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                </svg>
+                Running
+            {% elif run.status == 'failed' %}
+                Failed
+            {% else %}
+                {{ rec }}
+            {% endif %}
+        </span>
+    </div>
+
+    <!-- Thesis -->
+    {% if run.one_line_thesis %}
+    <p class="text-xs text-slate-400 leading-relaxed line-clamp-2 mb-3">{{ run.one_line_thesis }}</p>
+    {% elif run.status == 'failed' %}
+    <p class="text-xs text-red-400/80 leading-relaxed line-clamp-2 mb-3">{{ run.error_message or 'Analysis failed. Check system status for details.' }}</p>
+    {% elif run.status == 'running' %}
+    <p class="text-xs text-slate-500 leading-relaxed mb-3">Analysis in progress...</p>
+    {% else %}
+    <p class="text-xs text-slate-600 leading-relaxed mb-3">Awaiting analysis.</p>
+    {% endif %}
+
+    <!-- Bottom row: Cost + Model -->
+    <div class="flex items-center justify-between text-xs text-slate-600">
+        <div class="flex items-center gap-2">
+            {% if run.total_cost_usd and run.total_cost_usd > 0 %}
+            <span class="font-mono">${{ "%.4f"|format(run.total_cost_usd) }}</span>
+            {% endif %}
+            {% if run.model_used %}
+            <span class="text-slate-700">&middot;</span>
+            <span>{{ run.model_used }}</span>
+            {% endif %}
+        </div>
+        <svg class="w-3.5 h-3.5 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+        </svg>
+    </div>
+</a>

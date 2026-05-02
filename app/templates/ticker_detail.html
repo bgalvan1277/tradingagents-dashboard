@@ -1,0 +1,275 @@
+{% extends "base.html" %}
+{% set active_page = 'dashboard' %}
+
+{% block title %}{{ ticker_symbol }} Analysis{% endblock %}
+{% block meta_description %}TradingAgents analysis for {{ ticker_symbol }}{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<div class="flex items-center gap-3 mb-6">
+    <a href="/" class="text-slate-500 hover:text-slate-300 transition-colors">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+    </a>
+    <div class="flex-1">
+        <div class="flex items-center gap-3">
+            <h1 class="text-lg font-semibold text-slate-200">{{ ticker_symbol }}</h1>
+            {% if run and run.final_recommendation %}
+            {% set rec = run.final_recommendation %}
+            {% set rec_lower = rec|lower %}
+            {% set badge_map = {
+                'buy': 'bg-rating-buy/15 text-rating-buy border-rating-buy/30',
+                'overweight': 'bg-green-300/15 text-green-300 border-green-300/30',
+                'hold': 'bg-rating-hold/15 text-rating-hold border-rating-hold/30',
+                'underweight': 'bg-orange-400/15 text-orange-400 border-orange-400/30',
+                'sell': 'bg-rating-sell/15 text-rating-sell border-rating-sell/30',
+            } %}
+            <span class="inline-flex items-center px-2.5 py-1 rounded-lg border text-xs font-semibold uppercase tracking-wider
+                         {{ badge_map.get(rec_lower, 'bg-slate-500/15 text-slate-400 border-slate-500/30') }}">
+                {{ rec }}
+            </span>
+            {% endif %}
+        </div>
+        {% if run %}
+        <p class="text-xs text-slate-500 mt-0.5">
+            {{ run.run_date.strftime('%B %d, %Y') }}
+            &middot; Run completed {{ run.run_timestamp.strftime('%I:%M %p') if run.run_timestamp else '' }}
+            {% if run.total_cost_usd and run.total_cost_usd > 0 %}
+            &middot; Cost: <span class="font-mono">${{ "%.4f"|format(run.total_cost_usd) }}</span>
+            {% endif %}
+        </p>
+        {% endif %}
+    </div>
+
+    <!-- On-demand re-run button -->
+    <button
+        hx-post="/api/run/{{ ticker_symbol }}"
+        hx-swap="none"
+        hx-indicator="#rerun-spinner"
+        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-700 border border-surface-600
+               text-slate-400 text-xs font-medium hover:bg-surface-600 hover:text-slate-300 transition-colors">
+        <span id="rerun-spinner" class="htmx-indicator">
+            <svg class="animate-spin h-3 w-3" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+            </svg>
+        </span>
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+        </svg>
+        Re-run
+    </button>
+</div>
+
+{% if not run or not details %}
+<div class="rounded-xl border border-surface-600/50 bg-surface-800/60 p-12 text-center">
+    <p class="text-sm text-slate-500">No analysis data available for {{ ticker_symbol }}.</p>
+    <p class="text-xs text-slate-600 mt-1">Run an analysis from the dashboard or wait for the daily cron.</p>
+</div>
+{% else %}
+
+<!-- One-line Thesis -->
+{% if run.one_line_thesis %}
+<div class="rounded-xl border border-surface-600/50 bg-surface-800/60 p-4 mb-4">
+    <p class="text-sm text-slate-300 leading-relaxed">{{ run.one_line_thesis }}</p>
+</div>
+{% endif %}
+
+<!-- Final Trade Decision (PM Output) -->
+{% if details.final_trade_decision %}
+<div class="rounded-xl border border-surface-600/50 bg-surface-800/60 mb-4">
+    <div class="p-4 border-b border-surface-600/30">
+        <h2 class="text-xs font-semibold text-slate-300 uppercase tracking-wider">Portfolio Manager Decision</h2>
+    </div>
+    <div class="p-4 report-content text-sm">
+        {{ details.final_trade_decision | replace('\n', '<br>') | safe }}
+    </div>
+</div>
+{% endif %}
+
+<!-- Bull/Bear Debate (default expanded) -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+    <!-- Bull Case -->
+    <div class="rounded-xl border border-green-500/20 bg-surface-800/60">
+        <button onclick="toggleSection('bull-case')" class="w-full p-4 flex items-center justify-between text-left border-b border-surface-600/30">
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-rating-buy"></span>
+                <h2 class="text-xs font-semibold text-slate-300 uppercase tracking-wider">Bull Case</h2>
+            </div>
+            <svg id="bull-case-icon" class="w-4 h-4 text-slate-500 transition-transform duration-200" style="transform: rotate(180deg)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+        </button>
+        <div id="bull-case" class="collapsible-content expanded">
+            <div class="p-4 report-content text-sm">
+                {{ (details.bull_case_text or 'No bull case available.') | replace('\n', '<br>') | safe }}
+            </div>
+        </div>
+    </div>
+
+    <!-- Bear Case -->
+    <div class="rounded-xl border border-red-500/20 bg-surface-800/60">
+        <button onclick="toggleSection('bear-case')" class="w-full p-4 flex items-center justify-between text-left border-b border-surface-600/30">
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-rating-sell"></span>
+                <h2 class="text-xs font-semibold text-slate-300 uppercase tracking-wider">Bear Case</h2>
+            </div>
+            <svg id="bear-case-icon" class="w-4 h-4 text-slate-500 transition-transform duration-200" style="transform: rotate(180deg)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+        </button>
+        <div id="bear-case" class="collapsible-content expanded">
+            <div class="p-4 report-content text-sm">
+                {{ (details.bear_case_text or 'No bear case available.') | replace('\n', '<br>') | safe }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Debate Judge Decision -->
+{% if details.debate_judge_decision %}
+<div class="rounded-xl border border-surface-600/50 bg-surface-800/60 mb-4">
+    <button onclick="toggleSection('judge-decision')" class="w-full p-4 flex items-center justify-between text-left border-b border-surface-600/30">
+        <h2 class="text-xs font-semibold text-slate-300 uppercase tracking-wider">Research Manager Verdict</h2>
+        <svg id="judge-decision-icon" class="w-4 h-4 text-slate-500 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+        </svg>
+    </button>
+    <div id="judge-decision" class="collapsible-content">
+        <div class="p-4 report-content text-sm">
+            {{ details.debate_judge_decision | replace('\n', '<br>') | safe }}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Analyst Reports (collapsed by default) -->
+{% set analyst_sections = [
+    ('market-report', 'Market / Technical Report', details.market_report),
+    ('sentiment-report', 'Sentiment Report', details.sentiment_report),
+    ('news-report', 'News Report', details.news_report),
+    ('fundamentals-report', 'Fundamentals Report', details.fundamentals_report),
+] %}
+
+{% for section_id, section_title, section_content in analyst_sections %}
+{% if section_content %}
+<div class="rounded-xl border border-surface-600/50 bg-surface-800/60 mb-4">
+    <button onclick="toggleSection('{{ section_id }}')" class="w-full p-4 flex items-center justify-between text-left border-b border-surface-600/30">
+        <h2 class="text-xs font-semibold text-slate-300 uppercase tracking-wider">{{ section_title }}</h2>
+        <svg id="{{ section_id }}-icon" class="w-4 h-4 text-slate-500 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+        </svg>
+    </button>
+    <div id="{{ section_id }}" class="collapsible-content">
+        <div class="p-4 report-content text-sm">
+            {{ section_content | replace('\n', '<br>') | safe }}
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endfor %}
+
+<!-- Risk Assessment (collapsed) -->
+{% if details.risk_judge_decision %}
+<div class="rounded-xl border border-surface-600/50 bg-surface-800/60 mb-4">
+    <button onclick="toggleSection('risk-assessment')" class="w-full p-4 flex items-center justify-between text-left border-b border-surface-600/30">
+        <h2 class="text-xs font-semibold text-slate-300 uppercase tracking-wider">Risk Assessment</h2>
+        <svg id="risk-assessment-icon" class="w-4 h-4 text-slate-500 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+        </svg>
+    </button>
+    <div id="risk-assessment" class="collapsible-content">
+        <div class="p-4 report-content text-sm">
+            <div class="mb-4">
+                <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Judge Decision</h3>
+                {{ details.risk_judge_decision | replace('\n', '<br>') | safe }}
+            </div>
+            {% if details.risk_aggressive %}
+            <div class="mb-4 border-t border-surface-600/30 pt-4">
+                <h3 class="text-xs font-semibold text-orange-400/80 uppercase tracking-wider mb-2">Aggressive View</h3>
+                {{ details.risk_aggressive | replace('\n', '<br>') | safe }}
+            </div>
+            {% endif %}
+            {% if details.risk_conservative %}
+            <div class="mb-4 border-t border-surface-600/30 pt-4">
+                <h3 class="text-xs font-semibold text-blue-400/80 uppercase tracking-wider mb-2">Conservative View</h3>
+                {{ details.risk_conservative | replace('\n', '<br>') | safe }}
+            </div>
+            {% endif %}
+            {% if details.risk_neutral %}
+            <div class="border-t border-surface-600/30 pt-4">
+                <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Neutral View</h3>
+                {{ details.risk_neutral | replace('\n', '<br>') | safe }}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Trader Investment Plan (collapsed) -->
+{% if details.trader_investment_plan %}
+<div class="rounded-xl border border-surface-600/50 bg-surface-800/60 mb-4">
+    <button onclick="toggleSection('trader-plan')" class="w-full p-4 flex items-center justify-between text-left border-b border-surface-600/30">
+        <h2 class="text-xs font-semibold text-slate-300 uppercase tracking-wider">Trader Investment Plan</h2>
+        <svg id="trader-plan-icon" class="w-4 h-4 text-slate-500 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+        </svg>
+    </button>
+    <div id="trader-plan" class="collapsible-content">
+        <div class="p-4 report-content text-sm">
+            {{ details.trader_investment_plan | replace('\n', '<br>') | safe }}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Past Runs History -->
+{% if past_runs and past_runs|length > 0 %}
+<div class="rounded-xl border border-surface-600/50 bg-surface-800/60 mt-8">
+    <div class="p-4 border-b border-surface-600/30">
+        <h2 class="text-xs font-semibold text-slate-300 uppercase tracking-wider">Past Analyses</h2>
+    </div>
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-surface-600/30">
+                    <th class="text-left px-4 py-2.5 text-xs font-medium text-slate-500 uppercase tracking-wider">Date</th>
+                    <th class="text-left px-4 py-2.5 text-xs font-medium text-slate-500 uppercase tracking-wider">Rating</th>
+                    <th class="text-left px-4 py-2.5 text-xs font-medium text-slate-500 uppercase tracking-wider">Thesis</th>
+                    <th class="text-right px-4 py-2.5 text-xs font-medium text-slate-500 uppercase tracking-wider">Cost</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for past in past_runs %}
+                <tr class="border-b border-surface-600/20 hover:bg-surface-700/30 transition-colors cursor-pointer"
+                    onclick="window.location.href='/ticker/{{ ticker_symbol }}?run_id={{ past.id }}'">
+                    <td class="px-4 py-2.5 text-slate-400 whitespace-nowrap">{{ past.run_date.strftime('%b %d, %Y') }}</td>
+                    <td class="px-4 py-2.5">
+                        {% set past_rec = (past.final_recommendation or 'N/A')|lower %}
+                        {% set text_map = {
+                            'buy': 'text-rating-buy',
+                            'overweight': 'text-green-300',
+                            'hold': 'text-rating-hold',
+                            'underweight': 'text-orange-400',
+                            'sell': 'text-rating-sell',
+                        } %}
+                        <span class="font-medium {{ text_map.get(past_rec, 'text-slate-500') }}">
+                            {{ past.final_recommendation or 'N/A' }}
+                        </span>
+                    </td>
+                    <td class="px-4 py-2.5 text-slate-500 max-w-md truncate">{{ past.one_line_thesis or '' }}</td>
+                    <td class="px-4 py-2.5 text-slate-600 font-mono text-right whitespace-nowrap">
+                        {% if past.total_cost_usd and past.total_cost_usd > 0 %}${{ "%.4f"|format(past.total_cost_usd) }}{% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
+{% endif %}
+{% endblock %}

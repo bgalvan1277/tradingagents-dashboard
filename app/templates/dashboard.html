@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% set active_page = 'dashboard' %}
+
+{% block title %}Dashboard{% endblock %}
+{% block meta_description %}TradingAgents daily analysis overview{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<div class="flex items-end justify-between mb-6">
+    <div>
+        <h1 class="text-lg font-semibold text-slate-200">Today's Analysis</h1>
+        <p class="text-xs text-slate-500 mt-0.5">{{ current_date }} &middot; {{ runs|length }} ticker{{ 's' if runs|length != 1 else '' }} on watchlist</p>
+    </div>
+    <div class="flex items-center gap-3">
+        {% if daily_cost is not none %}
+        <div class="text-xs text-slate-500">
+            Today: <span class="text-slate-400 font-mono">${{ "%.2f"|format(daily_cost) }}</span>
+            / <span class="font-mono">${{ "%.2f"|format(daily_cap) }}</span>
+        </div>
+        {% endif %}
+        <a href="/run"
+           class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-accent-blue/10 border border-accent-blue/20
+                  text-accent-blue text-xs font-medium hover:bg-accent-blue/20 transition-colors">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            New Run
+        </a>
+    </div>
+</div>
+
+<!-- Watchlist Groups -->
+{% if grouped_runs %}
+    {% for group_name, group_runs in grouped_runs.items() %}
+    <div class="mb-6">
+        <h2 class="text-xs font-medium text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-2">
+            <span class="w-1.5 h-1.5 rounded-full bg-accent-blue/60"></span>
+            {{ group_name }}
+        </h2>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+            {% for run in group_runs %}
+            {% include "partials/ticker_card.html" %}
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+
+{% elif runs %}
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+        {% for run in runs %}
+        {% include "partials/ticker_card.html" %}
+        {% endfor %}
+    </div>
+
+{% else %}
+    <!-- Empty state -->
+    <div class="flex flex-col items-center justify-center py-24 text-center">
+        <div class="w-16 h-16 rounded-2xl bg-surface-700 flex items-center justify-center mb-4">
+            <svg class="w-8 h-8 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+            </svg>
+        </div>
+        <h2 class="text-sm font-medium text-slate-400 mb-1">No analyses yet</h2>
+        <p class="text-xs text-slate-600 max-w-xs mb-4">
+            Add tickers to your watchlist and run your first analysis. The daily cron will handle the rest.
+        </p>
+        <div class="flex items-center gap-2">
+            <a href="/watchlist"
+               class="px-3 py-1.5 rounded-lg bg-surface-600 text-slate-300 text-xs font-medium hover:bg-surface-500 transition-colors">
+                Setup Watchlist
+            </a>
+            <a href="/run"
+               class="px-3 py-1.5 rounded-lg bg-accent-blue text-white text-xs font-medium hover:bg-blue-600 transition-colors">
+                Run Analysis
+            </a>
+        </div>
+    </div>
+{% endif %}
+{% endblock %}
