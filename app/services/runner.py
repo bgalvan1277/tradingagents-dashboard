@@ -67,6 +67,37 @@ def extract_one_line_thesis(final_decision: str) -> str:
     return final_decision[:300]
 
 
+def _to_str(val) -> str:
+    """Convert any value to a string suitable for a Text column.
+
+    TradingAgents returns lists-of-strings for debate histories,
+    dicts for some fields, and plain strings for others.
+    """
+    if val is None:
+        return ""
+    if isinstance(val, str):
+        return val
+    if isinstance(val, list):
+        return "\n\n".join(str(item) for item in val)
+    if isinstance(val, dict):
+        try:
+            return json.dumps(val, indent=2, default=str)
+        except (TypeError, ValueError):
+            return str(val)
+    return str(val)
+
+
+def _make_json_safe(obj):
+    """Recursively convert an object to JSON-safe primitives."""
+    if isinstance(obj, dict):
+        return {k: _make_json_safe(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [_make_json_safe(item) for item in obj]
+    if isinstance(obj, (str, int, float, bool, type(None))):
+        return obj
+    return str(obj)
+
+
 def extract_state_to_detail(state: dict) -> dict:
     """Extract all structured fields from a TradingAgents state dict.
 
@@ -76,6 +107,11 @@ def extract_state_to_detail(state: dict) -> dict:
     invest_debate = state.get("investment_debate_state", {})
     risk_debate = state.get("risk_debate_state", {})
 
+    if not isinstance(invest_debate, dict):
+        invest_debate = {}
+    if not isinstance(risk_debate, dict):
+        risk_debate = {}
+
     # Build a clean copy of state for audit (exclude messages, they're huge)
     audit_state = {}
     for key in [
@@ -84,37 +120,37 @@ def extract_state_to_detail(state: dict) -> dict:
         "investment_plan", "trader_investment_plan", "final_trade_decision",
     ]:
         if key in state:
-            audit_state[key] = state[key]
+            audit_state[key] = _to_str(state[key])
 
     # Include debate states as dicts
     if invest_debate:
         audit_state["investment_debate_state"] = {
-            k: v for k, v in invest_debate.items() if k != "count"
+            k: _to_str(v) for k, v in invest_debate.items() if k != "count"
         }
     if risk_debate:
         audit_state["risk_debate_state"] = {
-            k: v for k, v in risk_debate.items()
+            k: _to_str(v) for k, v in risk_debate.items()
             if k not in ("count", "latest_speaker")
         }
 
     return {
-        "market_report": state.get("market_report", ""),
-        "sentiment_report": state.get("sentiment_report", ""),
-        "news_report": state.get("news_report", ""),
-        "fundamentals_report": state.get("fundamentals_report", ""),
-        "bull_case_text": invest_debate.get("bull_history", ""),
-        "bear_case_text": invest_debate.get("bear_history", ""),
-        "debate_transcript": invest_debate.get("history", ""),
-        "debate_judge_decision": invest_debate.get("judge_decision", ""),
-        "risk_aggressive": risk_debate.get("aggressive_history", ""),
-        "risk_conservative": risk_debate.get("conservative_history", ""),
-        "risk_neutral": risk_debate.get("neutral_history", ""),
-        "risk_transcript": risk_debate.get("history", ""),
-        "risk_judge_decision": risk_debate.get("judge_decision", ""),
-        "investment_plan": state.get("investment_plan", ""),
-        "trader_investment_plan": state.get("trader_investment_plan", ""),
-        "final_trade_decision": state.get("final_trade_decision", ""),
-        "full_state_json": audit_state,
+        "market_report": _to_str(state.get("market_report", "")),
+        "sentiment_report": _to_str(state.get("sentiment_report", "")),
+        "news_report": _to_str(state.get("news_report", "")),
+        "fundamentals_report": _to_str(state.get("fundamentals_report", "")),
+        "bull_case_text": _to_str(invest_debate.get("bull_history", "")),
+        "bear_case_text": _to_str(invest_debate.get("bear_history", "")),
+        "debate_transcript": _to_str(invest_debate.get("history", "")),
+        "debate_judge_decision": _to_str(invest_debate.get("judge_decision", "")),
+        "risk_aggressive": _to_str(risk_debate.get("aggressive_history", "")),
+        "risk_conservative": _to_str(risk_debate.get("conservative_history", "")),
+        "risk_neutral": _to_str(risk_debate.get("neutral_history", "")),
+        "risk_transcript": _to_str(risk_debate.get("history", "")),
+        "risk_judge_decision": _to_str(risk_debate.get("judge_decision", "")),
+        "investment_plan": _to_str(state.get("investment_plan", "")),
+        "trader_investment_plan": _to_str(state.get("trader_investment_plan", "")),
+        "final_trade_decision": _to_str(state.get("final_trade_decision", "")),
+        "full_state_json": _make_json_safe(audit_state),
     }
 
 
@@ -144,22 +180,27 @@ async def save_run_results(
     cost_usd: Decimal = Decimal("0"),
 ) -> None:
     """Save a completed run's results to the database."""
-    # Update the run record
+    # Update the run record first
     run.status = "complete"
     run.final_recommendation = decision
     run.one_line_thesis = extract_one_line_thesis(
-        state.get("final_trade_decision", "")
+        _to_str(state.get("final_trade_decision", ""))
     )
     run.total_cost_usd = cost_usd
     run.model_used = settings.deep_think_model
-
-    # Extract and save detailed state
-    detail_fields = extract_state_to_detail(state)
-    detail = RunDetail(run_id=run.id, **detail_fields)
-    db.add(detail)
-
     await db.commit()
-    logger.info("Saved run %d for %s: %s", run.id, run.ticker_symbol, decision)
+    logger.info("Marked run %d for %s as complete: %s", run.id, run.ticker_symbol, decision)
+
+    # Now save the detailed state (separate commit so Run is always saved)
+    try:
+        detail_fields = extract_state_to_detail(state)
+        detail = RunDetail(run_id=run.id, **detail_fields)
+        db.add(detail)
+        await db.commit()
+        logger.info("Saved RunDetail for run %d", run.id)
+    except Exception as e:
+        logger.error("Failed to save RunDetail for run %d: %s", run.id, e)
+        await db.rollback()
 
 
 async def mark_run_failed(
