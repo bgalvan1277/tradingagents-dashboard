@@ -313,10 +313,42 @@ async def generate_trade_plan(ticker: str) -> dict:
         usage = data.get("usage", {})
         input_tokens = usage.get("prompt_tokens", 0)
         output_tokens = usage.get("completion_tokens", 0)
+
+        # Estimate cost using DeepSeek pricing
+        model = settings.quick_think_model
+        pricing = {
+            "deepseek-v4-flash": {"input": 0.07, "output": 0.14},
+            "deepseek-v4-pro": {"input": 0.14, "output": 0.28},
+            "deepseek-chat": {"input": 0.14, "output": 0.28},
+        }
+        rates = pricing.get(model, {"input": 0.50, "output": 1.50})
+        cost_usd = Decimal(str(round(
+            (input_tokens * rates["input"] + output_tokens * rates["output"]) / 1_000_000, 6
+        )))
+
         logger.info(
-            "Briefing LLM call for %s: %d in / %d out tokens",
-            ticker, input_tokens, output_tokens,
+            "Briefing LLM call for %s: %d in / %d out tokens / $%.6f",
+            ticker, input_tokens, output_tokens, float(cost_usd),
         )
+
+        # Log cost to database so it shows on System Status page
+        try:
+            from app.database import async_session as async_session_factory
+            from app.models import CostLog
+            async with async_session_factory() as db:
+                cost_entry = CostLog(
+                    run_id=None,  # Briefings aren't tied to a run
+                    provider="deepseek",
+                    model=model,
+                    input_tokens=input_tokens,
+                    output_tokens=output_tokens,
+                    cost_usd=cost_usd,
+                )
+                db.add(cost_entry)
+                await db.commit()
+                logger.info("Briefing cost logged: $%.6f", float(cost_usd))
+        except Exception as e:
+            logger.warning("Failed to log briefing cost: %s", e)
 
         # Parse the JSON response
         trade_plan = _parse_trade_plan(content, ticker)
@@ -324,6 +356,7 @@ async def generate_trade_plan(ticker: str) -> dict:
         trade_plan["generated_at"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         trade_plan["ticker"] = ticker.upper()
         trade_plan["tokens_used"] = input_tokens + output_tokens
+        trade_plan["cost_usd"] = float(cost_usd)
 
         return trade_plan
 

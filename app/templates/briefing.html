@@ -221,7 +221,7 @@
             <div style="text-align:right">
                 <div style="font-size:.65rem;color:#475569;text-transform:uppercase;letter-spacing:.08em">Risk/Reward</div>
                 <div style="font-size:1.3rem;font-weight:800;color:#22d3ee">{{ trade_plan.risk_reward }}</div>
-                {% if trade_plan.tokens_used %}<div style="font-size:.6rem;color:#374151;margin-top:4px">{{ trade_plan.tokens_used }} tokens</div>{% endif %}
+                {% if trade_plan.tokens_used %}<div style="font-size:.6rem;color:#374151;margin-top:4px">{{ trade_plan.tokens_used }} tokens{% if trade_plan.cost_usd %} / ${{ "%.4f"|format(trade_plan.cost_usd) }}{% endif %}</div>{% endif %}
             </div>
         </div>
     </div>
