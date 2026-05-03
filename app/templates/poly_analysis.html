@@ -6,34 +6,211 @@
 
 {% block content %}
 <style>
+.pa-hero{padding:.5rem 0 1.5rem}
+.pa-hero h1{font-size:1.5rem;font-weight:800;color:#f1f5f9;margin:0 0 .25rem;letter-spacing:-.02em}
+.pa-hero p{font-size:.82rem;color:#64748b;margin:0}
 .section-label{display:flex;align-items:center;gap:10px;margin:2rem 0 1rem;font-size:.72rem;font-weight:700;color:rgba(139,92,246,.9);text-transform:uppercase;letter-spacing:.12em}
 .section-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(139,92,246,.2),transparent)}
+.filter-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1.25rem}
+.filter-btn{padding:6px 14px;border-radius:8px;border:1px solid rgba(71,85,105,.25);background:rgba(15,23,42,.55);color:#94a3b8;font-size:.72rem;font-weight:600;cursor:pointer;transition:all .2s;text-transform:capitalize}
+.filter-btn:hover{border-color:rgba(139,92,246,.3);color:#c4b5fd}
+.filter-btn.active{background:rgba(139,92,246,.12);border-color:rgba(139,92,246,.3);color:#a78bfa}
+.search-box{flex:1;min-width:200px;padding:8px 14px;border-radius:10px;border:1px solid rgba(71,85,105,.25);background:rgba(15,23,42,.55);color:#e2e8f0;font-size:.78rem;outline:none;transition:border-color .2s}
+.search-box:focus{border-color:rgba(139,92,246,.4)}
+.search-box::placeholder{color:#475569}
+.market-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:1rem}
+.m-card{background:rgba(15,23,42,.55);backdrop-filter:blur(16px);border:1px solid rgba(71,85,105,.25);border-radius:18px;padding:22px;transition:all .25s;position:relative;display:flex;flex-direction:column}
+.m-card:hover{border-color:rgba(139,92,246,.25);box-shadow:0 0 30px rgba(139,92,246,.06);transform:translateY(-2px)}
+.m-question{font-size:.9rem;font-weight:600;color:#f1f5f9;line-height:1.45;margin:0 0 14px;flex:1}
+.m-odds{display:flex;gap:8px;margin-bottom:14px}
+.m-odds-bar{flex:1;height:32px;border-radius:8px;overflow:hidden;display:flex;position:relative}
+.m-yes-bar{background:rgba(34,197,94,.2);display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:#4ade80;transition:width .3s}
+.m-no-bar{background:rgba(239,68,68,.12);display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:#f87171;flex:1}
+.m-meta{display:flex;align-items:center;justify-content:space-between;gap:8px;padding-top:12px;border-top:1px solid rgba(71,85,105,.12)}
+.m-vol{font-size:.65rem;color:#475569;font-weight:500}
+.m-end{font-size:.62rem;color:#475569}
+.m-tags{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px}
+.m-tag{font-size:.55rem;padding:2px 7px;border-radius:4px;background:rgba(139,92,246,.08);color:#a78bfa;border:1px solid rgba(139,92,246,.1);font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.m-analyze{display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:8px;background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.25);color:#a78bfa;font-size:.7rem;font-weight:700;cursor:pointer;transition:all .2s;text-decoration:none}
+.m-analyze:hover{background:rgba(139,92,246,.2);border-color:rgba(139,92,246,.4);transform:scale(1.02)}
+.skeleton-card{background:rgba(15,23,42,.55);border:1px solid rgba(71,85,105,.15);border-radius:18px;padding:22px;min-height:180px}
+.skeleton-line{background:linear-gradient(90deg,rgba(71,85,105,.08) 25%,rgba(71,85,105,.15) 50%,rgba(71,85,105,.08) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:4px;margin-bottom:10px}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.no-results{text-align:center;padding:4rem 2rem;color:#475569;font-size:.85rem}
+.load-more{display:block;width:100%;padding:12px;margin-top:1.25rem;border-radius:12px;background:rgba(139,92,246,.06);border:1px solid rgba(139,92,246,.15);color:#a78bfa;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .2s;text-align:center}
+.load-more:hover{background:rgba(139,92,246,.12);border-color:rgba(139,92,246,.3)}
 </style>
 
-<p style="font-size:.7rem;font-weight:700;color:rgba(139,92,246,.7);text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px">Prediction Division</p>
-<div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:1.5rem">
-    <div>
-        <h1 style="font-size:1.5rem;font-weight:800;color:#f1f5f9;margin:0 0 .25rem;letter-spacing:-.02em">Poly Analysis</h1>
-        <p style="font-size:.82rem;color:#64748b;margin:0">Prediction market analysis powered by adversarial AI agents</p>
-    </div>
-    <div style="display:flex;gap:10px;flex-wrap:wrap">
-        <a href="/poly/agents" style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:10px;background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.2);color:#a78bfa;font-size:.78rem;font-weight:600;text-decoration:none;transition:all .2s">
-            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-            Meet the Agents
-        </a>
-        <a href="/poly/intelligence" style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:10px;background:rgba(71,85,105,.12);border:1px solid rgba(71,85,105,.25);color:#94a3b8;font-size:.78rem;font-weight:600;text-decoration:none;transition:all .2s">
-            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-            Intel Feeds
-        </a>
+<div class="pa-hero">
+    <p style="font-size:.7rem;font-weight:700;color:rgba(139,92,246,.7);text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px">Prediction Division</p>
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px">
+        <div>
+            <h1>Poly Analysis</h1>
+            <p>Browse live prediction markets, then run AI agent analysis to find edge</p>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <a href="/poly/agents" style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:10px;background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.2);color:#a78bfa;font-size:.78rem;font-weight:600;text-decoration:none;transition:all .2s">
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                Meet the Agents
+            </a>
+            <a href="/poly/intelligence" style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:10px;background:rgba(71,85,105,.12);border:1px solid rgba(71,85,105,.25);color:#94a3b8;font-size:.78rem;font-weight:600;text-decoration:none;transition:all .2s">
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                Intel Feeds
+            </a>
+        </div>
     </div>
 </div>
 
-<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6rem 2rem;text-align:center;background:rgba(15,23,42,.55);backdrop-filter:blur(16px);border:1px solid rgba(71,85,105,.25);border-radius:20px">
-    <div style="width:64px;height:64px;border-radius:18px;background:rgba(139,92,246,.08);display:flex;align-items:center;justify-content:center;margin-bottom:20px">
-        <svg width="28" height="28" fill="none" stroke="#a78bfa" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-    </div>
-    <h2 style="font-size:1rem;font-weight:700;color:#e2e8f0;margin:0 0 6px">Polymarket Integration Coming Soon</h2>
-    <p style="font-size:.82rem;color:#64748b;max-width:400px;margin:0 0 20px;line-height:1.6">Live prediction markets from Polymarket's CLOB API will populate here. Track active markets, AI probability assessments, and edge calculations.</p>
-    <a href="/poly/agents" style="padding:8px 18px;border-radius:10px;background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.2);color:#a78bfa;font-size:.78rem;font-weight:600;text-decoration:none">Meet the Poly Agents</a>
+<!-- Search + Filters -->
+<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:6px">
+    <input type="text" class="search-box" id="market-search" placeholder="Search markets... e.g. Bitcoin, Trump, Fed, Olympics">
+    <select id="sort-select" style="padding:8px 12px;border-radius:10px;border:1px solid rgba(71,85,105,.25);background:rgba(15,23,42,.55);color:#e2e8f0;font-size:.72rem;outline:none;cursor:pointer">
+        <option value="volume">Highest Volume</option>
+        <option value="liquidity">Most Liquid</option>
+        <option value="startDate">Newest First</option>
+        <option value="endDate">Ending Soon</option>
+    </select>
 </div>
+<div class="filter-bar" id="filter-bar">
+    <button class="filter-btn active" data-filter="all">All Markets</button>
+    <button class="filter-btn" data-filter="politics">Politics</button>
+    <button class="filter-btn" data-filter="crypto">Crypto</button>
+    <button class="filter-btn" data-filter="sports">Sports</button>
+    <button class="filter-btn" data-filter="business">Business</button>
+    <button class="filter-btn" data-filter="science">Science</button>
+    <button class="filter-btn" data-filter="culture">Culture</button>
+</div>
+
+<!-- Market Cards -->
+<div class="market-grid" id="market-grid">
+    <div class="skeleton-card"><div class="skeleton-line" style="width:80%;height:16px"></div><div class="skeleton-line" style="width:60%;height:12px"></div><div class="skeleton-line" style="width:100%;height:32px;margin-top:16px"></div></div>
+    <div class="skeleton-card"><div class="skeleton-line" style="width:70%;height:16px"></div><div class="skeleton-line" style="width:50%;height:12px"></div><div class="skeleton-line" style="width:100%;height:32px;margin-top:16px"></div></div>
+    <div class="skeleton-card"><div class="skeleton-line" style="width:85%;height:16px"></div><div class="skeleton-line" style="width:65%;height:12px"></div><div class="skeleton-line" style="width:100%;height:32px;margin-top:16px"></div></div>
+    <div class="skeleton-card"><div class="skeleton-line" style="width:75%;height:16px"></div><div class="skeleton-line" style="width:55%;height:12px"></div><div class="skeleton-line" style="width:100%;height:32px;margin-top:16px"></div></div>
+    <div class="skeleton-card"><div class="skeleton-line" style="width:90%;height:16px"></div><div class="skeleton-line" style="width:45%;height:12px"></div><div class="skeleton-line" style="width:100%;height:32px;margin-top:16px"></div></div>
+    <div class="skeleton-card"><div class="skeleton-line" style="width:65%;height:16px"></div><div class="skeleton-line" style="width:70%;height:12px"></div><div class="skeleton-line" style="width:100%;height:32px;margin-top:16px"></div></div>
+</div>
+<button class="load-more" id="load-more" style="display:none" onclick="loadMore()">Load More Markets</button>
+
+<script>
+const API='/api/polymarket';
+let allMarkets=[];
+let currentFilter='all';
+let currentPage=0;
+const PAGE_SIZE=12;
+
+function fmtVol(n){
+    if(!n)return'$0';n=parseFloat(n);
+    if(n>=1e6)return'$'+(n/1e6).toFixed(1)+'M';
+    if(n>=1e3)return'$'+(n/1e3).toFixed(0)+'K';
+    return'$'+Math.round(n);
+}
+
+function fmtDate(d){
+    if(!d)return'No end date';
+    return new Date(d).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+}
+
+function renderCard(m){
+    const prices=m.outcomePrices?JSON.parse(m.outcomePrices):[];
+    const yesPct=prices[0]?(parseFloat(prices[0])*100).toFixed(0):50;
+    const noPct=prices[0]?(100-parseFloat(prices[0])*100).toFixed(0):50;
+    const tags=(m.tags||[]).slice(0,3);
+    const slug=m.slug||m.id||'';
+
+    return`<div class="m-card" data-tags="${(m.tags||[]).join(',').toLowerCase()}" data-question="${(m.question||'').toLowerCase()}">
+        ${tags.length?'<div class="m-tags">'+tags.map(t=>'<span class="m-tag">'+t+'</span>').join('')+'</div>':''}
+        <div class="m-question">${m.question||'Untitled Market'}</div>
+        <div class="m-odds">
+            <div class="m-odds-bar">
+                <div class="m-yes-bar" style="width:${yesPct}%">YES ${yesPct}¢</div>
+                <div class="m-no-bar">NO ${noPct}¢</div>
+            </div>
+        </div>
+        <div class="m-meta">
+            <div>
+                <span class="m-vol">Vol: ${fmtVol(m.volume)}</span>
+                <span class="m-end" style="margin-left:10px">Ends: ${fmtDate(m.endDate)}</span>
+            </div>
+            <a href="https://polymarket.com/event/${slug}" target="_blank" rel="noopener" class="m-analyze" title="View on Polymarket">
+                <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                View
+            </a>
+        </div>
+    </div>`;
+}
+
+function displayMarkets(markets){
+    const grid=document.getElementById('market-grid');
+    if(!markets.length){
+        grid.innerHTML='<div class="no-results" style="grid-column:1/-1">No markets match your filters</div>';
+        document.getElementById('load-more').style.display='none';
+        return;
+    }
+    const page=markets.slice(0,PAGE_SIZE*(currentPage+1));
+    grid.innerHTML=page.map(m=>renderCard(m)).join('');
+    document.getElementById('load-more').style.display=page.length<markets.length?'block':'none';
+}
+
+function getFiltered(){
+    let filtered=allMarkets;
+    if(currentFilter!=='all'){
+        filtered=filtered.filter(m=>{
+            const tags=(m.tags||[]).map(t=>t.toLowerCase());
+            return tags.some(t=>t.includes(currentFilter));
+        });
+    }
+    const q=document.getElementById('market-search').value.toLowerCase().trim();
+    if(q){
+        filtered=filtered.filter(m=>(m.question||'').toLowerCase().includes(q));
+    }
+    return filtered;
+}
+
+function applyFilters(){
+    currentPage=0;
+    displayMarkets(getFiltered());
+}
+
+function loadMore(){
+    currentPage++;
+    displayMarkets(getFiltered());
+}
+
+// Filter buttons
+document.getElementById('filter-bar').addEventListener('click',e=>{
+    if(!e.target.classList.contains('filter-btn'))return;
+    document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+    e.target.classList.add('active');
+    currentFilter=e.target.dataset.filter;
+    applyFilters();
+});
+
+// Search
+let searchTimeout;
+document.getElementById('market-search').addEventListener('input',()=>{
+    clearTimeout(searchTimeout);
+    searchTimeout=setTimeout(applyFilters,300);
+});
+
+// Sort change
+document.getElementById('sort-select').addEventListener('change',()=>{fetchMarkets();});
+
+function fetchMarkets(){
+    const sort=document.getElementById('sort-select').value;
+    const asc=sort==='endDate'?'true':'false';
+    fetch(`${API}/markets?limit=50&active=true&closed=false&order=${sort}&ascending=${asc}`)
+        .then(r=>r.json())
+        .then(markets=>{
+            if(markets.error){throw new Error(markets.error);}
+            allMarkets=markets;
+            applyFilters();
+        })
+        .catch(()=>{
+            document.getElementById('market-grid').innerHTML='<div class="no-results" style="grid-column:1/-1"><p style="color:#f87171">Failed to load Polymarket data.</p><p style="font-size:.75rem;margin-top:8px">The Polymarket API may be temporarily unavailable.</p></div>';
+        });
+}
+
+fetchMarkets();
+</script>
 {% endblock %}
