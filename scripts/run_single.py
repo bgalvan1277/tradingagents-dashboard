@@ -56,13 +56,19 @@ async def run_single(ticker_symbol: str, trade_date: str = None):
         try:
             # Run the TradingAgents analysis (this takes 2-5 minutes)
             logger.info("Calling TradingAgents for %s... (this takes a few minutes)", ticker_symbol)
-            state, decision = run_analysis_sync(ticker_symbol, trade_date)
+            state, decision, usage = run_analysis_sync(ticker_symbol, trade_date)
 
-            await save_run_results(db, run, state, decision)
+            await save_run_results(db, run, state, decision, usage=usage)
 
             elapsed = round(time.time() - start_time, 1)
             logger.info("Analysis complete for %s in %.1fs", ticker_symbol, elapsed)
             logger.info("Decision: %s", decision)
+            if usage.get("total_tokens"):
+                logger.info(
+                    "Tokens: %d in / %d out / $%.6f",
+                    usage["input_tokens"], usage["output_tokens"],
+                    float(usage.get("cost_usd", 0)),
+                )
 
         except Exception as e:
             error_msg = str(e)

@@ -109,9 +109,10 @@ async def run_daily():
             try:
                 # Run analysis (this is the slow part, 2-5 minutes per ticker)
                 trade_date_str = today.strftime("%Y-%m-%d")
-                state, decision = run_analysis_sync(ticker.symbol, trade_date_str)
+                state, decision, usage = run_analysis_sync(ticker.symbol, trade_date_str)
 
-                await save_run_results(db, run, state, decision)
+                await save_run_results(db, run, state, decision, usage=usage)
+                total_cost += usage.get("cost_usd", Decimal("0"))
                 succeeded += 1
                 logger.info("Completed %s: %s", ticker.symbol, decision)
 
