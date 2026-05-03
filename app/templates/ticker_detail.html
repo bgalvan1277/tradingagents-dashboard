@@ -92,33 +92,35 @@
             <p style="font-size:.72rem;color:#475569;margin-top:3px">
                 {% if quote.market_state == 'REGULAR' %}Market Open{% elif quote.market_state == 'CLOSED' or quote.market_state == 'POST' %}Market Closed{% else %}{{ quote.market_state }}{% endif %}
             </p>
-            {% if run %}
-            <div style="display:flex;align-items:center;gap:16px;margin-top:10px;flex-wrap:wrap">
-                {% if run_cost %}
-                <div style="background:rgba(6,182,212,.05);border:1px solid rgba(6,182,212,.12);border-radius:10px;padding:6px 14px;display:inline-flex;align-items:center;gap:8px">
-                    <svg width="13" height="13" fill="none" stroke="#22d3ee" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-                    <span style="font-size:.7rem;color:#94a3b8;font-family:'JetBrains Mono',monospace">{{ "{:,}".format(run_cost.total_tokens) }} tokens</span>
-                    <span style="font-size:.7rem;color:#64748b">|</span>
-                    <span style="font-size:.7rem;color:#22d3ee;font-weight:600;font-family:'JetBrains Mono',monospace">${{ "%.4f"|format(run_cost.cost_usd) }}</span>
-                </div>
-                {% elif run.total_cost_usd and run.total_cost_usd > 0 %}
-                <div style="background:rgba(6,182,212,.05);border:1px solid rgba(6,182,212,.12);border-radius:10px;padding:6px 14px;display:inline-flex;align-items:center;gap:8px">
-                    <svg width="13" height="13" fill="none" stroke="#22d3ee" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    <span style="font-size:.7rem;color:#22d3ee;font-weight:600;font-family:'JetBrains Mono',monospace">${{ "%.4f"|format(run.total_cost_usd) }}</span>
-                </div>
-                {% endif %}
-                <div style="display:inline-flex;align-items:center;gap:6px">
-                    <svg width="12" height="12" fill="none" stroke="#475569" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    <span style="font-size:.7rem;color:#64748b">Last analysis run on: <span style="color:#94a3b8;font-weight:600">{{ run.run_date.strftime('%b %d, %Y') }}{% if run.run_timestamp %} at {{ run.run_timestamp.strftime('%I:%M %p') }}{% endif %}</span></span>
-                </div>
-            </div>
-            {% endif %}
             {% endif %}
         </div>
-        <button hx-post="/api/run/{{ ticker_symbol }}" hx-swap="none" class="rerun-btn">
-            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-            Re-run
-        </button>
+        <!-- Right side: cost + run info + re-run button -->
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+            {% if run %}
+            <!-- Compute Cost -->
+            <div style="background:rgba(6,182,212,.05);border:1px solid rgba(6,182,212,.12);border-radius:10px;padding:6px 14px;display:inline-flex;align-items:center;gap:8px">
+                <svg width="13" height="13" fill="none" stroke="#22d3ee" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                {% if run_cost %}
+                <span style="font-size:.7rem;color:#94a3b8;font-family:'JetBrains Mono',monospace">{{ "{:,}".format(run_cost.total_tokens) }} tokens</span>
+                <span style="font-size:.7rem;color:#334155">|</span>
+                <span style="font-size:.7rem;color:#22d3ee;font-weight:600;font-family:'JetBrains Mono',monospace">${{ "%.4f"|format(run_cost.cost_usd) }}</span>
+                {% elif run.total_cost_usd and run.total_cost_usd > 0 %}
+                <span style="font-size:.7rem;color:#22d3ee;font-weight:600;font-family:'JetBrains Mono',monospace">${{ "%.4f"|format(run.total_cost_usd) }}</span>
+                {% else %}
+                <span style="font-size:.7rem;color:#475569;font-family:'JetBrains Mono',monospace">Cost not tracked</span>
+                {% endif %}
+            </div>
+            <!-- Last Run Date -->
+            <div style="display:inline-flex;align-items:center;gap:6px">
+                <svg width="12" height="12" fill="none" stroke="#475569" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span style="font-size:.7rem;color:#64748b">Last analysis run on: <span style="color:#94a3b8;font-weight:600">{{ run.run_date.strftime('%b %d, %Y') }}{% if run.run_timestamp %} at {{ run.run_timestamp.strftime('%I:%M %p') }}{% endif %}</span></span>
+            </div>
+            {% endif %}
+            <button hx-post="/api/run/{{ ticker_symbol }}" hx-swap="none" class="rerun-btn">
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                Re-run
+            </button>
+        </div>
     </div>
 
 </div>
