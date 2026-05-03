@@ -1,0 +1,369 @@
+{% extends "base.html" %}
+{% set active_page = 'briefing' %}
+{% block title %}Day Trade Briefing{% endblock %}
+{% block meta_description %}Day trade screener and briefing generator{% endblock %}
+
+{% block content %}
+<style>
+.bf-hero{padding:1.5rem 0 1.5rem}
+.bf-hero h1{font-size:1.8rem;font-weight:800;color:#f1f5f9;margin:0 0 .35rem;letter-spacing:-.02em}
+.bf-hero p{font-size:.88rem;color:#64748b;max-width:600px;line-height:1.6;margin:0}
+.bf-section{margin-top:2rem}
+.bf-label{display:flex;align-items:center;gap:10px;margin:0 0 1rem;font-size:.72rem;font-weight:700;color:rgba(6,182,212,.9);text-transform:uppercase;letter-spacing:.12em}
+.bf-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(6,182,212,.2),transparent)}
+.bf-card{background:rgba(15,23,42,.55);backdrop-filter:blur(16px);border:1px solid rgba(71,85,105,.25);border-radius:20px;padding:28px;transition:all .25s}
+.bf-form{display:flex;gap:12px;align-items:end;flex-wrap:wrap}
+.bf-input{background:rgba(15,23,42,.8);border:1px solid rgba(71,85,105,.35);border-radius:12px;padding:12px 16px;color:#f1f5f9;font-size:.9rem;font-family:inherit;outline:none;min-width:200px;transition:border-color .2s}
+.bf-input:focus{border-color:rgba(6,182,212,.5)}
+.bf-input::placeholder{color:#475569}
+.bf-btn{background:linear-gradient(135deg,#06b6d4,#3b82f6);color:#fff;border:none;border-radius:12px;padding:12px 24px;font-size:.85rem;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap}
+.bf-btn:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(6,182,212,.3)}
+.bf-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.bf-btn-secondary{background:rgba(71,85,105,.3);border:1px solid rgba(71,85,105,.4)}
+.bf-btn-secondary:hover{background:rgba(71,85,105,.5);box-shadow:none}
+/* Screener table */
+.sc-table{width:100%;border-collapse:separate;border-spacing:0}
+.sc-table th{font-size:.65rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.1em;padding:10px 12px;text-align:left;border-bottom:1px solid rgba(71,85,105,.25)}
+.sc-table td{padding:12px;font-size:.85rem;color:#cbd5e1;border-bottom:1px solid rgba(71,85,105,.12)}
+.sc-table tr:hover td{background:rgba(6,182,212,.03)}
+.sc-score{display:inline-flex;align-items:center;justify-content:center;width:42px;height:28px;border-radius:8px;font-size:.78rem;font-weight:700}
+.sc-score-high{background:rgba(34,197,94,.12);color:#4ade80;border:1px solid rgba(34,197,94,.2)}
+.sc-score-mid{background:rgba(251,191,36,.1);color:#fbbf24;border:1px solid rgba(251,191,36,.15)}
+.sc-score-low{background:rgba(239,68,68,.1);color:#f87171;border:1px solid rgba(239,68,68,.15)}
+.sc-bias{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:3px 8px;border-radius:6px}
+.sc-bias-long{background:rgba(34,197,94,.1);color:#4ade80}
+.sc-bias-short{background:rgba(239,68,68,.1);color:#f87171}
+.sc-bias-neutral{background:rgba(251,191,36,.08);color:#fbbf24}
+.sc-signals{display:flex;flex-wrap:wrap;gap:4px}
+.sc-signal{font-size:.68rem;background:rgba(71,85,105,.2);color:#94a3b8;padding:2px 7px;border-radius:5px;white-space:nowrap}
+.sc-action{font-size:.75rem;color:#22d3ee;text-decoration:none;font-weight:600;white-space:nowrap}
+.sc-action:hover{text-decoration:underline}
+/* Trade Plan */
+.tp-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
+@media(max-width:900px){.tp-grid{grid-template-columns:1fr}}
+.tp-direction{display:inline-flex;align-items:center;gap:8px;font-size:1.4rem;font-weight:800;letter-spacing:-.01em}
+.tp-direction.long{color:#4ade80}
+.tp-direction.short{color:#f87171}
+.tp-direction.no-trade{color:#fbbf24}
+.tp-conf{display:flex;align-items:center;gap:10px;margin-top:8px}
+.tp-conf-bar{flex:1;max-width:200px;height:6px;background:rgba(71,85,105,.3);border-radius:3px;overflow:hidden}
+.tp-conf-fill{height:100%;border-radius:3px;transition:width .5s}
+.tp-thesis{font-size:.92rem;color:#cbd5e1;line-height:1.7;margin:16px 0 0;font-style:italic}
+.tp-levels{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-top:12px}
+.tp-level{background:rgba(15,23,42,.6);border:1px solid rgba(71,85,105,.2);border-radius:14px;padding:16px;text-align:center}
+.tp-level-label{font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#64748b;margin-bottom:4px}
+.tp-level-price{font-size:1.15rem;font-weight:700;color:#f1f5f9}
+.tp-level-pct{font-size:.72rem;font-weight:600;margin-top:2px}
+.tp-level-entry{border-color:rgba(6,182,212,.25)}
+.tp-level-stop{border-color:rgba(239,68,68,.25)}
+.tp-level-t1{border-color:rgba(34,197,94,.2)}
+.tp-level-t2{border-color:rgba(34,197,94,.25)}
+.tp-level-t3{border-color:rgba(34,197,94,.3)}
+.tp-list{list-style:none;padding:0;margin:8px 0 0}
+.tp-list li{position:relative;padding:6px 0 6px 18px;font-size:.82rem;color:#94a3b8;line-height:1.5}
+.tp-list li::before{content:'';position:absolute;left:0;top:12px;width:6px;height:6px;border-radius:50%}
+.tp-list.catalysts li::before{background:#22d3ee}
+.tp-list.warnings li::before{background:#f87171}
+.tp-strat{background:rgba(6,182,212,.04);border:1px solid rgba(6,182,212,.12);border-radius:14px;padding:20px;margin-top:12px}
+.tp-strat p{font-size:.88rem;color:#cbd5e1;line-height:1.75;margin:0}
+.tp-strat-label{font-size:.65rem;font-weight:700;color:rgba(6,182,212,.7);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px}
+.tp-key-levels{display:flex;gap:16px;flex-wrap:wrap;margin-top:8px}
+.tp-key-levels span{font-size:.82rem;color:#94a3b8}
+.tp-key-levels .price{color:#f1f5f9;font-weight:600;font-family:'JetBrains Mono',monospace}
+.tp-raw{margin-top:1rem}
+.tp-raw-toggle{background:none;border:1px solid rgba(71,85,105,.25);border-radius:10px;padding:8px 16px;color:#64748b;font-size:.78rem;cursor:pointer;transition:all .15s}
+.tp-raw-toggle:hover{border-color:rgba(6,182,212,.3);color:#94a3b8}
+.tp-raw-content{display:none;margin-top:12px;background:rgba(10,14,23,.6);border:1px solid rgba(71,85,105,.2);border-radius:14px;padding:20px;max-height:500px;overflow-y:auto}
+.tp-raw-content.show{display:block}
+.tp-raw-content pre{font-size:.75rem;color:#94a3b8;white-space:pre-wrap;word-break:break-word;font-family:'JetBrains Mono',monospace;line-height:1.6;margin:0}
+.tp-actions{display:flex;gap:10px;margin-top:1.5rem;flex-wrap:wrap}
+.tp-actions a{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;border-radius:12px;font-size:.82rem;font-weight:600;text-decoration:none;transition:all .2s}
+.tp-actions .act-run{background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.2);color:#60a5fa}
+.tp-actions .act-run:hover{background:rgba(59,130,246,.15)}
+.tp-actions .act-sim{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);color:#4ade80}
+.tp-actions .act-sim:hover{background:rgba(34,197,94,.15)}
+.loading-spinner{display:inline-block;width:18px;height:18px;border:2px solid rgba(6,182,212,.2);border-top-color:#22d3ee;border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+
+<div class="bf-hero">
+    <p style="font-size:.7rem;font-weight:700;color:rgba(6,182,212,.7);text-transform:uppercase;letter-spacing:.12em;margin-bottom:10px">Day Trader</p>
+    <h1>Day Trade Briefing</h1>
+    <p>Scan for opportunities, then generate an actionable trade plan with specific entry points, stop losses, and targets. Powered by Col. Wolfe intelligence + DeepSeek AI.</p>
+</div>
+
+<!-- ══════ TICKER INPUT + SCREENER ══════ -->
+<div class="bf-card">
+    <div style="display:flex;gap:2rem;flex-wrap:wrap">
+        <!-- Single Ticker Briefing -->
+        <div style="flex:1;min-width:280px">
+            <div class="bf-label" style="margin-top:0">Generate Trade Plan</div>
+            <form method="POST" action="/briefing" class="bf-form" id="briefingForm">
+                <div style="flex:1">
+                    <input type="text" name="ticker" class="bf-input" style="width:100%" placeholder="Enter ticker (e.g. NVDA)" value="{{ selected_ticker or '' }}" required autocomplete="off" id="tickerInput">
+                </div>
+                <button type="submit" class="bf-btn" id="briefingBtn">
+                    <span id="btnText">Generate Briefing</span>
+                </button>
+            </form>
+            {% if watchlist %}
+            <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:12px">
+                <span style="font-size:.68rem;color:#475569;padding-top:4px">Quick:</span>
+                {% for t in watchlist %}
+                <button onclick="document.getElementById('tickerInput').value='{{ t.symbol }}'" style="background:rgba(71,85,105,.2);border:1px solid rgba(71,85,105,.3);border-radius:8px;padding:4px 10px;color:#94a3b8;font-size:.72rem;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='rgba(6,182,212,.3)'" onmouseout="this.style.borderColor='rgba(71,85,105,.3)'">{{ t.symbol }}</button>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+        <!-- Screener -->
+        <div style="flex:1;min-width:280px">
+            <div class="bf-label" style="margin-top:0">Scan for Opportunities</div>
+            <form method="POST" action="/briefing/screen" class="bf-form">
+                <div style="flex:1">
+                    <input type="text" name="tickers" class="bf-input" style="width:100%" placeholder="NVDA TSLA AMD... (or leave blank for all)">
+                </div>
+                <button type="submit" class="bf-btn bf-btn-secondary">Run Screener</button>
+            </form>
+            <p style="font-size:.68rem;color:#475569;margin-top:8px">Scans your watchlist + popular day-trade tickers. No AI cost, just technical scoring.</p>
+        </div>
+    </div>
+</div>
+
+<!-- ══════ SCREENER RESULTS ══════ -->
+{% if screener_results is defined and screener_results %}
+<div class="bf-section">
+    <div class="bf-label">Screener Results — {{ screener_count }} Tickers Scored</div>
+    <div class="bf-card" style="padding:0;overflow:hidden">
+        <div style="overflow-x:auto">
+        <table class="sc-table">
+            <thead>
+                <tr>
+                    <th>Score</th>
+                    <th>Ticker</th>
+                    <th>Price</th>
+                    <th>Bias</th>
+                    <th>RSI</th>
+                    <th>ATR%</th>
+                    <th>Vol</th>
+                    <th>Signals</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for t in screener_results %}
+                <tr>
+                    <td>
+                        <span class="sc-score {% if t.score >= 70 %}sc-score-high{% elif t.score >= 45 %}sc-score-mid{% else %}sc-score-low{% endif %}">{{ t.score }}</span>
+                    </td>
+                    <td>
+                        <div style="font-weight:700;color:#f1f5f9">{{ t.symbol }}</div>
+                        <div style="font-size:.68rem;color:#64748b">{{ t.name[:25] }}</div>
+                    </td>
+                    <td style="font-family:'JetBrains Mono',monospace;font-weight:600">${{ "%.2f"|format(t.price) }}</td>
+                    <td><span class="sc-bias sc-bias-{{ t.bias|lower }}">{{ t.bias }}</span></td>
+                    <td style="font-family:'JetBrains Mono',monospace">{{ t.rsi }}</td>
+                    <td style="font-family:'JetBrains Mono',monospace">{{ t.atr_pct }}%</td>
+                    <td style="font-family:'JetBrains Mono',monospace">{{ t.vol_ratio }}x</td>
+                    <td>
+                        <div class="sc-signals">
+                            {% for sig in t.signals[:3] %}
+                            <span class="sc-signal">{{ sig }}</span>
+                            {% endfor %}
+                        </div>
+                    </td>
+                    <td>
+                        <form method="POST" action="/briefing" style="display:inline">
+                            <input type="hidden" name="ticker" value="{{ t.symbol }}">
+                            <button type="submit" class="sc-action" style="background:none;border:none;cursor:pointer;font-family:inherit">Get Plan →</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- ══════ TRADE PLAN RESULTS ══════ -->
+{% if trade_plan is defined and trade_plan %}
+<div class="bf-section" id="tradePlan">
+    {% if trade_plan.error %}
+    <!-- Error State -->
+    <div class="bf-card" style="border-color:rgba(239,68,68,.2)">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+            <svg width="20" height="20" fill="none" stroke="#f87171" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
+            <span style="color:#f87171;font-weight:600">{{ trade_plan.error }}</span>
+        </div>
+        {% if trade_plan.raw_response %}<pre style="font-size:.75rem;color:#64748b;white-space:pre-wrap">{{ trade_plan.raw_response }}</pre>{% endif %}
+    </div>
+    {% else %}
+    <!-- Trade Plan Header -->
+    <div class="bf-label">Trade Plan — {{ trade_plan.ticker }} — {{ trade_plan.generated_at }}</div>
+
+    <div class="bf-card" style="margin-bottom:1.25rem">
+        <div style="display:flex;justify-content:space-between;align-items:start;flex-wrap:wrap;gap:16px">
+            <div>
+                <span class="tp-direction {% if trade_plan.direction == 'LONG' %}long{% elif trade_plan.direction == 'SHORT' %}short{% else %}no-trade{% endif %}">
+                    {% if trade_plan.direction == 'LONG' %}▲{% elif trade_plan.direction == 'SHORT' %}▼{% else %}—{% endif %}
+                    {{ trade_plan.direction }}
+                </span>
+                <div class="tp-conf">
+                    <span style="font-size:.75rem;color:#64748b">Confidence:</span>
+                    <div class="tp-conf-bar">
+                        <div class="tp-conf-fill" style="width:{{ trade_plan.confidence }}%;background:{% if trade_plan.confidence >= 70 %}#4ade80{% elif trade_plan.confidence >= 40 %}#fbbf24{% else %}#f87171{% endif %}"></div>
+                    </div>
+                    <span style="font-size:.85rem;font-weight:700;color:#f1f5f9">{{ trade_plan.confidence }}%</span>
+                </div>
+                <div class="tp-thesis">"{{ trade_plan.thesis }}"</div>
+            </div>
+            <div style="text-align:right">
+                <div style="font-size:.65rem;color:#475569;text-transform:uppercase;letter-spacing:.08em">Risk/Reward</div>
+                <div style="font-size:1.3rem;font-weight:800;color:#22d3ee">{{ trade_plan.risk_reward }}</div>
+                {% if trade_plan.tokens_used %}<div style="font-size:.6rem;color:#374151;margin-top:4px">{{ trade_plan.tokens_used }} tokens</div>{% endif %}
+            </div>
+        </div>
+    </div>
+
+    {% if trade_plan.direction != 'NO TRADE' %}
+    <!-- Price Levels -->
+    <div class="tp-levels">
+        <div class="tp-level tp-level-entry">
+            <div class="tp-level-label">Entry Zone</div>
+            <div class="tp-level-price">${{ "%.2f"|format(trade_plan.entry_low) }} — ${{ "%.2f"|format(trade_plan.entry_high) }}</div>
+        </div>
+        <div class="tp-level tp-level-stop">
+            <div class="tp-level-label">Stop Loss</div>
+            <div class="tp-level-price">${{ "%.2f"|format(trade_plan.stop_loss) }}</div>
+            <div class="tp-level-pct" style="color:#f87171">{{ "%.1f"|format(trade_plan.stop_loss_pct) }}%</div>
+        </div>
+        <div class="tp-level tp-level-t1">
+            <div class="tp-level-label">Target 1</div>
+            <div class="tp-level-price">${{ "%.2f"|format(trade_plan.target_1) }}</div>
+            <div class="tp-level-pct" style="color:#4ade80">+{{ "%.1f"|format(trade_plan.target_1_pct) }}%</div>
+        </div>
+        <div class="tp-level tp-level-t2">
+            <div class="tp-level-label">Target 2</div>
+            <div class="tp-level-price">${{ "%.2f"|format(trade_plan.target_2) }}</div>
+            <div class="tp-level-pct" style="color:#4ade80">+{{ "%.1f"|format(trade_plan.target_2_pct) }}%</div>
+        </div>
+        <div class="tp-level tp-level-t3">
+            <div class="tp-level-label">Target 3</div>
+            <div class="tp-level-price">${{ "%.2f"|format(trade_plan.target_3) }}</div>
+            <div class="tp-level-pct" style="color:#4ade80">+{{ "%.1f"|format(trade_plan.target_3_pct) }}%</div>
+        </div>
+    </div>
+
+    <!-- Position Sizing -->
+    {% if trade_plan.position_size_shares %}
+    <div style="display:flex;gap:16px;margin-top:1rem;flex-wrap:wrap">
+        <div style="background:rgba(6,182,212,.04);border:1px solid rgba(6,182,212,.12);border-radius:12px;padding:12px 18px">
+            <span style="font-size:.65rem;color:#475569;text-transform:uppercase;letter-spacing:.08em">Position Size</span>
+            <div style="font-size:1rem;font-weight:700;color:#f1f5f9;margin-top:2px">{{ trade_plan.position_size_shares }} shares</div>
+        </div>
+        <div style="background:rgba(6,182,212,.04);border:1px solid rgba(6,182,212,.12);border-radius:12px;padding:12px 18px">
+            <span style="font-size:.65rem;color:#475569;text-transform:uppercase;letter-spacing:.08em">Dollar Exposure</span>
+            <div style="font-size:1rem;font-weight:700;color:#f1f5f9;margin-top:2px">${{ "{:,.0f}".format(trade_plan.position_size_dollars) }}</div>
+        </div>
+        {% if trade_plan.best_entry_time %}
+        <div style="background:rgba(251,191,36,.04);border:1px solid rgba(251,191,36,.12);border-radius:12px;padding:12px 18px">
+            <span style="font-size:.65rem;color:#475569;text-transform:uppercase;letter-spacing:.08em">Best Entry Time</span>
+            <div style="font-size:1rem;font-weight:700;color:#fbbf24;margin-top:2px">{{ trade_plan.best_entry_time }}</div>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+    {% endif %}
+
+    <!-- Strategy + Catalysts + Warnings Grid -->
+    <div class="tp-grid" style="margin-top:1.25rem">
+        <!-- Strategy -->
+        <div class="bf-card">
+            <div class="tp-strat-label">Strategy</div>
+            <p style="font-size:.88rem;color:#cbd5e1;line-height:1.75;margin:0">{{ trade_plan.strategy }}</p>
+            {% if trade_plan.exit_strategy %}
+            <div class="tp-strat-label" style="margin-top:16px">Exit Strategy</div>
+            <p style="font-size:.85rem;color:#94a3b8;line-height:1.7;margin:0">{{ trade_plan.exit_strategy }}</p>
+            {% endif %}
+        </div>
+        <!-- Catalysts + Warnings -->
+        <div>
+            {% if trade_plan.catalysts %}
+            <div class="bf-card" style="margin-bottom:1rem">
+                <div class="tp-strat-label">Catalysts</div>
+                <ul class="tp-list catalysts">
+                    {% for c in trade_plan.catalysts %}<li>{{ c }}</li>{% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+            {% if trade_plan.warnings %}
+            <div class="bf-card">
+                <div class="tp-strat-label" style="color:rgba(248,113,113,.7)">Warnings</div>
+                <ul class="tp-list warnings">
+                    {% for w in trade_plan.warnings %}<li>{{ w }}</li>{% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Key Support/Resistance -->
+    {% if trade_plan.key_supports or trade_plan.key_resistances %}
+    <div class="bf-card" style="margin-top:1.25rem">
+        <div class="tp-strat-label">Key Levels</div>
+        <div style="display:flex;gap:2rem;flex-wrap:wrap">
+            {% if trade_plan.key_supports %}
+            <div>
+                <span style="font-size:.72rem;color:#4ade80;font-weight:600">Support</span>
+                <div class="tp-key-levels">
+                    {% for s in trade_plan.key_supports %}<span class="price">${{ "%.2f"|format(s) }}</span>{% if not loop.last %}<span style="color:#334155">|</span>{% endif %}{% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            {% if trade_plan.key_resistances %}
+            <div>
+                <span style="font-size:.72rem;color:#f87171;font-weight:600">Resistance</span>
+                <div class="tp-key-levels">
+                    {% for r in trade_plan.key_resistances %}<span class="price">${{ "%.2f"|format(r) }}</span>{% if not loop.last %}<span style="color:#334155">|</span>{% endif %}{% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Action Buttons -->
+    <div class="tp-actions">
+        <a href="/run" class="act-run">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/></svg>
+            Run Full 9-Agent Analysis
+        </a>
+        <a href="/simtrader" class="act-sim">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+            Paper Trade in SimTrader
+        </a>
+    </div>
+
+    <!-- Raw Intel (Collapsible) -->
+    {% if trade_plan.briefing %}
+    <div class="tp-raw">
+        <button class="tp-raw-toggle" onclick="var c=document.getElementById('rawIntel');c.classList.toggle('show');this.textContent=c.classList.contains('show')?'Hide Raw Intelligence':'Show Raw Intelligence'">Show Raw Intelligence</button>
+        <div id="rawIntel" class="tp-raw-content">
+            <pre>{{ trade_plan.briefing }}</pre>
+        </div>
+    </div>
+    {% endif %}
+
+    {% endif %}{# end if not error #}
+</div>
+{% endif %}
+
+<script>
+document.getElementById('briefingForm').addEventListener('submit', function(){
+    var btn = document.getElementById('briefingBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="loading-spinner"></span> Analyzing...';
+});
+</script>
+{% endblock %}
