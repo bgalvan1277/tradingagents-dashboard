@@ -10,7 +10,7 @@ Data sources:
 - Earnings Calendar: Next earnings date, EPS/revenue estimates
 - Technical Indicators: RSI, moving averages, volume profile
 - Sector Rotation: Sector ETF relative performance
-- FDA Calendar: Drug approval dates (biotech/pharma tickers)
+- Reddit Sentiment: ApeWisdom retail mention tracking
 - Stock Fundamentals: Full company profile via yfinance
 """
 
@@ -129,6 +129,43 @@ async def _fetch_fred_indicators() -> dict:
     except Exception as e:
         logger.warning("FRED fetch failed: %s", e)
     return indicators
+
+
+# ── REDDIT SENTIMENT ───────────────────────────────────────────────────────────
+
+async def _fetch_reddit_sentiment(ticker: str) -> dict:
+    """Fetch Reddit mention data from ApeWisdom (free, no API key)."""
+    try:
+        async with httpx.AsyncClient(timeout=10) as client:
+            resp = await client.get(
+                "https://apewisdom.io/api/v1.0/filter/all-stocks/",
+                headers={"User-Agent": "TradingAgents/1.0"},
+            )
+            if resp.status_code == 200:
+                data = resp.json()
+                results = data.get("results", [])
+                for entry in results:
+                    if entry.get("ticker", "").upper() == ticker.upper():
+                        mentions = entry.get("mentions", 0)
+                        mentions_24h = entry.get("mentions_24h_ago", 0)
+                        if mentions_24h and mentions_24h > 0:
+                            change_pct = ((mentions - mentions_24h) / mentions_24h) * 100
+                        else:
+                            change_pct = 0
+                        return {
+                            "rank": entry.get("rank", 0),
+                            "mentions": mentions,
+                            "upvotes": entry.get("upvotes", 0),
+                            "rank_24h_ago": entry.get("rank_24h_ago", 0),
+                            "mentions_24h_ago": mentions_24h,
+                            "mention_change_pct": round(change_pct, 1),
+                            "found": True,
+                        }
+                # Ticker not in top 100
+                return {"found": False, "mentions": 0, "rank": None}
+    except Exception as e:
+        logger.warning("Reddit sentiment fetch failed: %s", e)
+    return {"found": False, "mentions": 0, "rank": None}
 
 
 # ── YFINANCE DATA (sync, run in executor) ──────────────────────────────────────
@@ -289,7 +326,8 @@ def _fetch_full_stock_data(ticker: str) -> dict:
 
 def _format_briefing(ticker: str, stock_data: dict, insider_trades: list,
                      material_events: list, institutional: list,
-                     gov_contracts: list, macro: dict) -> str:
+                     gov_contracts: list, macro: dict,
+                     reddit: dict = None) -> str:
     """Compile all intelligence into a structured briefing document."""
     basics = stock_data.get("basics", {})
     technicals = stock_data.get("technicals", {})
@@ -404,6 +442,24 @@ def _format_briefing(ticker: str, stock_data: dict, insider_trades: list,
     else:
         lines.append("  Sector rotation data unavailable.")
 
+    # ── REDDIT SENTIMENT ──
+    reddit = reddit or {}
+    lines.append("\n─── REDDIT SENTIMENT (ApeWisdom) ──────────────────────────────")
+    if reddit.get('found'):
+        lines.append(f"  Rank:       #{reddit.get('rank', 'N/A')} across all stock subreddits")
+        lines.append(f"  Mentions:   {reddit.get('mentions', 0)} (24h period)")
+        lines.append(f"  Upvotes:    {reddit.get('upvotes', 0)}")
+        change = reddit.get('mention_change_pct', 0)
+        prev_rank = reddit.get('rank_24h_ago', 0)
+        trend = "SURGING" if change > 50 else "RISING" if change > 0 else "DECLINING" if change < -20 else "STABLE"
+        lines.append(f"  24h Change: {change:+.1f}%  [{trend}]")
+        if prev_rank:
+            rank_dir = "UP" if reddit.get('rank', 0) < prev_rank else "DOWN"
+            lines.append(f"  Rank Shift: #{prev_rank} → #{reddit.get('rank', 0)}  [{rank_dir}]")
+    else:
+        lines.append(f"  {ticker} not found in top 100 mentioned tickers.")
+        lines.append("  Low retail attention at this time.")
+
     # ── SEC FORM 4 INSIDER TRADES ──
     lines.append(f"\n─── SEC FORM 4 — INSIDER TRANSACTIONS ({len(insider_trades)} filings) ──")
     if insider_trades:
@@ -483,6 +539,17 @@ def _format_briefing(ticker: str, stock_data: dict, insider_trades: list,
     if si_val and si_val > 0.10:
         signals.append(f"[ALERT] Short interest at {si_val*100:.1f}% of float. Elevated bearish positioning.")
 
+    # Reddit sentiment signals
+    if reddit.get('found'):
+        r_rank = reddit.get('rank', 999)
+        r_change = reddit.get('mention_change_pct', 0)
+        if r_rank <= 10:
+            signals.append(f"[RETAIL] {ticker} ranked #{r_rank} on Reddit. High retail attention.")
+        if r_change > 100:
+            signals.append(f"[MOMENTUM] Reddit mentions surging {r_change:+.0f}% in 24h. Potential retail momentum building.")
+        elif r_change > 50:
+            signals.append(f"[WATCH] Reddit mentions rising {r_change:+.0f}% in 24h. Growing retail interest.")
+
     if signals:
         for s in signals:
             lines.append(f"  {s}")
@@ -491,9 +558,10 @@ def _format_briefing(ticker: str, stock_data: dict, insider_trades: list,
 
     total_datapoints = (len(insider_trades) + len(material_events) + len(institutional)
                         + len(gov_contracts) + len(macro) + (1 if technicals else 0)
-                        + (1 if earnings else 0) + (1 if sector else 0))
+                        + (1 if earnings else 0) + (1 if sector else 0)
+                        + (1 if reddit.get('found') else 0))
     lines.append(f"\n  Total data points collected: {total_datapoints}")
-    lines.append(f"  Intelligence channels queried: 9")
+    lines.append(f"  Intelligence channels queried: 10")
     lines.append("  Classification: UNCLASSIFIED // OPEN SOURCE")
     lines.append("=" * 72)
 
@@ -510,6 +578,7 @@ async def run_intelligence_sweep(ticker: str) -> str:
     2. USASpending.gov (government contracts)
     3. FRED (macroeconomic indicators)
     4. yfinance (fundamentals, earnings, technicals, sector rotation)
+    5. ApeWisdom (Reddit retail sentiment)
 
     Returns a formatted intelligence briefing string.
     """
@@ -524,9 +593,10 @@ async def run_intelligence_sweep(ticker: str) -> str:
     events_task = _fetch_sec_filings(ticker, "8-K", limit=10)
     institutional_task = _fetch_sec_filings(ticker, "13F-HR", limit=10)
     macro_task = _fetch_fred_indicators()
+    reddit_task = _fetch_reddit_sentiment(ticker)
 
-    insider_trades, material_events, institutional, macro = await asyncio.gather(
-        insider_task, events_task, institutional_task, macro_task
+    insider_trades, material_events, institutional, macro, reddit = await asyncio.gather(
+        insider_task, events_task, institutional_task, macro_task, reddit_task
     )
 
     # Government contracts - use company name
@@ -536,7 +606,7 @@ async def run_intelligence_sweep(ticker: str) -> str:
     # Compile the full briefing
     briefing = _format_briefing(
         ticker, stock_data, insider_trades, material_events,
-        institutional, gov_contracts, macro
+        institutional, gov_contracts, macro, reddit
     )
 
     logger.info(

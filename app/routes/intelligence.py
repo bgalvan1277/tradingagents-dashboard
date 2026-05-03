@@ -126,10 +126,23 @@ async def reddit(request: Request):
     redirect = require_auth(request)
     if redirect:
         return redirect
-    return templates.TemplateResponse(request, "intelligence/coming_soon.html", context={
-        "feed_title": "Reddit Sentiment",
-        "feed_desc": "WallStreetBets and r/investing mention velocity tracking, sentiment classification, and momentum scoring. Surface tickers gaining retail conviction before institutional recognition, and detect coordinated positioning events in real-time.",
-        "feed_icon": '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"/>',
+    # Fetch live Reddit sentiment data
+    import httpx
+    tickers = []
+    try:
+        async with httpx.AsyncClient(timeout=10) as client:
+            resp = await client.get(
+                "https://apewisdom.io/api/v1.0/filter/all-stocks/",
+                headers={"User-Agent": "TradingAgents/1.0"},
+            )
+            if resp.status_code == 200:
+                data = resp.json()
+                tickers = data.get("results", [])[:50]
+    except Exception:
+        pass
+    return templates.TemplateResponse(request, "intelligence/reddit.html", context={
+        "tickers": tickers,
+        "ticker_count": len(tickers),
     })
 
 

@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% set active_page = 'intelligence' %}
+
+{% block title %}Reddit Sentiment{% endblock %}
+
+{% block content %}
+<style>
+.section-label{display:flex;align-items:center;gap:10px;margin:1.5rem 0 .75rem;font-size:.72rem;font-weight:700;color:rgba(6,182,212,.9);text-transform:uppercase;letter-spacing:.12em}
+.section-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(6,182,212,.2),transparent)}
+.stat-row{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1.25rem}
+.stat-box{background:rgba(15,23,42,.55);backdrop-filter:blur(16px);border:1px solid rgba(71,85,105,.25);border-radius:14px;padding:16px 20px;flex:1;min-width:140px}
+.stat-box .stat-val{font-size:1.3rem;font-weight:800;color:#f1f5f9}
+.stat-box .stat-label{font-size:.68rem;color:#64748b;text-transform:uppercase;letter-spacing:.06em;margin-top:2px}
+.data-table-wrap{background:rgba(15,23,42,.55);backdrop-filter:blur(16px);border:1px solid rgba(71,85,105,.25);border-radius:16px;overflow:hidden}
+.data-table{width:100%;border-collapse:collapse;font-size:.78rem}
+.data-table thead{position:sticky;top:0;z-index:2}
+.data-table th{background:rgba(15,23,42,.95);color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:.06em;font-size:.65rem;padding:12px 14px;text-align:left;border-bottom:1px solid rgba(71,85,105,.25);cursor:pointer}
+.data-table th:hover{color:#22d3ee}
+.data-table td{padding:10px 14px;border-bottom:1px solid rgba(71,85,105,.1);color:#94a3b8;white-space:nowrap}
+.data-table tr:hover td{background:rgba(6,182,212,.02)}
+.data-table .ticker-cell{font-weight:700;color:#f1f5f9;font-size:.85rem}
+.data-table .rank-cell{font-weight:800;color:#22d3ee;font-size:.9rem}
+.table-scroll{max-height:calc(100vh - 340px);overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(71,85,105,.3) transparent}
+.trend-up{color:#4ade80;font-weight:600}.trend-down{color:#f87171;font-weight:600}
+.tag-hot{background:rgba(239,68,68,.1);color:#f87171;padding:2px 8px;border-radius:4px;font-size:.62rem;font-weight:700;text-transform:uppercase}
+.tag-warm{background:rgba(251,146,60,.1);color:#fb923c;padding:2px 8px;border-radius:4px;font-size:.62rem;font-weight:700;text-transform:uppercase}
+.tag-cool{background:rgba(71,85,105,.15);color:#94a3b8;padding:2px 8px;border-radius:4px;font-size:.62rem;font-weight:700;text-transform:uppercase}
+.source-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:8px;background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.12);color:#4ade80;font-size:.68rem;font-weight:600;margin-left:12px}
+.search-input{background:rgba(15,23,42,.6);border:1px solid rgba(71,85,105,.3);border-radius:10px;padding:8px 14px 8px 36px;color:#e2e8f0;font-size:.78rem;width:220px;outline:none;transition:border-color .2s}
+.search-input:focus{border-color:rgba(6,182,212,.3)}
+.search-wrap{position:relative;display:inline-flex;align-items:center}
+.search-wrap svg{position:absolute;left:12px;color:#475569;pointer-events:none}
+</style>
+
+<a href="/intelligence" style="display:inline-flex;align-items:center;gap:6px;font-size:.78rem;color:#64748b;text-decoration:none;margin-bottom:1rem">
+    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+    Back to Intelligence
+</a>
+<div style="display:flex;align-items:center;flex-wrap:wrap">
+    <h1 style="font-size:1.5rem;font-weight:800;color:#f1f5f9;margin:0;letter-spacing:-.02em">Reddit Sentiment</h1>
+    <span class="source-badge">
+        <span style="width:5px;height:5px;border-radius:50%;background:#4ade80"></span>
+        Live from ApeWisdom
+    </span>
+</div>
+<p style="font-size:.82rem;color:#64748b;margin:4px 0 1.25rem">Top mentioned tickers across WallStreetBets and all stock subreddits</p>
+
+<!-- Stats -->
+<div class="stat-row">
+    <div class="stat-box">
+        <div class="stat-val">{{ ticker_count }}</div>
+        <div class="stat-label">Tickers Tracked</div>
+    </div>
+    <div class="stat-box">
+        <div class="stat-val" id="total-mentions">—</div>
+        <div class="stat-label">Total Mentions</div>
+    </div>
+    <div class="stat-box">
+        <div class="stat-val" id="total-upvotes">—</div>
+        <div class="stat-label">Total Upvotes</div>
+    </div>
+    <div class="stat-box">
+        <div class="stat-val" id="top-ticker">—</div>
+        <div class="stat-label">#1 Trending</div>
+    </div>
+</div>
+
+<div class="section-label">Trending Tickers</div>
+<div style="margin-bottom:1rem">
+    <div class="search-wrap">
+        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        <input type="text" class="search-input" placeholder="Search ticker..." oninput="searchTable(this.value)">
+    </div>
+</div>
+
+<div class="data-table-wrap">
+    <div class="table-scroll">
+        <table class="data-table" id="redditTable">
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Ticker</th>
+                    <th>Mentions (24h)</th>
+                    <th>Upvotes</th>
+                    <th>Previous Rank</th>
+                    <th>Prev Mentions</th>
+                    <th>Heat</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for t in tickers %}
+                {% set mentions = t.mentions|default(0) %}
+                {% set prev_mentions = t.mentions_24h_ago|default(0) %}
+                {% set rank = t.rank|default(0) %}
+                {% set prev_rank = t.rank_24h_ago|default(0) %}
+                <tr>
+                    <td class="rank-cell">#{{ rank }}</td>
+                    <td class="ticker-cell">{{ t.ticker }}</td>
+                    <td>{{ mentions }}</td>
+                    <td>{{ t.upvotes|default(0) }}</td>
+                    <td>
+                        {% if prev_rank and prev_rank != rank %}
+                            {% if rank < prev_rank %}
+                                <span class="trend-up">↑ #{{ prev_rank }}</span>
+                            {% else %}
+                                <span class="trend-down">↓ #{{ prev_rank }}</span>
+                            {% endif %}
+                        {% else %}
+                            <span style="color:#64748b">—</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if prev_mentions %}
+                            {{ prev_mentions }}
+                            {% if mentions > prev_mentions %}
+                                <span class="trend-up" style="font-size:.68rem;margin-left:4px">▲</span>
+                            {% elif mentions < prev_mentions %}
+                                <span class="trend-down" style="font-size:.68rem;margin-left:4px">▼</span>
+                            {% endif %}
+                        {% else %}
+                            <span style="color:#64748b">—</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if rank <= 5 %}
+                            <span class="tag-hot">🔥 Hot</span>
+                        {% elif rank <= 20 %}
+                            <span class="tag-warm">Warm</span>
+                        {% else %}
+                            <span class="tag-cool">Low</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+(function(){
+    var rows = document.querySelectorAll('#redditTable tbody tr');
+    var totalMentions=0, totalUpvotes=0, topTicker='';
+    rows.forEach(function(r,i){
+        var cells=r.querySelectorAll('td');
+        totalMentions += parseInt(cells[2].textContent)||0;
+        totalUpvotes += parseInt(cells[3].textContent)||0;
+        if(i===0) topTicker=cells[1].textContent.trim();
+    });
+    document.getElementById('total-mentions').textContent=totalMentions.toLocaleString();
+    document.getElementById('total-upvotes').textContent=totalUpvotes.toLocaleString();
+    document.getElementById('top-ticker').textContent=topTicker;
+})();
+
+function searchTable(q){
+    q=q.toLowerCase();
+    document.querySelectorAll('#redditTable tbody tr').forEach(function(r){
+        r.style.display=r.textContent.toLowerCase().includes(q)?'':'none';
+    });
+}
+</script>
+{% endblock %}
