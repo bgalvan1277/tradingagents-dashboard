@@ -20,18 +20,41 @@ async def login_page(request: Request):
 
 @router.post("/login", response_class=HTMLResponse)
 async def login_submit(request: Request, password: str = Form(...)):
-    """Validate password and set session cookie."""
+    """Validate password and set session cookie.
+    
+    After 2 failed attempts, redirect to the WordPress honeypot.
+    """
     if check_password(password):
         response = RedirectResponse(url="/", status_code=303)
         set_session_cookie(response)
+        # Clear fail counter on success
+        response.delete_cookie("_fa")
         return response
 
-    return templates.TemplateResponse(
+    # Track failed attempts via cookie
+    fail_count = 0
+    try:
+        fa_cookie = request.cookies.get("_fa", "0")
+        fail_count = int(fa_cookie)
+    except (ValueError, TypeError):
+        fail_count = 0
+
+    fail_count += 1
+
+    if fail_count >= 2:
+        # Redirect to honeypot scare page
+        response = RedirectResponse(url="/wp-admin", status_code=303)
+        response.delete_cookie("_fa")
+        return response
+
+    response = templates.TemplateResponse(
         request,
         "login.html",
         context={"error": "Incorrect password."},
         status_code=401,
     )
+    response.set_cookie("_fa", str(fail_count), max_age=300, httponly=True)
+    return response
 
 
 @router.get("/logout")
