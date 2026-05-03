@@ -1,5 +1,11 @@
 """FastAPI application entry point."""
 
+import os
+from dotenv import load_dotenv
+
+# Load .env into os.environ so TradingAgents/LangChain can find API keys
+load_dotenv(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), ".env"))
+
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 

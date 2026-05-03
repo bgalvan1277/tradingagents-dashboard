@@ -1,21 +1,20 @@
 """Run route: trigger on-demand analysis runs."""
 
-import asyncio
 import logging
 import threading
 from datetime import date
 
-from fastapi import APIRouter, Request, Depends, Form, BackgroundTasks
+from fastapi import APIRouter, Request, Depends, Form
 from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import select, desc
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth import require_auth, get_current_user
-from app.database import get_db, async_session
-from app.models import Run, Ticker
+from app.database import get_db
+from app.models import Run, RunDetail, Ticker, CostLog
 from app.config import settings
-from app.services.runner import run_analysis_sync, save_run_results, mark_run_failed
+from app.services.runner import run_analysis_sync
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -23,31 +22,80 @@ templates = Jinja2Templates(directory="app/templates")
 
 
 def _process_run_in_thread(run_id: int, symbol: str, trade_date: str):
-    """Run analysis in a background thread (blocking call)."""
-    async def _inner():
-        async with async_session() as db:
-            result = await db.execute(select(Run).where(Run.id == run_id))
-            run = result.scalar_one_or_none()
-            if not run or run.status != "pending":
-                return
+    """Run analysis in a background thread using sync DB.
 
-            run.status = "running"
-            await db.commit()
+    Uses sync SQLAlchemy to avoid event-loop conflicts with
+    run_analysis_sync, which needs its own asyncio.run() for Colonel Wolfe.
+    """
+    from sqlalchemy import create_engine, select as sa_select
+    from sqlalchemy.orm import Session
+    from app.config import settings as cfg
 
+    sync_engine = create_engine(cfg.database_url_sync, pool_pre_ping=True)
+
+    with Session(sync_engine) as db:
+        run = db.get(Run, run_id)
+        if not run or run.status != "pending":
+            sync_engine.dispose()
+            return
+
+        run.status = "running"
+        db.commit()
+
+        try:
+            logger.info("[worker] Starting analysis for %s (run %d)", symbol, run_id)
+            state, decision, usage = run_analysis_sync(symbol, trade_date)
+
+            # Save results synchronously
+            from decimal import Decimal as D
+            cost_usd = usage.get("cost_usd", D("0")) if usage else D("0")
+
+            run.status = "complete"
+            run.final_recommendation = decision
+            from app.services.runner import extract_one_line_thesis, _to_str, extract_state_to_detail
+            run.one_line_thesis = extract_one_line_thesis(
+                _to_str(state.get("final_trade_decision", ""))
+            )
+            run.total_cost_usd = cost_usd
+            run.model_used = cfg.deep_think_model
+            db.commit()
+
+            # Log cost
+            if usage and (usage.get("input_tokens", 0) > 0 or usage.get("output_tokens", 0) > 0):
+                try:
+                    cost_entry = CostLog(
+                        run_id=run.id,
+                        provider="deepseek",
+                        model=cfg.deep_think_model,
+                        input_tokens=usage.get("input_tokens", 0),
+                        output_tokens=usage.get("output_tokens", 0),
+                        cost_usd=cost_usd,
+                    )
+                    db.add(cost_entry)
+                    db.commit()
+                except Exception as e:
+                    logger.error("[worker] Failed to log cost: %s", e)
+                    db.rollback()
+
+            # Save detail
             try:
-                logger.info("[worker] Starting analysis for %s (run %d)", symbol, run_id)
-                state, decision, usage = run_analysis_sync(symbol, trade_date)
-                await save_run_results(db, run, state, decision, usage=usage)
-                logger.info("[worker] Analysis complete for %s (run %d): %s", symbol, run_id, decision)
+                detail_fields = extract_state_to_detail(state)
+                detail = RunDetail(run_id=run.id, **detail_fields)
+                db.add(detail)
+                db.commit()
             except Exception as e:
-                logger.error("[worker] Analysis failed for %s (run %d): %s", symbol, run_id, e)
-                await mark_run_failed(db, run, str(e))
+                logger.error("[worker] Failed to save RunDetail: %s", e)
+                db.rollback()
 
-    loop = asyncio.new_event_loop()
-    try:
-        loop.run_until_complete(_inner())
-    finally:
-        loop.close()
+            logger.info("[worker] Analysis complete for %s (run %d): %s", symbol, run_id, decision)
+
+        except Exception as e:
+            logger.error("[worker] Analysis failed for %s (run %d): %s", symbol, run_id, e)
+            run.status = "failed"
+            run.error_message = str(e)[:2000]
+            db.commit()
+
+    sync_engine.dispose()
 
 
 @router.get("/run", response_class=HTMLResponse)
