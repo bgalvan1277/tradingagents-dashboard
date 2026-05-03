@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}TradingAgents{% endblock %} | Autonomous AI Research</title>
+    <meta name="description" content="{% block meta_description %}AI-powered autonomous research pipeline for institutional-grade stock analysis.{% endblock %}">
+    <meta name="robots" content="index, follow">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0e17;color:#e2e8f0;font-family:'Inter',system-ui,sans-serif;overflow-x:hidden;
+    background-image:radial-gradient(ellipse 80% 60% at 10% 0%,rgba(6,182,212,.04) 0%,transparent 60%),radial-gradient(ellipse 60% 50% at 90% 100%,rgba(59,130,246,.03) 0%,transparent 50%);background-attachment:fixed}
+a{text-decoration:none;color:inherit}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:#0f1420}::-webkit-scrollbar-thumb{background:#243044;border-radius:3px}
+
+/* ── NAV ────────────────────────────────────────────────────── */
+.pn{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,14,23,.88);backdrop-filter:blur(24px);border-bottom:1px solid rgba(71,85,105,.25)}
+.pn::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(6,182,212,.15),transparent)}
+.pn-inner{max-width:1200px;margin:0 auto;padding:0 2rem;height:64px;display:flex;align-items:center;justify-content:space-between}
+.pn-logo img{height:36px;object-fit:contain}
+.pn-links{display:flex;align-items:center;gap:6px}
+.pn-link{padding:8px 18px;border-radius:8px;font-size:.82rem;font-weight:500;color:#94a3b8;transition:all .2s}
+.pn-link:hover{color:#e2e8f0;background:rgba(226,232,240,.04)}
+.pn-link.active{color:#22d3ee;background:rgba(6,182,212,.08)}
+.pn-cta{padding:9px 22px;border-radius:10px;background:linear-gradient(135deg,rgba(6,182,212,.12),rgba(59,130,246,.12));border:1px solid rgba(6,182,212,.25);color:#22d3ee;font-size:.8rem;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap}
+.pn-cta:hover{background:linear-gradient(135deg,rgba(6,182,212,.22),rgba(59,130,246,.22));border-color:rgba(6,182,212,.4)}
+
+/* Mobile nav */
+.pn-hamburger{display:none;background:none;border:none;cursor:pointer;padding:4px}
+.pn-mobile{display:none;position:fixed;top:64px;left:0;right:0;background:rgba(10,14,23,.96);backdrop-filter:blur(20px);border-bottom:1px solid rgba(71,85,105,.25);padding:12px 2rem 16px;z-index:99}
+.pn-mobile.open{display:flex;flex-direction:column;gap:4px}
+.pn-mobile .pn-link{padding:12px 16px;border-radius:10px;font-size:.9rem}
+
+@media(max-width:768px){
+    .pn-links{display:none}
+    .pn-hamburger{display:block}
+}
+
+/* ── FOOTER ─────────────────────────────────────────────────── */
+.pub-footer{text-align:center;padding:4rem 2rem 2.5rem;border-top:1px solid rgba(71,85,105,.15)}
+.pub-footer p{font-size:.72rem;color:#334155;line-height:1.8}
+.pub-footer a{color:#475569;border-bottom:1px solid rgba(71,85,105,.3);transition:color .2s}
+.pub-footer a:hover{color:#22d3ee}
+
+/* ── UTILITY ────────────────────────────────────────────────── */
+.grad-text{background:linear-gradient(135deg,#22d3ee,#3b82f6);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.section-wrap{max-width:1100px;margin:0 auto;padding:0 2rem}
+
+{% block extra_css %}{% endblock %}
+    </style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav class="pn">
+    <div class="pn-inner">
+        <a href="/" class="pn-logo"><img src="/static/logo.png" alt="TradingAgents"></a>
+        <div class="pn-links">
+            <a href="/" class="pn-link {% if active_page == 'home' %}active{% endif %}">Home</a>
+            <a href="/how-it-works" class="pn-link {% if active_page == 'how' %}active{% endif %}">How It Works</a>
+            <a href="/about-us" class="pn-link {% if active_page == 'about' %}active{% endif %}">About Us</a>
+            <a href="/contact" class="pn-link {% if active_page == 'contact' %}active{% endif %}">Contact</a>
+        </div>
+        <a href="/login" class="pn-cta">Access Dashboard</a>
+        <button class="pn-hamburger" onclick="document.getElementById('mobileNav').classList.toggle('open')">
+            <svg width="22" height="22" fill="none" stroke="#94a3b8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+    </div>
+</nav>
+<div id="mobileNav" class="pn-mobile">
+    <a href="/" class="pn-link {% if active_page == 'home' %}active{% endif %}">Home</a>
+    <a href="/how-it-works" class="pn-link {% if active_page == 'how' %}active{% endif %}">How It Works</a>
+    <a href="/about-us" class="pn-link {% if active_page == 'about' %}active{% endif %}">About Us</a>
+    <a href="/contact" class="pn-link {% if active_page == 'contact' %}active{% endif %}">Contact</a>
+    <a href="/login" class="pn-link" style="color:#22d3ee;margin-top:4px">Access Dashboard &rarr;</a>
+</div>
+
+<!-- Content -->
+{% block content %}{% endblock %}
+
+<!-- Footer -->
+<footer class="pub-footer">
+    <p>TradingAgents &mdash; Autonomous AI Research Platform</p>
+    <p style="margin-top:4px">Built by <a href="https://briangalvan.com" target="_blank">Brian Galvan</a> &middot; Not financial advice</p>
+</footer>
+
+</body>
+</html>

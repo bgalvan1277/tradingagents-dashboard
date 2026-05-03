@@ -15,6 +15,6 @@ async def dashboard(request: Request):
     """Show the market overview dashboard for authenticated users,
     or the public landing page for visitors."""
     if not get_current_user(request):
-        return templates.TemplateResponse(request, "landing.html")
+        return templates.TemplateResponse(request, "public/home.html")
 
     return templates.TemplateResponse(request, "dashboard.html")

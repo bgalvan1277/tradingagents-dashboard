@@ -1,0 +1,155 @@
+{% extends "public/base.html" %}
+{% set active_page = 'about' %}
+
+{% block title %}About Us{% endblock %}
+{% block meta_description %}Meet Brian Galvan, the creator of TradingAgents, and the 9 autonomous AI agents that power the research pipeline.{% endblock %}
+
+{% block extra_css %}
+.about-hero{text-align:center;padding:8rem 2rem 3rem;max-width:800px;margin:0 auto}
+.about-hero h1{font-size:2.8rem;font-weight:900;color:#f1f5f9;letter-spacing:-.03em;margin-bottom:1rem}
+.about-hero p{font-size:1rem;color:#64748b;line-height:1.85;max-width:640px;margin:0 auto}
+.about-wrap{max-width:1000px;margin:0 auto;padding:0 2rem}
+
+/* Creator */
+.creator{background:linear-gradient(135deg,rgba(6,182,212,.03),rgba(59,130,246,.03));border:1px solid rgba(6,182,212,.12);border-radius:24px;padding:48px 44px;display:flex;align-items:flex-start;gap:36px;margin-bottom:4rem;position:relative;overflow:hidden}
+.creator::before{content:'';position:absolute;top:-1px;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(6,182,212,.3),transparent)}
+.creator img{width:140px;height:140px;border-radius:50%;object-fit:cover;border:3px solid rgba(6,182,212,.25);box-shadow:0 0 32px rgba(6,182,212,.1);flex-shrink:0}
+.creator h2{font-size:1.6rem;font-weight:800;color:#f1f5f9;margin:0 0 4px;letter-spacing:-.01em}
+.creator .title{font-size:.72rem;color:#22d3ee;text-transform:uppercase;letter-spacing:.1em;font-weight:700;margin:0 0 18px}
+.creator p{font-size:.88rem;color:#94a3b8;line-height:1.85;margin:0 0 1rem}
+.creator p:last-child{margin:0}
+
+/* Section */
+.team-label{display:flex;align-items:center;gap:12px;margin:3rem 0 1.5rem;font-size:.72rem;font-weight:700;color:rgba(6,182,212,.9);text-transform:uppercase;letter-spacing:.12em}
+.team-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(6,182,212,.2),transparent)}
+
+/* Agent cards */
+.agent-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.25rem;margin-bottom:3rem}
+.agent{background:rgba(15,23,42,.55);backdrop-filter:blur(16px);border:1px solid rgba(71,85,105,.25);border-radius:20px;padding:28px 24px;text-align:center;transition:all .3s}
+.agent:hover{border-color:rgba(6,182,212,.2);transform:translateY(-3px);box-shadow:0 8px 30px rgba(0,0,0,.25)}
+.agent img{width:100px;height:100px;border-radius:50%;object-fit:cover;border:2.5px solid rgba(6,182,212,.3);box-shadow:0 0 20px rgba(6,182,212,.08);margin:0 auto 16px}
+.agent h3{font-size:1.05rem;font-weight:700;color:#f1f5f9;margin:0 0 4px}
+.agent .role{font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;font-weight:700;margin:0 0 14px}
+.agent p{font-size:.8rem;color:#94a3b8;line-height:1.75;margin:0;text-align:left}
+.agent-lead{grid-column:1 / -1;display:flex;align-items:center;gap:28px;text-align:left;padding:32px 36px}
+.agent-lead img{width:120px;height:120px;margin:0;flex-shrink:0}
+
+@media(max-width:768px){
+    .about-hero h1{font-size:2rem}
+    .about-hero{padding:7rem 1.5rem 2.5rem}
+    .creator{flex-direction:column;align-items:center;text-align:center;padding:32px 24px}
+    .agent-lead{flex-direction:column;text-align:center}
+    .agent-lead img{margin:0 auto}
+    .about-wrap{padding:0 1.25rem}
+}
+{% endblock %}
+
+{% block content %}
+
+<section class="about-hero">
+    <p style="font-size:.7rem;font-weight:700;color:rgba(6,182,212,.7);text-transform:uppercase;letter-spacing:.12em;margin-bottom:12px">The Team Behind the Intelligence</p>
+    <h1>About <span class="grad-text">TradingAgents</span></h1>
+    <p>A platform built by an AI researcher, powered by autonomous agents designed to reason, argue, and produce institutional-grade analysis.</p>
+</section>
+
+<div class="about-wrap">
+
+    <!-- Creator -->
+    <div class="creator">
+        <img src="/static/avatars/brian_galvan.jpg" alt="Brian Galvan">
+        <div>
+            <h2>Brian Galvan</h2>
+            <div class="title">Creator &amp; Chief Portfolio Manager</div>
+            <p>TradingAgents was built and is maintained by Brian Galvan, an AI researcher and developer specializing in agentic systems, autonomous workflows, and applied machine learning for financial intelligence. The platform extends the open-source TradingAgents framework from Tauric Research with a proprietary OSINT intelligence layer, custom agent architectures, and a full-stack analytical dashboard.</p>
+            <p>Every AI agent operating on this platform was designed, named, and trained by Brian to fulfill a specific analytical role within the research pipeline. From the intelligence officer who executes the initial data sweep, to the adversarial debate advocates who stress-test every investment thesis, each agent represents a deliberate architectural decision about how autonomous systems should reason about financial markets.</p>
+            <p>The philosophy behind TradingAgents is straightforward: the best investment analysis is produced when multiple specialized perspectives are forced to operate independently, argue adversarially, and submit to judicial review before any capital is deployed. AI makes this possible at a speed and consistency that no human team can match.</p>
+        </div>
+    </div>
+
+    <!-- Intelligence Agent -->
+    <div class="team-label">Stage 0: Intelligence Gathering</div>
+    <div class="agent-grid">
+        <div class="agent agent-lead" style="border-color:rgba(251,146,60,.12)">
+            <img src="/static/avatars/don_wolfe.png" alt="Col. Don Wolfe" style="border-color:rgba(251,146,60,.3)">
+            <div>
+                <h3>Col. Don Wolfe (RET)</h3>
+                <div class="role" style="color:#fb923c">Intelligence Officer A.I. Agent</div>
+                <p>Before a single analyst touches a ticker, Colonel Wolfe conducts a full-spectrum open-source intelligence sweep across every available data channel. His reconnaissance protocol queries SEC EDGAR for insider transactions, scans government contract award databases for federal revenue exposure, cross-references Congressional trading disclosures for political positioning signals, monitors FDA regulatory calendars for biotech catalysts, and aggregates macroeconomic indicators that could impact the target sector. The Colonel's intelligence briefing is the foundational document upon which all subsequent analysis is built. No research analyst, debate advocate, or risk assessor operates without first reviewing his findings.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Research Analysts -->
+    <div class="team-label">Stage 1: Research Analysts</div>
+    <div class="agent-grid">
+        <div class="agent">
+            <img src="/static/avatars/marcus_chen.png" alt="Marcus Chen">
+            <h3>Marcus Chen</h3>
+            <div class="role" style="color:#22d3ee">Chief Technical Analyst</div>
+            <p>Specializes in quantitative price action analysis, chart pattern recognition, and multi-timeframe technical indicator synthesis. Marcus processes candlestick formations, Bollinger Band compressions, MACD divergences, RSI oscillations, and volume profile anomalies to construct a technical probability framework for each equity.</p>
+        </div>
+        <div class="agent">
+            <img src="/static/avatars/sarah_mitchell.png" alt="Sarah Mitchell">
+            <h3>Sarah Mitchell</h3>
+            <div class="role" style="color:#22d3ee">Sentiment Intelligence Lead</div>
+            <p>Operates the sentiment quantification engine, processing institutional positioning data, options flow analysis, social media signal aggregation, and insider transaction monitoring. Sarah constructs a composite sentiment score that captures both retail and institutional conviction levels, fear/greed indicators, and short interest dynamics.</p>
+        </div>
+        <div class="agent">
+            <img src="/static/avatars/james_rivera.png" alt="James Rivera">
+            <h3>James Rivera</h3>
+            <div class="role" style="color:#22d3ee">News &amp; Media Analyst</div>
+            <p>Monitors and processes real-time news feeds, earnings call transcripts, regulatory filings, and macroeconomic event signals. James applies natural language understanding to extract actionable intelligence from unstructured media data, flagging material catalysts, sector rotation triggers, and geopolitical risk vectors.</p>
+        </div>
+        <div class="agent">
+            <img src="/static/avatars/elena_kowalski.png" alt="Elena Kowalski">
+            <h3>Elena Kowalski</h3>
+            <div class="role" style="color:#22d3ee">Fundamentals Research Lead</div>
+            <p>Conducts deep-dive financial statement analysis, valuation modeling, and competitive positioning assessment. Elena evaluates revenue growth trajectories, margin structures, free cash flow generation, balance sheet resilience, and capital allocation efficiency using proprietary composite scoring methodologies.</p>
+        </div>
+    </div>
+
+    <!-- Debate -->
+    <div class="team-label">Stage 2: Investment Debate</div>
+    <div class="agent-grid">
+        <div class="agent" style="border-color:rgba(34,197,94,.12)">
+            <img src="/static/avatars/david_park.png" alt="David Park" style="border-color:rgba(34,197,94,.3)">
+            <h3>David Park</h3>
+            <div class="role" style="color:#4ade80">Bull Case Advocate</div>
+            <p>Constructs the strongest possible investment thesis in favor of each position. David aggregates the most compelling evidence from all four research verticals to build a rigorous case for upside potential, identifying asymmetric risk/reward opportunities, margin-of-safety arguments, and catalyst timelines that support accumulation.</p>
+        </div>
+        <div class="agent" style="border-color:rgba(239,68,68,.12)">
+            <img src="/static/avatars/catherine_walsh.png" alt="Catherine Walsh" style="border-color:rgba(239,68,68,.3)">
+            <h3>Catherine Walsh</h3>
+            <div class="role" style="color:#f87171">Bear Case Advocate</div>
+            <p>Systematically deconstructs the investment thesis, stress-testing every assumption against downside scenarios. Catherine identifies valuation risks, competitive threats, earnings quality concerns, and macro headwinds that could impair performance, forcing the pipeline to confront uncomfortable data points.</p>
+        </div>
+    </div>
+
+    <!-- Research Director -->
+    <div class="team-label">Stage 3: Research Director</div>
+    <div class="agent-grid">
+        <div class="agent agent-lead">
+            <img src="/static/avatars/michael_torres.png" alt="Michael Torres">
+            <div>
+                <h3>Michael Torres</h3>
+                <div class="role" style="color:#a78bfa">Research Director</div>
+                <p>Presides over the adversarial debate between the bull and bear advocates, evaluating the strength of evidence, logical consistency, and analytical rigor of each argument. Michael does not have a predetermined bias; his role is to identify which side presented the more defensible thesis based on the available data. His verdict determines the informational foundation upon which the final risk assessment and portfolio decision are built.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Risk Panel -->
+    <div class="team-label">Stage 4: Risk Assessment</div>
+    <div class="agent-grid">
+        <div class="agent agent-lead" style="border-color:rgba(251,191,36,.12)">
+            <img src="/static/avatars/michael_torres.png" alt="Risk Committee" style="border-color:rgba(251,191,36,.3)">
+            <div>
+                <h3>Risk Committee</h3>
+                <div class="role" style="color:#fbbf24">Multi-Perspective Risk Board</div>
+                <p>A three-member risk evaluation board examines every position through aggressive, conservative, and neutral analytical lenses. The aggressive analyst quantifies maximum upside capture potential and optimal entry timing. The conservative analyst models worst-case drawdown scenarios and capital preservation thresholds. The neutral analyst balances both perspectives against portfolio-level correlation and concentration risk. A Risk Judge synthesizes all three inputs into a unified risk verdict that directly informs the final portfolio directive.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

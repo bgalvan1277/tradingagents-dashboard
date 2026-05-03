@@ -1,0 +1,214 @@
+{% extends "public/base.html" %}
+{% set active_page = 'home' %}
+
+{% block title %}Autonomous AI-Powered Stock Analysis{% endblock %}
+{% block meta_description %}TradingAgents is an autonomous multi-agent research platform that deploys 9 AI agents across 6 analytical stages to produce institutional-grade stock analysis from proprietary OSINT intelligence.{% endblock %}
+
+{% block extra_css %}
+/* ── HERO ────────────────────────────────────────────────────── */
+.hero{position:relative;text-align:center;padding:10rem 2rem 6rem;overflow:hidden}
+.hero::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:800px;height:800px;background:radial-gradient(circle,rgba(6,182,212,.06) 0%,transparent 60%);pointer-events:none}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(6,182,212,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(6,182,212,.03) 1px,transparent 1px);background-size:60px 60px;mask-image:radial-gradient(ellipse 70% 60% at 50% 40%,black 20%,transparent 80%)}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;padding:8px 20px;border-radius:30px;background:rgba(6,182,212,.06);border:1px solid rgba(6,182,212,.12);color:#22d3ee;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;margin-bottom:2rem}
+.hero-badge span{width:6px;height:6px;border-radius:50%;background:#22d3ee;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.hero h1{font-size:4rem;font-weight:900;line-height:1.05;letter-spacing:-.04em;margin-bottom:1.5rem;position:relative}
+.hero .sub{font-size:1.1rem;color:#64748b;line-height:1.85;max-width:680px;margin:0 auto 3rem}
+.hero-ctas{display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap}
+.hero-primary{padding:14px 36px;border-radius:12px;background:linear-gradient(135deg,#06b6d4,#3b82f6);color:#fff;font-size:.9rem;font-weight:700;box-shadow:0 4px 24px rgba(6,182,212,.25);transition:all .25s}
+.hero-primary:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(6,182,212,.35)}
+.hero-secondary{padding:14px 36px;border-radius:12px;background:rgba(226,232,240,.04);border:1px solid rgba(71,85,105,.3);color:#94a3b8;font-size:.9rem;font-weight:600;transition:all .2s}
+.hero-secondary:hover{color:#e2e8f0;border-color:rgba(6,182,212,.2)}
+
+/* AI Logos */
+.ai-logos{display:flex;align-items:center;justify-content:center;gap:2.5rem;flex-wrap:wrap;margin-top:3.5rem;opacity:.15}
+.ai-logo-item{display:flex;align-items:center;gap:8px;color:#e2e8f0}
+.ai-logo-item span{font-size:.82rem;font-weight:600;white-space:nowrap}
+
+/* ── STATS ───────────────────────────────────────────────────── */
+.stats-bar{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:rgba(71,85,105,.15);border-radius:20px;overflow:hidden;margin:5rem auto;max-width:900px}
+.stat-item{background:rgba(10,14,23,.7);padding:2rem 1rem;text-align:center}
+.stat-item .num{font-size:2.2rem;font-weight:900;letter-spacing:-.03em}
+.stat-item .lbl{font-size:.62rem;color:#64748b;text-transform:uppercase;letter-spacing:.1em;font-weight:600;margin-top:6px}
+
+/* ── FEATURES ────────────────────────────────────────────────── */
+.feat-section{padding:4rem 0}
+.feat-label{display:flex;align-items:center;gap:12px;font-size:.7rem;font-weight:700;color:rgba(6,182,212,.8);text-transform:uppercase;letter-spacing:.14em;margin-bottom:3rem;text-align:center;justify-content:center}
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem}
+.feat-card{background:rgba(15,23,42,.55);backdrop-filter:blur(16px);border:1px solid rgba(71,85,105,.2);border-radius:20px;padding:32px 28px;transition:all .3s;position:relative;overflow:hidden}
+.feat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:0;transition:opacity .3s}
+.feat-card:hover{border-color:rgba(6,182,212,.15);transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,.3)}
+.feat-card:hover::before{opacity:1}
+.feat-icon{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:20px}
+.feat-card h3{font-size:1rem;font-weight:700;color:#f1f5f9;margin:0 0 10px}
+.feat-card p{font-size:.82rem;color:#94a3b8;line-height:1.75;margin:0}
+
+/* ── SIMTRADER ───────────────────────────────────────────────── */
+.sim-section{padding:5rem 0;text-align:center}
+.sim-card{max-width:800px;margin:0 auto;background:linear-gradient(135deg,rgba(6,182,212,.04),rgba(59,130,246,.04));border:1px solid rgba(6,182,212,.12);border-radius:24px;padding:48px 40px;position:relative;overflow:hidden}
+.sim-card::before{content:'';position:absolute;top:-1px;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(6,182,212,.4),transparent)}
+.sim-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.15);color:#fbbf24;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:1.25rem}
+.sim-card h2{font-size:1.8rem;font-weight:800;color:#f1f5f9;margin:0 0 1rem;letter-spacing:-.02em}
+.sim-card p{font-size:.9rem;color:#94a3b8;line-height:1.85;max-width:600px;margin:0 auto}
+
+/* ── PIPELINE PREVIEW ────────────────────────────────────────── */
+.pipeline-preview{padding:5rem 0}
+.pp-header{text-align:center;margin-bottom:3rem}
+.pp-header h2{font-size:2rem;font-weight:800;color:#f1f5f9;letter-spacing:-.02em;margin-bottom:1rem}
+.pp-header p{font-size:.92rem;color:#64748b;max-width:620px;margin:0 auto;line-height:1.8}
+.pp-flow{display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;max-width:900px;margin:0 auto;padding:2rem;background:rgba(15,23,42,.4);border:1px solid rgba(71,85,105,.15);border-radius:20px}
+.pp-step{padding:10px 18px;border-radius:10px;font-size:.72rem;font-weight:700;background:rgba(30,41,59,.6);border:1px solid rgba(71,85,105,.3);color:#94a3b8;transition:all .3s;cursor:default}
+.pp-step:hover{border-color:rgba(6,182,212,.3);color:#e2e8f0}
+.pp-arrow{color:rgba(6,182,212,.3);font-size:.9rem}
+.pp-cta{text-align:center;margin-top:2.5rem}
+.pp-cta a{display:inline-flex;align-items:center;gap:8px;padding:12px 28px;border-radius:12px;background:rgba(6,182,212,.08);border:1px solid rgba(6,182,212,.2);color:#22d3ee;font-size:.85rem;font-weight:600;transition:all .2s}
+.pp-cta a:hover{background:rgba(6,182,212,.14);transform:translateY(-1px)}
+
+/* ── RESPONSIVE ──────────────────────────────────────────────── */
+@media(max-width:768px){
+    .hero h1{font-size:2.4rem}
+    .hero{padding:8rem 1.5rem 4rem}
+    .stats-bar{grid-template-columns:repeat(3,1fr)}
+    .feat-grid{grid-template-columns:1fr}
+    .sim-card{padding:32px 24px}
+}
+{% endblock %}
+
+{% block content %}
+
+<!-- Hero -->
+<section class="hero">
+    <div class="hero-grid"></div>
+    <div style="position:relative">
+        <div class="hero-badge"><span></span> Autonomous AI Research Pipeline</div>
+        <h1>Next-Generation<br>Stock Intelligence,<br><span class="grad-text">Powered by AI Agents</span></h1>
+        <p class="sub">9 autonomous AI agents. 12 proprietary intelligence channels. 6 adversarial analysis stages. A fully orchestrated research pipeline that produces institutional-grade investment analysis without human intervention.</p>
+        <div class="hero-ctas">
+            <a href="/how-it-works" class="hero-primary">See How It Works</a>
+            <a href="/about-us" class="hero-secondary">Meet the Agents</a>
+        </div>
+        <div class="ai-logos">
+            <div class="ai-logo-item">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M13.827 3.52h3.603L24 20.48h-3.603l-6.57-16.96zm-7.258 0h3.767L16.906 20.48h-3.674l-1.343-3.461H5.017l-1.344 3.46H0L6.57 3.522zm1.21 5.124-2.36 6.076h4.72l-2.36-6.076z"/></svg>
+                <span>Anthropic</span>
+            </div>
+            <div class="ai-logo-item">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M22.282 9.821a5.985 5.985 0 0 0-.516-4.91 6.046 6.046 0 0 0-6.51-2.9A6.065 6.065 0 0 0 4.981 4.18a5.998 5.998 0 0 0-3.998 2.9 6.042 6.042 0 0 0 .743 7.097 5.98 5.98 0 0 0 .51 4.911 6.051 6.051 0 0 0 6.515 2.9A5.985 5.985 0 0 0 13.26 24a6.056 6.056 0 0 0 5.772-4.206 5.99 5.99 0 0 0 3.997-2.9 6.056 6.056 0 0 0-.747-7.073zM13.26 22.43a4.476 4.476 0 0 1-2.876-1.04l.141-.081 4.779-2.758a.795.795 0 0 0 .392-.681v-6.737l2.02 1.168a.071.071 0 0 1 .038.052v5.583a4.504 4.504 0 0 1-4.494 4.494zM3.6 18.304a4.47 4.47 0 0 1-.535-3.014l.142.085 4.783 2.759a.771.771 0 0 0 .78 0l5.843-3.369v2.332a.08.08 0 0 1-.033.062L9.74 19.95a4.5 4.5 0 0 1-6.14-1.646zM2.34 7.896a4.485 4.485 0 0 1 2.366-1.973V11.6a.766.766 0 0 0 .388.676l5.815 3.355-2.02 1.168a.076.076 0 0 1-.071 0l-4.83-2.786A4.504 4.504 0 0 1 2.34 7.872zm16.597 3.855-5.833-3.387L15.119 7.2a.076.076 0 0 1 .071 0l4.83 2.791a4.494 4.494 0 0 1-.676 8.105v-5.678a.79.79 0 0 0-.407-.667zm2.01-3.023-.141-.085-4.774-2.782a.776.776 0 0 0-.785 0L9.409 9.23V6.897a.066.066 0 0 1 .028-.061l4.83-2.787a4.5 4.5 0 0 1 6.68 4.66zm-12.64 4.135-2.02-1.164a.08.08 0 0 1-.038-.057V6.075a4.5 4.5 0 0 1 7.375-3.453l-.142.08L8.704 5.46a.795.795 0 0 0-.393.681zm1.097-2.365 2.602-1.5 2.607 1.5v2.999l-2.597 1.5-2.607-1.5z"/></svg>
+                <span>OpenAI</span>
+            </div>
+            <div class="ai-logo-item">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.352 0 0 5.352 0 12s5.352 12 12 12 12-5.352 12-12S18.648 0 12 0zm0 2.4c5.28 0 9.6 4.32 9.6 9.6 0 5.28-4.32 9.6-9.6 9.6-5.28 0-9.6-4.32-9.6-9.6C2.4 6.72 6.72 2.4 12 2.4z"/><path d="M12 3.6A8.4 8.4 0 0 0 3.6 12c0 4.632 3.768 8.4 8.4 8.4s8.4-3.768 8.4-8.4c0-2.328-.936-4.44-2.472-5.976A8.352 8.352 0 0 0 12 3.6z" opacity=".5"/></svg>
+                <span>Google Gemini</span>
+            </div>
+            <div class="ai-logo-item">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8 12c0-2.21 1.79-4 4-4s4 1.79 4 4-1.79 4-4 4-4-1.79-4-4z"/><path d="M12 6v2M12 16v2M6 12h2M16 12h2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                <span>DeepSeek</span>
+            </div>
+            <div class="ai-logo-item">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M2 2l8.571 10L2 22h1.714l7.429-8.571L18.286 22H22l-8.571-10L22 2h-1.714l-7.429 8.571L5.714 2H2z" stroke="currentColor" stroke-width=".5"/></svg>
+                <span>xAI Grok</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats -->
+<div class="section-wrap">
+    <div class="stats-bar">
+        <div class="stat-item"><div class="num grad-text">12</div><div class="lbl">Intel Channels</div></div>
+        <div class="stat-item"><div class="num grad-text">9</div><div class="lbl">AI Agents</div></div>
+        <div class="stat-item"><div class="num grad-text">6</div><div class="lbl">Analysis Stages</div></div>
+        <div class="stat-item"><div class="num grad-text">4</div><div class="lbl">Research Verticals</div></div>
+        <div class="stat-item"><div class="num grad-text">3</div><div class="lbl">Risk Perspectives</div></div>
+    </div>
+</div>
+
+<!-- Features -->
+<section class="feat-section">
+    <div class="section-wrap">
+        <div class="feat-label">Platform Capabilities</div>
+        <div class="feat-grid">
+            <div class="feat-card" style="--accent:rgba(6,182,212,.4)">
+                <div class="feat-icon" style="background:rgba(6,182,212,.08);border:1px solid rgba(6,182,212,.15)">
+                    <svg width="22" height="22" fill="none" stroke="#22d3ee" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                </div>
+                <h3>Proprietary OSINT Engine</h3>
+                <p>A custom-built intelligence layer sweeps 12 classified data channels in parallel before any AI analyst begins. SEC EDGAR filings, federal contract databases, Congressional trading disclosures, options flow, and macroeconomic feeds are synthesized into a structured briefing that no competitor replicates.</p>
+            </div>
+            <div class="feat-card" style="--accent:rgba(139,92,246,.4)">
+                <div class="feat-icon" style="background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.15)">
+                    <svg width="22" height="22" fill="none" stroke="#a78bfa" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                </div>
+                <h3>Adversarial Debate Architecture</h3>
+                <p>Two AI advocates are forced to construct opposing investment theses from identical research data. Neither is permitted to equivocate. This adversarial framework surfaces risks and opportunities that consensus-seeking models consistently miss. A judicial AI Director presides over the verdict.</p>
+            </div>
+            <div class="feat-card" style="--accent:rgba(251,146,60,.4)">
+                <div class="feat-icon" style="background:rgba(251,146,60,.08);border:1px solid rgba(251,146,60,.15)">
+                    <svg width="22" height="22" fill="none" stroke="#fb923c" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                </div>
+                <h3>Multi-Perspective Risk Panel</h3>
+                <p>Every position is stress-tested by a three-member AI risk board operating through aggressive, neutral, and conservative analytical lenses. A unified risk verdict is synthesized before any investment directive is issued, ensuring no blind spots survive the review process.</p>
+            </div>
+            <div class="feat-card" style="--accent:rgba(34,197,94,.4)">
+                <div class="feat-icon" style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.15)">
+                    <svg width="22" height="22" fill="none" stroke="#4ade80" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                </div>
+                <h3>Fully Autonomous Pipeline</h3>
+                <p>Zero manual intervention from data collection to final recommendation. AI agents independently research, argue, judge, and assess risk across 6 sequential stages. The only human in the loop is at the final portfolio decision, reviewing a fully documented analytical record.</p>
+            </div>
+            <div class="feat-card" style="--accent:rgba(59,130,246,.4)">
+                <div class="feat-icon" style="background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.15)">
+                    <svg width="22" height="22" fill="none" stroke="#3b82f6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/></svg>
+                </div>
+                <h3>Proprietary Data Aggregation</h3>
+                <p>Beyond standard market APIs, the platform aggregates intelligence from SEC EDGAR, FRED, USASpending.gov, ApeWisdom, and derivatives positioning data into a unified analytical substrate. Each source is queried asynchronously and cross-referenced for signal validation.</p>
+            </div>
+            <div class="feat-card" style="--accent:rgba(236,72,153,.4)">
+                <div class="feat-icon" style="background:rgba(236,72,153,.08);border:1px solid rgba(236,72,153,.15)">
+                    <svg width="22" height="22" fill="none" stroke="#ec4899" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                </div>
+                <h3>Full Audit Trail</h3>
+                <p>Every analysis run produces 14 documented deliverables stored in a structured database with complete JSON state audit. Every agent's reasoning, every debate argument, and every risk assessment is preserved for compliance review and iterative improvement.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Pipeline Preview -->
+<section class="pipeline-preview">
+    <div class="section-wrap">
+        <div class="pp-header">
+            <h2>Six Stages. Zero Gaps.</h2>
+            <p>Every ticker analysis passes through a rigorous, multi-stage pipeline where AI agents independently research, debate, and assess risk before a recommendation is produced.</p>
+        </div>
+        <div class="pp-flow">
+            <span class="pp-step" style="color:#fb923c;background:rgba(251,146,60,.08);border-color:rgba(251,146,60,.2)">Stage 0: OSINT</span>
+            <span class="pp-arrow">&rarr;</span>
+            <span class="pp-step" style="color:#22d3ee;background:rgba(6,182,212,.08);border-color:rgba(6,182,212,.2)">Stage 1: Research</span>
+            <span class="pp-arrow">&rarr;</span>
+            <span class="pp-step" style="color:#e2e8f0">Stage 2: Debate</span>
+            <span class="pp-arrow">&rarr;</span>
+            <span class="pp-step" style="color:#a78bfa;background:rgba(139,92,246,.08);border-color:rgba(139,92,246,.2)">Stage 3: Verdict</span>
+            <span class="pp-arrow">&rarr;</span>
+            <span class="pp-step" style="color:#fbbf24;background:rgba(251,191,36,.08);border-color:rgba(251,191,36,.2)">Stage 4: Risk</span>
+            <span class="pp-arrow">&rarr;</span>
+            <span class="pp-step" style="color:#f1f5f9;background:rgba(6,182,212,.1);border-color:rgba(6,182,212,.25)">Stage 5: Consensus</span>
+        </div>
+        <div class="pp-cta">
+            <a href="/how-it-works">Explore the Full Pipeline <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></a>
+        </div>
+    </div>
+</section>
+
+<!-- SimTrader -->
+<section class="sim-section">
+    <div class="section-wrap">
+        <div class="sim-card">
+            <div class="sim-badge"><span style="width:6px;height:6px;border-radius:50%;background:#fbbf24;animation:pulse 2s infinite"></span> Coming Soon</div>
+            <h2>SimTrader<span class="grad-text" style="margin-left:8px">BETA</span></h2>
+            <p>Our autonomous simulation engine is currently in closed testing. SimTrader uses the full TradingAgents pipeline to execute paper trades in real time, tracking performance against live market data. Built on the same multi-agent framework, it validates research accuracy and portfolio directive quality through continuous simulated execution. The platform continues to evolve.</p>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
