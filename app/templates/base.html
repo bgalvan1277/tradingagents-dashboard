@@ -140,8 +140,8 @@
 
     <!-- Navigation -->
     {% if not hide_nav %}
-    <nav class="sticky top-0 z-50 bg-surface-900/90 backdrop-blur-xl" style="border-bottom:1px solid rgba(6,182,212,.12)">
-        <div style="background:linear-gradient(90deg,transparent,rgba(6,182,212,.15),transparent);height:1px;position:absolute;bottom:0;left:0;right:0"></div>
+    <nav class="sticky top-0 z-50 bg-surface-900/90 backdrop-blur-xl" style="border-bottom:1px solid rgba(71,85,105,.4)">
+        <div style="background:linear-gradient(90deg,transparent,rgba(6,182,212,.2),transparent);height:1px;position:absolute;bottom:-1px;left:0;right:0"></div>
         <div class="px-5 sm:px-8">
             <div class="flex items-center justify-between h-14">
                 <!-- Left: Logo + nav links -->
@@ -156,23 +156,23 @@
                     </a>
 
                     <div class="hidden sm:flex items-center gap-1" style="border-left:1px solid rgba(71,85,105,.3);padding-left:1rem;margin-left:.25rem">
-                        <a href="/" class="px-3 py-1.5 text-xs font-medium rounded-md transition-colors
+                        <a href="/" class="px-3 py-1.5 text-sm font-medium rounded-md transition-colors
                             {% if active_page == 'dashboard' %}bg-cyan-500/10 text-cyan-400 border border-cyan-500/20{% else %}text-slate-400 hover:text-slate-200 hover:bg-surface-700{% endif %}">
                             Dashboard
                         </a>
-                        <a href="/history" class="px-3 py-1.5 text-xs font-medium rounded-md transition-colors
+                        <a href="/history" class="px-3 py-1.5 text-sm font-medium rounded-md transition-colors
                             {% if active_page == 'history' %}bg-cyan-500/10 text-cyan-400 border border-cyan-500/20{% else %}text-slate-400 hover:text-slate-200 hover:bg-surface-700{% endif %}">
                             History
                         </a>
-                        <a href="/watchlist" class="px-3 py-1.5 text-xs font-medium rounded-md transition-colors
+                        <a href="/watchlist" class="px-3 py-1.5 text-sm font-medium rounded-md transition-colors
                             {% if active_page == 'watchlist' %}bg-cyan-500/10 text-cyan-400 border border-cyan-500/20{% else %}text-slate-400 hover:text-slate-200 hover:bg-surface-700{% endif %}">
                             Watchlist
                         </a>
-                        <a href="/run" class="px-3 py-1.5 text-xs font-medium rounded-md transition-colors
+                        <a href="/run" class="px-3 py-1.5 text-sm font-medium rounded-md transition-colors
                             {% if active_page == 'run' %}bg-cyan-500/10 text-cyan-400 border border-cyan-500/20{% else %}text-slate-400 hover:text-slate-200 hover:bg-surface-700{% endif %}">
                             Run
                         </a>
-                        <a href="/status" class="px-3 py-1.5 text-xs font-medium rounded-md transition-colors
+                        <a href="/status" class="px-3 py-1.5 text-sm font-medium rounded-md transition-colors
                             {% if active_page == 'status' %}bg-cyan-500/10 text-cyan-400 border border-cyan-500/20{% else %}text-slate-400 hover:text-slate-200 hover:bg-surface-700{% endif %}">
                             System
                         </a>
