@@ -57,7 +57,12 @@ async def congress(request: Request):
     redirect = require_auth(request)
     if redirect:
         return redirect
-    return templates.TemplateResponse(request, "intelligence/congress.html")
+    from app.services.intel_data import get_congress_trades
+    trades = await get_congress_trades(limit=200)
+    return templates.TemplateResponse(request, "intelligence/congress.html", context={
+        "trades": trades,
+        "trade_count": len(trades),
+    })
 
 
 @router.get("/contracts", response_class=HTMLResponse)
