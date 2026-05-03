@@ -75,19 +75,37 @@
 </a>
 
 <!-- Ticker Hero -->
-<div class="ticker-hero">
-    <h1>{{ ticker_symbol }}</h1>
+<div style="margin-bottom:1.5rem">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px">
+        <div>
+            <h1 style="font-size:2rem;font-weight:800;color:#f1f5f9;margin:0;letter-spacing:-.02em">{{ ticker_symbol }}</h1>
+            {% if quote %}
+            <p style="font-size:.85rem;color:#64748b;margin:2px 0 0">{{ quote.company_name or ticker_symbol }}</p>
+            <div style="display:flex;align-items:baseline;gap:10px;margin-top:6px">
+                <span style="font-size:1.6rem;font-weight:700;color:#f1f5f9;font-variant-numeric:tabular-nums">{{ quote.price }} {{ quote.currency }}</span>
+                {% if quote.change %}
+                <span style="font-size:.9rem;font-weight:600;color:{{ '#4ade80' if quote.change >= 0 else '#f87171' }}">
+                    {{ '+' if quote.change >= 0 else '' }}{{ quote.change }} ({{ quote.change_pct }}%)
+                </span>
+                {% endif %}
+            </div>
+            <p style="font-size:.72rem;color:#475569;margin-top:3px">
+                {% if quote.market_state == 'REGULAR' %}Market Open{% elif quote.market_state == 'CLOSED' or quote.market_state == 'POST' %}Market Closed{% else %}{{ quote.market_state }}{% endif %}
+                {% if run %}&middot; Analysis: {{ run.run_date.strftime('%b %d, %Y') }} {{ run.run_timestamp.strftime('%I:%M %p') if run.run_timestamp else '' }}{% endif %}
+            </p>
+            {% endif %}
+        </div>
+        <button hx-post="/api/run/{{ ticker_symbol }}" hx-swap="none" class="rerun-btn">
+            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            Re-run
+        </button>
+    </div>
     {% if run and run.final_recommendation %}
     {% set rec_lower = run.final_recommendation|lower %}
-    <span class="rec-badge rec-{{ rec_lower }}">{{ run.final_recommendation }}</span>
-    {% endif %}
-    <div class="run-meta">
-        {% if run %}{{ run.run_date.strftime('%B %d, %Y') }} &middot; {{ run.run_timestamp.strftime('%I:%M %p') if run.run_timestamp else '' }}{% endif %}
+    <div style="text-align:center;margin-top:1.25rem">
+        <span class="rec-badge rec-{{ rec_lower }}" style="font-size:.9rem;padding:10px 32px">{{ run.final_recommendation }}</span>
     </div>
-    <button hx-post="/api/run/{{ ticker_symbol }}" hx-swap="none" class="rerun-btn">
-        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-        Re-run
-    </button>
+    {% endif %}
 </div>
 
 <!-- TradingView Chart -->

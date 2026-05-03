@@ -1,5 +1,6 @@
 """Ticker detail route: full analysis view for a single ticker."""
 
+import logging
 from fastapi import APIRouter, Request, Depends
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
@@ -13,6 +14,30 @@ from app.models import Run, RunDetail
 
 router = APIRouter()
 templates = Jinja2Templates(directory="app/templates")
+logger = logging.getLogger(__name__)
+
+
+def _get_stock_quote(symbol: str) -> dict:
+    """Fetch live stock data from yfinance. Returns empty dict on failure."""
+    try:
+        import yfinance as yf
+        tk = yf.Ticker(symbol)
+        info = tk.info or {}
+        price = info.get("currentPrice") or info.get("regularMarketPrice") or 0
+        prev = info.get("regularMarketPreviousClose") or info.get("previousClose") or 0
+        change = round(price - prev, 2) if price and prev else 0
+        pct = round((change / prev) * 100, 2) if prev else 0
+        return {
+            "company_name": info.get("shortName") or info.get("longName") or symbol,
+            "price": round(price, 2),
+            "change": change,
+            "change_pct": pct,
+            "currency": info.get("currency", "USD"),
+            "market_state": info.get("marketState", ""),
+        }
+    except Exception as e:
+        logger.warning("yfinance lookup failed for %s: %s", symbol, e)
+        return {}
 
 
 @router.get("/ticker/{symbol}", response_class=HTMLResponse)
@@ -28,6 +53,9 @@ async def ticker_detail(
         return redirect
 
     symbol = symbol.upper()
+
+    # Fetch live stock quote
+    quote = _get_stock_quote(symbol)
 
     # Get the specific run or the latest one
     if run_id:
@@ -69,6 +97,7 @@ async def ticker_detail(
 
     return templates.TemplateResponse(request, "ticker_detail.html", context={
         "ticker_symbol": symbol,
+        "quote": quote,
         "run": run,
         "details": details,
         "past_runs": past_runs,
