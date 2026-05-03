@@ -2,40 +2,43 @@
 {% set active_page = 'contact' %}
 
 {% block title %}Contact{% endblock %}
-{% block meta_description %}Get in touch with Brian Galvan, the creator of TradingAgents autonomous AI research platform.{% endblock %}
+{% block meta_description %}Learn about the TradingAgents project, its purpose as a personal AI research tool, and future directions including OSINT expansion and AI hive swarm architecture.{% endblock %}
 
 {% block extra_css %}
 .contact-hero{text-align:center;padding:8rem 2rem 3rem;max-width:1100px;margin:0 auto}
 .contact-hero h1{font-size:2.8rem;font-weight:900;color:#f1f5f9;letter-spacing:-.03em;margin-bottom:1rem}
-.contact-hero p{font-size:1rem;color:#64748b;line-height:1.85;max-width:540px;margin:0 auto}
+.contact-hero p{font-size:1rem;color:#64748b;line-height:1.85;max-width:640px;margin:0 auto}
 .contact-wrap{max-width:1100px;margin:0 auto;padding:0 2rem 4rem}
 
-.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:2.5rem}
-.contact-card{background:rgba(15,23,42,.55);backdrop-filter:blur(16px);border:1px solid rgba(71,85,105,.25);border-radius:20px;padding:32px 28px;text-align:center;transition:all .3s}
-.contact-card:hover{border-color:rgba(6,182,212,.2);transform:translateY(-2px)}
-.contact-card .icon{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
-.contact-card h3{font-size:.95rem;font-weight:700;color:#f1f5f9;margin:0 0 6px}
-.contact-card p{font-size:.8rem;color:#94a3b8;margin:0 0 14px;line-height:1.6}
-.contact-card a.link{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:10px;background:rgba(6,182,212,.06);border:1px solid rgba(6,182,212,.15);color:#22d3ee;font-size:.78rem;font-weight:600;transition:all .2s}
-.contact-card a.link:hover{background:rgba(6,182,212,.12)}
+.msg-card{background:rgba(15,23,42,.55);backdrop-filter:blur(16px);border:1px solid rgba(71,85,105,.25);border-radius:24px;padding:48px 44px;margin-bottom:2rem;position:relative;overflow:hidden}
+.msg-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(6,182,212,.3),transparent)}
+.msg-card h2{font-size:1.4rem;font-weight:800;color:#f1f5f9;margin:0 0 1.25rem;letter-spacing:-.02em}
+.msg-card p{font-size:.9rem;color:#94a3b8;line-height:1.9;margin:0 0 1.25rem}
+.msg-card p:last-child{margin:0}
+.msg-card strong{color:#e2e8f0}
 
-/* Form */
-.contact-form{background:rgba(15,23,42,.55);backdrop-filter:blur(16px);border:1px solid rgba(71,85,105,.25);border-radius:24px;padding:40px 36px}
-.contact-form h2{font-size:1.2rem;font-weight:700;color:#f1f5f9;margin:0 0 6px}
-.contact-form .sub{font-size:.8rem;color:#64748b;margin:0 0 28px}
-.form-group{margin-bottom:18px}
-.form-group label{display:block;font-size:.72rem;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
-.form-group input,.form-group textarea{width:100%;padding:11px 14px;border-radius:10px;border:1px solid rgba(71,85,105,.35);background:rgba(10,14,23,.8);color:#e2e8f0;font-family:inherit;font-size:.84rem;outline:none;transition:border-color .2s;resize:vertical}
-.form-group input:focus,.form-group textarea:focus{border-color:rgba(6,182,212,.4)}
-.form-group textarea{min-height:120px}
-.form-submit{width:100%;padding:12px;border-radius:10px;border:none;background:linear-gradient(135deg,#06b6d4,#3b82f6);color:#fff;font-size:.86rem;font-weight:700;cursor:pointer;transition:opacity .2s;box-shadow:0 4px 20px rgba(6,182,212,.2);margin-top:6px}
-.form-submit:hover{opacity:.9}
+.vision-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:2rem}
+.vision-card{background:rgba(15,23,42,.55);backdrop-filter:blur(16px);border:1px solid rgba(71,85,105,.25);border-radius:20px;padding:32px 28px;transition:all .3s;position:relative;overflow:hidden}
+.vision-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--vc,rgba(6,182,212,.3)),transparent);opacity:0;transition:opacity .3s}
+.vision-card:hover{border-color:rgba(6,182,212,.15);transform:translateY(-2px)}.vision-card:hover::before{opacity:1}
+.vision-card .v-icon{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:16px}
+.vision-card h3{font-size:1rem;font-weight:700;color:#f1f5f9;margin:0 0 8px}
+.vision-card p{font-size:.82rem;color:#94a3b8;line-height:1.8;margin:0}
+
+.connect-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
+.connect-card{background:rgba(15,23,42,.55);backdrop-filter:blur(16px);border:1px solid rgba(71,85,105,.25);border-radius:20px;padding:32px 28px;text-align:center;transition:all .3s}
+.connect-card:hover{border-color:rgba(6,182,212,.2);transform:translateY(-2px)}
+.connect-card .icon{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
+.connect-card h3{font-size:.95rem;font-weight:700;color:#f1f5f9;margin:0 0 6px}
+.connect-card p{font-size:.8rem;color:#94a3b8;margin:0 0 14px;line-height:1.6}
+.connect-card a.link{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:10px;background:rgba(6,182,212,.06);border:1px solid rgba(6,182,212,.15);color:#22d3ee;font-size:.78rem;font-weight:600;transition:all .2s}
+.connect-card a.link:hover{background:rgba(6,182,212,.12)}
 
 @media(max-width:768px){
     .contact-hero h1{font-size:2rem}
     .contact-hero{padding:7rem 1.5rem 2.5rem}
-    .contact-grid{grid-template-columns:1fr}
-    .contact-form{padding:28px 20px}
+    .vision-grid,.connect-grid{grid-template-columns:1fr}
+    .msg-card{padding:32px 24px}
     .contact-wrap{padding:0 1.25rem 3rem}
 }
 {% endblock %}
@@ -43,14 +46,46 @@
 {% block content %}
 
 <section class="contact-hero">
-    <p style="font-size:.7rem;font-weight:700;color:rgba(6,182,212,.7);text-transform:uppercase;letter-spacing:.12em;margin-bottom:12px">Get in Touch</p>
-    <h1>Contact</h1>
-    <p>Interested in the platform, have questions about the architecture, or want to discuss collaboration opportunities? Reach out below.</p>
+    <p style="font-size:.7rem;font-weight:700;color:rgba(6,182,212,.7);text-transform:uppercase;letter-spacing:.12em;margin-bottom:12px">A Note from the Creator</p>
+    <h1>Thanks for <span class="grad-text">Viewing</span></h1>
+    <p>A personal project built for a real use case, not a commercial product.</p>
 </section>
 
 <div class="contact-wrap">
-    <div class="contact-grid">
-        <div class="contact-card">
+    <div class="msg-card">
+        <h2>Why I Built This</h2>
+        <p>This project started because I wanted a better way to manage my own portfolio. I needed research and recommendations that I could trust, structured the way I like to see them, covering what to buy, sell, or hold across the financial instruments I care about. So I built it.</p>
+        <p>TradingAgents is <strong>not intended to be a commercial trading tool</strong>. It was designed as a personal system where I could combine my interest in building AI architectures with a real, tangible use case: managing my own investment research pipeline. Every agent, every data source, every stage of the pipeline was built because I needed it for my own decision-making process.</p>
+        <p>The platform exists at the intersection of two things I care about: <strong>artificial intelligence systems engineering</strong> and <strong>financial market research</strong>. It gives me a place to experiment with multi-agent architectures, adversarial reasoning, and autonomous data aggregation while producing something genuinely useful for my own portfolio.</p>
+    </div>
+
+    <div class="msg-card">
+        <h2>What I'm Interested in Exploring</h2>
+        <p>That said, I am more than happy to talk about where this can go. The architecture was designed to be extensible, and there are several directions I find genuinely exciting:</p>
+        <p><strong>Expanding data collection</strong> is the most immediate opportunity. The OSINT layer currently pulls from 12 channels, but there is room to integrate additional intelligence sources, including SIGINT-style signal processing, alternative data feeds, satellite imagery analysis for commodity plays, patent filing monitors, and supply chain disruption tracking.</p>
+        <p><strong>AI hive swarms</strong> represent the longer-term vision. Imagine connecting multiple independent TradingAgents systems into a larger research pool, where each node contributes its own analysis, its own data, and its own perspective. The swarm would produce a higher-fidelity consensus than any single system could achieve alone, while each participant retains full autonomy over their own portfolio decisions. Decentralized intelligence, individually actionable.</p>
+        <p>If any of this resonates with you, whether it is the data expansion, the hive architecture, or something else entirely, I would genuinely enjoy the conversation.</p>
+    </div>
+
+    <div class="vision-grid">
+        <div class="vision-card" style="--vc:rgba(6,182,212,.3)">
+            <div class="v-icon" style="background:rgba(6,182,212,.08);border:1px solid rgba(6,182,212,.15)">
+                <svg width="22" height="22" fill="none" stroke="#22d3ee" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+            </div>
+            <h3>OSINT / SIGINT Expansion</h3>
+            <p>Extending the intelligence layer with additional data channels: satellite imagery, patent filings, supply chain signals, regulatory calendars, and alternative sentiment sources beyond Reddit.</p>
+        </div>
+        <div class="vision-card" style="--vc:rgba(139,92,246,.3)">
+            <div class="v-icon" style="background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.15)">
+                <svg width="22" height="22" fill="none" stroke="#a78bfa" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9"/></svg>
+            </div>
+            <h3>AI Hive Swarm Architecture</h3>
+            <p>Connecting independent TradingAgents systems into a decentralized research network. Each node contributes analysis to a shared intelligence pool while maintaining full individual autonomy over portfolio actions.</p>
+        </div>
+    </div>
+
+    <div class="connect-grid">
+        <div class="connect-card">
             <div class="icon" style="background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.15)">
                 <svg width="22" height="22" fill="none" stroke="#3b82f6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2" stroke-width="1.5"/></svg>
             </div>
@@ -61,7 +96,7 @@
                 <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
             </a>
         </div>
-        <div class="contact-card">
+        <div class="connect-card">
             <div class="icon" style="background:rgba(6,182,212,.08);border:1px solid rgba(6,182,212,.15)">
                 <svg width="22" height="22" fill="none" stroke="#22d3ee" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9"/></svg>
             </div>
@@ -72,30 +107,6 @@
                 <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
             </a>
         </div>
-    </div>
-
-    <div class="contact-form">
-        <h2>Send a Message</h2>
-        <p class="sub">All inquiries are reviewed and responded to personally.</p>
-        <form action="https://formspree.io/f/placeholder" method="POST">
-            <div class="form-group">
-                <label for="name">Name</label>
-                <input type="text" id="name" name="name" placeholder="Your name" required>
-            </div>
-            <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" name="email" placeholder="your@email.com" required>
-            </div>
-            <div class="form-group">
-                <label for="subject">Subject</label>
-                <input type="text" id="subject" name="subject" placeholder="What is this regarding?">
-            </div>
-            <div class="form-group">
-                <label for="message">Message</label>
-                <textarea id="message" name="message" placeholder="Your message..." required></textarea>
-            </div>
-            <button type="submit" class="form-submit">Send Message</button>
-        </form>
     </div>
 </div>
 
