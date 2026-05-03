@@ -40,6 +40,26 @@ def _get_stock_quote(symbol: str) -> dict:
         return {}
 
 
+@router.get("/api/quote/{symbol}")
+async def api_quote(request: Request, symbol: str):
+    """JSON API: return live quote data for a ticker."""
+    redirect = require_auth(request)
+    if redirect:
+        from fastapi.responses import JSONResponse
+        return JSONResponse({"error": "unauthorized"}, status_code=401)
+    data = _get_stock_quote(symbol.upper())
+    if not data:
+        from fastapi.responses import JSONResponse
+        return JSONResponse({"error": "not found"}, status_code=404)
+    from fastapi.responses import JSONResponse
+    return JSONResponse({
+        "name": data.get("company_name", symbol),
+        "price": data.get("price", 0),
+        "change": data.get("change", 0),
+        "pct": data.get("change_pct", 0),
+    })
+
+
 @router.get("/ticker/{symbol}", response_class=HTMLResponse)
 async def ticker_detail(
     request: Request,
