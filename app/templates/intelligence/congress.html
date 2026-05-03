@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% set active_page = 'intelligence' %}
 
-{% block title %}Congressional Trading{% endblock %}
+{% block title %}Insider &amp; Congressional Trading{% endblock %}
 
 {% block content %}
 <style>
@@ -16,110 +16,87 @@
 .data-table{width:100%;border-collapse:collapse;font-size:.78rem}
 .data-table thead{position:sticky;top:0;z-index:2}
 .data-table th{background:rgba(15,23,42,.95);color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:.06em;font-size:.65rem;padding:12px 14px;text-align:left;border-bottom:1px solid rgba(71,85,105,.25)}
-.data-table td{padding:10px 14px;border-bottom:1px solid rgba(71,85,105,.1);color:#94a3b8;white-space:nowrap}
+.data-table td{padding:10px 14px;border-bottom:1px solid rgba(71,85,105,.1);color:#94a3b8}
 .data-table tr:hover td{background:rgba(6,182,212,.02)}
-.data-table .ticker-cell{font-weight:700;color:#f1f5f9;font-size:.82rem}
-.data-table .name-cell{color:#e2e8f0;font-weight:500}
-.tag-buy{background:rgba(34,197,94,.1);color:#4ade80;padding:2px 8px;border-radius:4px;font-size:.65rem;font-weight:700;text-transform:uppercase}
-.tag-sell{background:rgba(239,68,68,.1);color:#f87171;padding:2px 8px;border-radius:4px;font-size:.65rem;font-weight:700;text-transform:uppercase}
-.tag-exchange{background:rgba(251,146,60,.1);color:#fb923c;padding:2px 8px;border-radius:4px;font-size:.65rem;font-weight:700;text-transform:uppercase}
-.tag-house{background:rgba(59,130,246,.08);color:#60a5fa;padding:2px 8px;border-radius:4px;font-size:.62rem;font-weight:600}
-.tag-senate{background:rgba(168,85,247,.08);color:#a78bfa;padding:2px 8px;border-radius:4px;font-size:.62rem;font-weight:600}
-.tag-r{color:#f87171}.tag-d{color:#60a5fa}.tag-i{color:#a78bfa}
-.filter-bar{display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap}
-.filter-btn{padding:5px 14px;border-radius:8px;background:rgba(71,85,105,.15);border:1px solid rgba(71,85,105,.2);color:#94a3b8;font-size:.72rem;font-weight:600;cursor:pointer;transition:all .15s}
-.filter-btn:hover,.filter-btn.active{background:rgba(6,182,212,.08);border-color:rgba(6,182,212,.2);color:#22d3ee}
+.data-table .company-cell{font-weight:600;color:#e2e8f0;font-size:.8rem}
+.data-table .insider-cell{color:#f1f5f9;font-weight:500}
+.tag-form4{background:rgba(6,182,212,.08);color:#22d3ee;padding:2px 8px;border-radius:4px;font-size:.65rem;font-weight:700}
 .table-scroll{max-height:calc(100vh - 340px);overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(71,85,105,.3) transparent}
 .search-input{background:rgba(15,23,42,.6);border:1px solid rgba(71,85,105,.3);border-radius:10px;padding:8px 14px 8px 36px;color:#e2e8f0;font-size:.78rem;width:260px;outline:none;transition:border-color .2s}
 .search-input:focus{border-color:rgba(6,182,212,.3)}
 .search-wrap{position:relative;display:inline-flex;align-items:center}
 .search-wrap svg{position:absolute;left:12px;color:#475569;pointer-events:none}
+.filing-link{color:#22d3ee;text-decoration:none;font-size:.68rem;font-weight:600;opacity:.7;transition:opacity .2s}
+.filing-link:hover{opacity:1}
+.source-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:8px;background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.12);color:#4ade80;font-size:.68rem;font-weight:600;margin-left:12px}
 </style>
 
 <a href="/intelligence" style="display:inline-flex;align-items:center;gap:6px;font-size:.78rem;color:#64748b;text-decoration:none;margin-bottom:1rem">
     <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
     Back to Intelligence
 </a>
-<h1 style="font-size:1.5rem;font-weight:800;color:#f1f5f9;margin:0 0 .25rem;letter-spacing:-.02em">Congressional Trading</h1>
-<p style="font-size:.82rem;color:#64748b;margin:0 0 1.25rem">STOCK Act disclosure tracking, sourced from House & Senate Stock Watcher</p>
+<div style="display:flex;align-items:center;flex-wrap:wrap">
+    <h1 style="font-size:1.5rem;font-weight:800;color:#f1f5f9;margin:0;letter-spacing:-.02em">Insider &amp; Congressional Trading</h1>
+    <span class="source-badge">
+        <span style="width:5px;height:5px;border-radius:50%;background:#4ade80"></span>
+        Live from SEC EDGAR
+    </span>
+</div>
+<p style="font-size:.82rem;color:#64748b;margin:4px 0 1.25rem">Real-time Form 4 insider trade filings from the SEC</p>
 
 <!-- Stats -->
 <div class="stat-row">
     <div class="stat-box">
         <div class="stat-val">{{ trade_count }}</div>
-        <div class="stat-label">Trades Loaded</div>
+        <div class="stat-label">Recent Filings</div>
     </div>
     <div class="stat-box">
-        <div class="stat-val" id="buy-count">—</div>
-        <div class="stat-label">Purchases</div>
+        <div class="stat-val" id="unique-companies">—</div>
+        <div class="stat-label">Companies</div>
     </div>
     <div class="stat-box">
-        <div class="stat-val" id="sell-count">—</div>
-        <div class="stat-label">Sales</div>
-    </div>
-    <div class="stat-box">
-        <div class="stat-val" id="unique-tickers">—</div>
-        <div class="stat-label">Unique Tickers</div>
+        <div class="stat-val" id="unique-insiders">—</div>
+        <div class="stat-label">Insiders</div>
     </div>
 </div>
 
-<!-- Filters -->
-<div class="section-label">Recent Trades</div>
-<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:1rem">
-    <div class="filter-bar">
-        <button class="filter-btn active" onclick="filterTrades('all',this)">All</button>
-        <button class="filter-btn" onclick="filterTrades('purchase',this)">Purchases</button>
-        <button class="filter-btn" onclick="filterTrades('sale',this)">Sales</button>
-        <button class="filter-btn" onclick="filterTrades('house',this)">House</button>
-        <button class="filter-btn" onclick="filterTrades('senate',this)">Senate</button>
-    </div>
+<!-- Search -->
+<div class="section-label">Recent Form 4 Filings</div>
+<div style="margin-bottom:1rem">
     <div class="search-wrap">
         <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-        <input type="text" class="search-input" placeholder="Search ticker or name..." oninput="searchTrades(this.value)">
+        <input type="text" class="search-input" placeholder="Search company or insider..." oninput="searchTable(this.value)">
     </div>
 </div>
 
 <!-- Data Table -->
 <div class="data-table-wrap">
     <div class="table-scroll">
-        <table class="data-table" id="tradesTable">
+        <table class="data-table" id="filingTable">
             <thead>
                 <tr>
-                    <th>Date</th>
-                    <th>Member</th>
-                    <th>Chamber</th>
-                    <th>Ticker</th>
+                    <th>Filing Date</th>
+                    <th>Insider</th>
+                    <th>Company</th>
                     <th>Type</th>
-                    <th>Amount</th>
-                    <th>Description</th>
+                    <th>Filing</th>
                 </tr>
             </thead>
             <tbody>
                 {% for t in trades %}
-                <tr data-type="{{ t.type|lower }}" data-chamber="{{ t.chamber|lower }}">
-                    <td>{{ t.date }}</td>
-                    <td class="name-cell">
-                        {{ t.name }}
-                        {% if t.party %}
-                        <span class="tag-{{ t.party[0]|lower if t.party else '' }}" style="font-size:.65rem;font-weight:600;margin-left:4px">({{ t.party[0] if t.party else '' }})</span>
-                        {% endif %}
-                    </td>
-                    <td><span class="tag-{{ t.chamber|lower }}">{{ t.chamber }}</span></td>
-                    <td class="ticker-cell">{{ t.ticker }}</td>
+                <tr>
+                    <td style="white-space:nowrap">{{ t.date }}</td>
+                    <td class="insider-cell">{{ t.insider }}</td>
+                    <td class="company-cell">{{ t.company }}</td>
+                    <td><span class="tag-form4">{{ t.form }}</span></td>
                     <td>
-                        {% set type_lower = t.type|lower %}
-                        {% if 'purchase' in type_lower or 'buy' in type_lower %}
-                            <span class="tag-buy">Purchase</span>
-                        {% elif 'sale' in type_lower or 'sell' in type_lower %}
-                            <span class="tag-sell">Sale</span>
-                        {% elif 'exchange' in type_lower %}
-                            <span class="tag-exchange">Exchange</span>
-                        {% else %}
-                            <span style="color:#64748b;font-size:.72rem">{{ t.type }}</span>
+                        {% if t.filing_id %}
+                        <a href="https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK={{ t.filing_id }}&type=4&dateb=&owner=include&count=10" target="_blank" class="filing-link">
+                            View on SEC
+                            <svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display:inline;vertical-align:middle;margin-left:3px"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                        </a>
                         {% endif %}
                     </td>
-                    <td style="font-size:.72rem;color:#e2e8f0">{{ t.amount }}</td>
-                    <td style="font-size:.7rem;color:#64748b;max-width:200px;overflow:hidden;text-overflow:ellipsis" title="{{ t.description }}">{{ t.description[:60] }}{% if t.description|length > 60 %}...{% endif %}</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -127,40 +104,43 @@
     </div>
 </div>
 
+{% if trade_count == 0 %}
+<div style="text-align:center;padding:3rem;color:#64748b;font-size:.85rem">
+    <p>Unable to fetch data from SEC EDGAR at this time. The API may be temporarily unavailable.</p>
+    <a href="https://www.sec.gov/cgi-bin/browse-edgar?action=getcurrent&type=4&dateb=&owner=include&count=40" target="_blank" style="color:#22d3ee;text-decoration:none;font-weight:600;font-size:.82rem">View directly on SEC.gov →</a>
+</div>
+{% endif %}
+
+<div class="section-label" style="margin-top:2rem">Additional Sources</div>
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:2rem">
+    <a href="https://www.capitoltrades.com/trades" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:rgba(6,182,212,.06);border:1px solid rgba(6,182,212,.12);color:#22d3ee;font-size:.72rem;font-weight:600;text-decoration:none">
+        <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+        Capitol Trades
+    </a>
+    <a href="https://www.quiverquant.com/congresstrading/" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:rgba(6,182,212,.06);border:1px solid rgba(6,182,212,.12);color:#22d3ee;font-size:.72rem;font-weight:600;text-decoration:none">
+        <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+        Quiver Quant
+    </a>
+</div>
+
 <script>
-// Stats
 (function(){
-    var rows = document.querySelectorAll('#tradesTable tbody tr');
-    var buys=0,sells=0,tickers=new Set();
+    var rows = document.querySelectorAll('#filingTable tbody tr');
+    var companies=new Set(), insiders=new Set();
     rows.forEach(function(r){
-        var t=r.getAttribute('data-type')||'';
-        if(t.includes('purchase')||t.includes('buy'))buys++;
-        if(t.includes('sale')||t.includes('sell'))sells++;
-        var tk=r.querySelector('.ticker-cell');
-        if(tk&&tk.textContent.trim()!=='N/A')tickers.add(tk.textContent.trim());
+        var cells=r.querySelectorAll('td');
+        if(cells[1])insiders.add(cells[1].textContent.trim());
+        if(cells[2])companies.add(cells[2].textContent.trim());
     });
-    document.getElementById('buy-count').textContent=buys;
-    document.getElementById('sell-count').textContent=sells;
-    document.getElementById('unique-tickers').textContent=tickers.size;
+    var ce=document.getElementById('unique-companies');
+    var ie=document.getElementById('unique-insiders');
+    if(ce)ce.textContent=companies.size;
+    if(ie)ie.textContent=insiders.size;
 })();
 
-function filterTrades(type,btn){
-    document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    document.querySelectorAll('#tradesTable tbody tr').forEach(function(r){
-        var tt=r.getAttribute('data-type')||'';
-        var ch=r.getAttribute('data-chamber')||'';
-        if(type==='all'){r.style.display='';}
-        else if(type==='purchase'){r.style.display=(tt.includes('purchase')||tt.includes('buy'))?'':'none';}
-        else if(type==='sale'){r.style.display=(tt.includes('sale')||tt.includes('sell'))?'':'none';}
-        else if(type==='house'){r.style.display=ch==='house'?'':'none';}
-        else if(type==='senate'){r.style.display=ch==='senate'?'':'none';}
-    });
-}
-
-function searchTrades(q){
+function searchTable(q){
     q=q.toLowerCase();
-    document.querySelectorAll('#tradesTable tbody tr').forEach(function(r){
+    document.querySelectorAll('#filingTable tbody tr').forEach(function(r){
         r.style.display=r.textContent.toLowerCase().includes(q)?'':'none';
     });
 }

@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 # In-memory cache: { key: (data, expiry_timestamp) }
 _cache: dict[str, tuple[list, float]] = {}
-CACHE_TTL = 3600  # 1 hour
+CACHE_TTL = 1800  # 30 minutes
 
 
 def _get_cached(key: str) -> Optional[list]:
@@ -26,68 +26,86 @@ def _set_cached(key: str, data: list):
     _cache[key] = (data, time.time() + CACHE_TTL)
 
 
-async def get_congress_trades(limit: int = 100) -> list[dict]:
-    """Fetch recent Congressional stock trades from House & Senate Stock Watcher."""
-    cached = _get_cached("congress_trades")
+SEC_HEADERS = {"User-Agent": "TradingAgents Dashboard support@tradingagents.website"}
+
+
+async def get_insider_trades(limit: int = 100) -> list[dict]:
+    """Fetch recent SEC Form 4 insider trades from EDGAR full-text search."""
+    cached = _get_cached("insider_trades")
     if cached is not None:
         return cached[:limit]
 
     trades = []
-
-    # House trades
     try:
-        async with httpx.AsyncClient(timeout=15) as client:
+        async with httpx.AsyncClient(timeout=20) as client:
+            # Fetch recent Form 4 filings from EDGAR
             resp = await client.get(
-                "https://house-stock-watcher-data.s3-us-west-2.amazonaws.com"
-                "/data/all_transactions.json"
+                "https://efts.sec.gov/LATEST/search-index",
+                params={"q": "", "forms": "4", "dateRange": "custom", "startdt": "2026-04-01"},
+                headers=SEC_HEADERS,
             )
             if resp.status_code == 200:
-                house_data = resp.json()
-                for t in house_data:
+                data = resp.json()
+                hits = data.get("hits", {}).get("hits", [])
+                for h in hits:
+                    src = h.get("_source", {})
+                    names = src.get("display_names", [])
+                    # First name is the insider, second is the company
+                    insider_name = names[0].split("(CIK")[0].strip() if len(names) > 0 else "Unknown"
+                    company_name = names[1].split("(CIK")[0].strip() if len(names) > 1 else "Unknown"
+                    # Clean up names (remove trailing periods, extra spaces)
+                    insider_name = " ".join(w.capitalize() for w in insider_name.lower().split())
+                    company_name = company_name.replace("/DE/", "").replace("/", "").strip()
+
                     trades.append({
-                        "chamber": "House",
-                        "name": t.get("representative", "Unknown"),
-                        "ticker": t.get("ticker", "N/A"),
-                        "type": t.get("type", ""),
-                        "amount": t.get("amount", ""),
-                        "date": t.get("transaction_date", ""),
-                        "disclosure_date": t.get("disclosure_date", ""),
-                        "district": t.get("district", ""),
-                        "party": t.get("party", ""),
-                        "description": t.get("asset_description", ""),
+                        "date": src.get("file_date", ""),
+                        "insider": insider_name,
+                        "company": company_name,
+                        "form": "Form 4",
+                        "filing_id": src.get("adsh", ""),
                     })
-                logger.info("Fetched %d House trades", len(house_data))
+                logger.info("Fetched %d Form 4 filings from SEC EDGAR", len(trades))
     except Exception as e:
-        logger.warning("Failed to fetch House trades: %s", e)
+        logger.warning("Failed to fetch SEC EDGAR data: %s", e)
 
-    # Senate trades
-    try:
-        async with httpx.AsyncClient(timeout=15) as client:
-            resp = await client.get(
-                "https://senate-stock-watcher-data.s3-us-west-2.amazonaws.com"
-                "/aggregate/all_transactions.json"
-            )
-            if resp.status_code == 200:
-                senate_data = resp.json()
-                for t in senate_data:
-                    trades.append({
-                        "chamber": "Senate",
-                        "name": t.get("senator", t.get("full_name", "Unknown")),
-                        "ticker": t.get("ticker", "N/A"),
-                        "type": t.get("type", t.get("transaction_type", "")),
-                        "amount": t.get("amount", ""),
-                        "date": t.get("transaction_date", ""),
-                        "disclosure_date": t.get("disclosure_date", ""),
-                        "district": "",
-                        "party": t.get("party", ""),
-                        "description": t.get("asset_description", ""),
-                    })
-                logger.info("Fetched %d Senate trades", len(senate_data))
-    except Exception as e:
-        logger.warning("Failed to fetch Senate trades: %s", e)
-
-    # Sort by date descending
-    trades.sort(key=lambda x: x.get("date", ""), reverse=True)
-
-    _set_cached("congress_trades", trades)
+    _set_cached("insider_trades", trades)
     return trades[:limit]
+
+
+async def get_sec_filings(form_type: str = "8-K", limit: int = 50) -> list[dict]:
+    """Fetch recent SEC filings of a given type from EDGAR."""
+    cache_key = f"sec_{form_type}"
+    cached = _get_cached(cache_key)
+    if cached is not None:
+        return cached[:limit]
+
+    filings = []
+    try:
+        async with httpx.AsyncClient(timeout=20) as client:
+            resp = await client.get(
+                "https://efts.sec.gov/LATEST/search-index",
+                params={"q": "", "forms": form_type, "dateRange": "custom", "startdt": "2026-04-01"},
+                headers=SEC_HEADERS,
+            )
+            if resp.status_code == 200:
+                data = resp.json()
+                hits = data.get("hits", {}).get("hits", [])
+                for h in hits:
+                    src = h.get("_source", {})
+                    names = src.get("display_names", [])
+                    company = names[0].split("(CIK")[0].strip() if names else "Unknown"
+
+                    filings.append({
+                        "date": src.get("file_date", ""),
+                        "company": company,
+                        "form": form_type,
+                        "description": src.get("file_description", ""),
+                        "filing_id": src.get("adsh", ""),
+                        "items": src.get("items", ""),
+                    })
+                logger.info("Fetched %d %s filings from SEC EDGAR", len(filings), form_type)
+    except Exception as e:
+        logger.warning("Failed to fetch SEC %s data: %s", form_type, e)
+
+    _set_cached(cache_key, filings)
+    return filings[:limit]
