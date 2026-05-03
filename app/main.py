@@ -21,6 +21,9 @@ app.include_router(history.router)
 app.include_router(run.router)
 app.include_router(status.router)
 
+# Serve static files (avatars, etc.)
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
+
 
 @app.on_event("startup")
 async def startup():
