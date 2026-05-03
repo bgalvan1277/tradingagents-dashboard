@@ -39,6 +39,21 @@
 .no-results{text-align:center;padding:4rem 2rem;color:#475569;font-size:.85rem}
 .load-more{display:block;width:100%;padding:12px;margin-top:1.25rem;border-radius:12px;background:rgba(139,92,246,.06);border:1px solid rgba(139,92,246,.15);color:#a78bfa;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .2s;text-align:center}
 .load-more:hover{background:rgba(139,92,246,.12);border-color:rgba(139,92,246,.3)}
+.m-analyze-btn{display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:8px;background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.25);color:#a78bfa;font-size:.7rem;font-weight:700;cursor:pointer;transition:all .2s}
+.m-analyze-btn:hover{background:rgba(139,92,246,.2);border-color:rgba(139,92,246,.4)}
+.m-analyze-btn.running{opacity:.7;pointer-events:none}
+.m-analyze-btn .spin{animation:spin .8s linear infinite;display:none}
+.m-analyze-btn.running .spin{display:inline}
+.m-analyze-btn.running .icon{display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.show{display:flex}
+.modal{background:#0f172a;border:1px solid rgba(139,92,246,.2);border-radius:24px;max-width:760px;width:100%;max-height:85vh;overflow-y:auto;padding:32px;position:relative}
+.modal-close{position:absolute;top:16px;right:16px;width:32px;height:32px;border-radius:8px;border:1px solid rgba(71,85,105,.25);background:transparent;color:#94a3b8;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem}
+.result-section{margin:16px 0;padding:16px;border-radius:14px;background:rgba(15,23,42,.6);border:1px solid rgba(71,85,105,.15)}
+.result-section h4{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin:0 0 8px}
+.result-section p{font-size:.82rem;color:#cbd5e1;line-height:1.65;margin:0;white-space:pre-line}
+.edge-badge{display:inline-flex;align-items:center;gap:6px;padding:8px 20px;border-radius:10px;font-size:1rem;font-weight:800}
 </style>
 
 <div class="pa-hero">
@@ -92,6 +107,11 @@
 </div>
 <button class="load-more" id="load-more" style="display:none" onclick="loadMore()">Load More Markets</button>
 
+<!-- Results Modal -->
+<div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal" id="modal-content"></div>
+</div>
+
 <script>
 const API='/api/polymarket';
 let allMarkets=[];
@@ -132,12 +152,16 @@ function renderCard(m){
                 <span class="m-vol">Vol: ${fmtVol(m.volume)}</span>
                 <span class="m-end" style="margin-left:10px">Ends: ${fmtDate(m.endDate)}</span>
             </div>
-            <a href="https://polymarket.com/event/${slug}" target="_blank" rel="noopener" class="m-analyze" title="View on Polymarket">
-                <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                View
-            </a>
+            <div style="display:flex;gap:6px">
+                <button class="m-analyze-btn" onclick="analyzeMarket(this,'${encodeURIComponent(m.question||'')}',${yesPct},${noPct},'${fmtVol(m.volume)}','${fmtDate(m.endDate)}','${slug}')">
+                    <svg class="icon" width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                    <svg class="spin" width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                    Analyze
+                </button>
+            </div>
         </div>
     </div>`;
+}
 }
 
 function displayMarkets(markets){
@@ -212,5 +236,80 @@ function fetchMarkets(){
 }
 
 fetchMarkets();
+
+function analyzeMarket(btn,question,yesPct,noPct,vol,endDate,slug){
+    question=decodeURIComponent(question);
+    btn.classList.add('running');
+    btn.querySelector('.icon').style.display='none';
+    btn.querySelector('.spin').style.display='inline';
+    fetch(API+'/analyze',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({question,yes_price:yesPct,no_price:noPct,volume:vol,end_date:endDate,slug})
+    }).then(r=>r.json()).then(d=>{
+        if(d.analysis_id) pollAnalysis(d.analysis_id,btn,question,yesPct,noPct);
+        else{btn.classList.remove('running');alert('Failed to start analysis');}
+    }).catch(()=>{btn.classList.remove('running');alert('Network error');});
+}
+
+function pollAnalysis(id,btn,question,yesPct,noPct){
+    const poll=setInterval(()=>{
+        fetch(API+'/analyze/'+id).then(r=>r.json()).then(d=>{
+            if(d.status==='running')return;
+            clearInterval(poll);
+            btn.classList.remove('running');
+            showResults(d,question,yesPct,noPct);
+        }).catch(()=>{clearInterval(poll);btn.classList.remove('running');});
+    },2000);
+}
+
+function showResults(r,question,mktYes,mktNo){
+    const prob=r.ai_probability||50;
+    const edge=r.edge||0;
+    const rec=r.recommendation||'HOLD';
+    const edgeColor=edge>0?'#4ade80':'#f87171';
+    const edgeBg=edge>0?'rgba(34,197,94,.1)':'rgba(239,68,68,.1)';
+    const m=document.getElementById('modal-content');
+    m.innerHTML=`<button class="modal-close" onclick="closeModal()">&times;</button>
+        <p style="font-size:.65rem;font-weight:700;color:rgba(139,92,246,.7);text-transform:uppercase;letter-spacing:.1em;margin:0 0 8px">Agent Analysis</p>
+        <h2 style="font-size:1.15rem;font-weight:700;color:#f1f5f9;margin:0 0 16px;line-height:1.4">${question}</h2>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px">
+            <div style="padding:14px 20px;border-radius:12px;background:rgba(15,23,42,.6);border:1px solid rgba(71,85,105,.15);text-align:center;flex:1;min-width:120px">
+                <div style="font-size:.6rem;color:#475569;text-transform:uppercase;letter-spacing:.06em">Market Price</div>
+                <div style="font-size:1.3rem;font-weight:800;color:#e2e8f0;margin-top:4px">YES ${mktYes}¢</div>
+            </div>
+            <div style="padding:14px 20px;border-radius:12px;background:rgba(139,92,246,.06);border:1px solid rgba(139,92,246,.15);text-align:center;flex:1;min-width:120px">
+                <div style="font-size:.6rem;color:#a78bfa;text-transform:uppercase;letter-spacing:.06em">AI Consensus</div>
+                <div style="font-size:1.3rem;font-weight:800;color:#a78bfa;margin-top:4px">${prob.toFixed(0)}%</div>
+            </div>
+            <div style="padding:14px 20px;border-radius:12px;background:${edgeBg};border:1px solid ${edgeColor}22;text-align:center;flex:1;min-width:120px">
+                <div style="font-size:.6rem;color:${edgeColor};text-transform:uppercase;letter-spacing:.06em">Edge</div>
+                <div style="font-size:1.3rem;font-weight:800;color:${edgeColor};margin-top:4px">${edge>0?'+':''}${edge.toFixed(1)}%</div>
+            </div>
+        </div>
+        <div style="text-align:center;margin-bottom:20px">
+            <span class="edge-badge" style="background:${edgeBg};color:${edgeColor};border:1px solid ${edgeColor}22">${rec}</span>
+            <p style="font-size:.82rem;color:#94a3b8;margin:10px 0 0;font-style:italic">${r.one_line_thesis||''}</p>
+        </div>
+        ${renderSection('Intelligence Briefing','Nadia Petrova',r.intelligence_briefing,'#a78bfa')}
+        ${renderSection('YES Advocate','Lena Torres',r.yes_case,'#4ade80')}
+        ${renderSection('NO Advocate','Ryan Ashford',r.no_case,'#f87171')}
+        ${renderSection('Contrarian Stress Test','Derek Harmon',r.contrarian_note,'#fb923c')}
+        ${renderSection('Probability Synthesis','Dr. Anika Patel',r.synthesis,'#c084fc')}
+        ${renderSection('Edge Analysis','Marco Chen',r.edge_analysis,'#22d3ee')}
+    `;
+    document.getElementById('modal-overlay').classList.add('show');
+}
+
+function renderSection(title,agent,text,color){
+    if(!text)return'';
+    return`<div class="result-section">
+        <h4 style="color:${color}">${title} <span style="font-weight:400;opacity:.6">— ${agent}</span></h4>
+        <p>${text}</p>
+    </div>`;
+}
+
+function closeModal(){document.getElementById('modal-overlay').classList.remove('show');}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
 </script>
 {% endblock %}
