@@ -170,92 +170,128 @@
 </head>
 <body class="min-h-screen grid-bg">
 
-    <!-- Navigation -->
+    <!-- Sidebar -->
     {% if not hide_nav %}
-    <nav class="sticky top-0 z-50 bg-surface-900/90 backdrop-blur-xl" style="border-bottom:1px solid rgba(71,85,105,.4)">
-        <div style="background:linear-gradient(90deg,transparent,rgba(6,182,212,.2),transparent);height:1px;position:absolute;bottom:-1px;left:0;right:0"></div>
-        <div class="px-5 sm:px-8">
-            <div class="flex items-center justify-between h-14">
-                <!-- Left: Logo + nav links -->
-                <div class="flex items-center gap-6">
-                    <a href="/" class="flex items-center gap-2.5 group">
-                        <img src="/static/logo.png" alt="TradingAgents" style="height:38px;object-fit:contain">
-                    </a>
-
-                    <div class="hidden sm:flex items-center gap-1" style="border-left:1px solid rgba(71,85,105,.3);padding-left:1rem;margin-left:.25rem">
-                        <a href="/" class="px-3 py-1.5 text-sm font-medium rounded-md transition-colors
-                            {% if active_page == 'dashboard' %}bg-cyan-500/10 text-cyan-400 border border-cyan-500/20{% else %}text-slate-400 hover:text-slate-200 hover:bg-surface-700{% endif %}">
-                            Dashboard
-                        </a>
-                        <a href="/portfolio" class="px-3 py-1.5 text-sm font-medium rounded-md transition-colors
-                            {% if active_page == 'portfolio' %}bg-cyan-500/10 text-cyan-400 border border-cyan-500/20{% else %}text-slate-400 hover:text-slate-200 hover:bg-surface-700{% endif %}">
-                            Portfolio
-                        </a>
-                        <a href="/about" class="px-3 py-1.5 text-sm font-medium rounded-md transition-colors
-                            {% if active_page == 'about' %}bg-cyan-500/10 text-cyan-400 border border-cyan-500/20{% else %}text-slate-400 hover:text-slate-200 hover:bg-surface-700{% endif %}">
-                            About Us
-                        </a>
-                        <a href="/the-process" class="px-3 py-1.5 text-sm font-medium rounded-md transition-colors
-                            {% if active_page == 'process' %}bg-cyan-500/10 text-cyan-400 border border-cyan-500/20{% else %}text-slate-400 hover:text-slate-200 hover:bg-surface-700{% endif %}">
-                            The Process
-                        </a>
-                        <a href="/intelligence" class="px-3 py-1.5 text-sm font-medium rounded-md transition-colors
-                            {% if active_page == 'intelligence' %}bg-cyan-500/10 text-cyan-400 border border-cyan-500/20{% else %}text-slate-400 hover:text-slate-200 hover:bg-surface-700{% endif %}">
-                            Intelligence
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Right: Status dot + Hamburger menu -->
-                <div class="flex items-center gap-4">
-                    <div class="hidden md:flex items-center gap-2 text-xs text-slate-500">
-                        <span class="relative flex h-2 w-2">
-                            <span class="status-dot-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                        </span>
-                        <span>Online</span>
-                    </div>
-                    <div style="position:relative">
-                        <button onclick="document.getElementById('navMenu').classList.toggle('nav-menu-open')" style="background:rgba(30,41,59,.6);border:1px solid rgba(71,85,105,.3);border-radius:8px;padding:7px 8px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s" onmouseover="this.style.borderColor='rgba(6,182,212,.3)'" onmouseout="this.style.borderColor='rgba(71,85,105,.3)'">
-                            <svg width="18" height="18" fill="none" stroke="#94a3b8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
-                        </button>
-                        <div id="navMenu" style="position:absolute;top:calc(100% + 8px);right:0;min-width:180px;background:rgba(15,23,42,.92);backdrop-filter:blur(20px);border:1px solid rgba(71,85,105,.35);border-radius:14px;padding:6px;opacity:0;visibility:hidden;transform:translateY(-6px);transition:all .2s ease;z-index:100;box-shadow:0 12px 40px rgba(0,0,0,.4)">
-                            <a href="/history" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;font-size:.82rem;font-weight:500;color:#94a3b8;text-decoration:none;transition:all .15s" onmouseover="this.style.background='rgba(6,182,212,.06)';this.style.color='#e2e8f0'" onmouseout="this.style.background='transparent';this.style.color='#94a3b8'">
-                                <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                History
-                            </a>
-                            <a href="/watchlist" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;font-size:.82rem;font-weight:500;color:#94a3b8;text-decoration:none;transition:all .15s" onmouseover="this.style.background='rgba(6,182,212,.06)';this.style.color='#e2e8f0'" onmouseout="this.style.background='transparent';this.style.color='#94a3b8'">
-                                <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
-                                Watchlist
-                            </a>
-                            <a href="/run" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;font-size:.82rem;font-weight:500;color:#94a3b8;text-decoration:none;transition:all .15s" onmouseover="this.style.background='rgba(6,182,212,.06)';this.style.color='#e2e8f0'" onmouseout="this.style.background='transparent';this.style.color='#94a3b8'">
-                                <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                Run Analysis
-                            </a>
-                            <a href="/status" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;font-size:.82rem;font-weight:500;color:#94a3b8;text-decoration:none;transition:all .15s" onmouseover="this.style.background='rgba(6,182,212,.06)';this.style.color='#e2e8f0'" onmouseout="this.style.background='transparent';this.style.color='#94a3b8'">
-                                <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                                System
-                            </a>
-                            <div style="height:1px;background:rgba(71,85,105,.25);margin:4px 10px"></div>
-                            <a href="/logout" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;font-size:.82rem;font-weight:500;color:#f87171;text-decoration:none;transition:all .15s" onmouseover="this.style.background='rgba(239,68,68,.06)'" onmouseout="this.style.background='transparent'">
-                                <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
-                                Logout
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <aside id="sidebar" class="sb">
+        <!-- Logo -->
+        <div class="sb-logo">
+            <a href="/"><img src="/static/logo.png" alt="TradingAgents" class="sb-logo-img"></a>
         </div>
-    </nav>
+
+        <!-- Nav Groups -->
+        <nav class="sb-nav">
+            <div class="sb-group-label"><span>Main</span></div>
+            <a href="/" class="sb-link {% if active_page == 'dashboard' %}sb-active{% endif %}">
+                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1h-2z"/></svg>
+                <span>Dashboard</span>
+            </a>
+            <a href="/portfolio" class="sb-link {% if active_page == 'portfolio' %}sb-active{% endif %}">
+                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                <span>Portfolio</span>
+            </a>
+            <a href="/watchlist" class="sb-link {% if active_page == 'watchlist' %}sb-active{% endif %}">
+                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
+                <span>Watchlist</span>
+            </a>
+
+            <div class="sb-group-label"><span>Research</span></div>
+            <a href="/run" class="sb-link {% if active_page == 'run' %}sb-active{% endif %}">
+                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span>Run Analysis</span>
+            </a>
+            <a href="/history" class="sb-link {% if active_page == 'history' %}sb-active{% endif %}">
+                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span>History</span>
+            </a>
+            <a href="/intelligence" class="sb-link {% if active_page == 'intelligence' %}sb-active{% endif %}">
+                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                <span>Intelligence</span>
+            </a>
+
+            <div class="sb-group-label"><span>Info</span></div>
+            <a href="/the-process" class="sb-link {% if active_page == 'process' %}sb-active{% endif %}">
+                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+                <span>The Process</span>
+            </a>
+            <a href="/about" class="sb-link {% if active_page == 'about' %}sb-active{% endif %}">
+                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                <span>About Us</span>
+            </a>
+            <a href="/status" class="sb-link {% if active_page == 'status' %}sb-active{% endif %}">
+                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                <span>System</span>
+            </a>
+        </nav>
+
+        <!-- Bottom -->
+        <div class="sb-bottom">
+            <div class="sb-status">
+                <span class="sb-dot"></span>
+                <span>Online</span>
+            </div>
+            <a href="/logout" class="sb-link sb-logout">
+                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Mobile hamburger -->
+    <button class="sb-hamburger" onclick="document.getElementById('sidebar').classList.toggle('sb-open')">
+        <svg width="20" height="20" fill="none" stroke="#94a3b8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+    <div class="sb-overlay" onclick="document.getElementById('sidebar').classList.remove('sb-open')"></div>
+
     <style>
-    .nav-menu-open{opacity:1!important;visibility:visible!important;transform:translateY(0)!important}
+    /* Sidebar core */
+    .sb{position:fixed;top:0;left:0;bottom:0;width:64px;background:rgba(10,14,23,.95);backdrop-filter:blur(20px);border-right:1px solid rgba(71,85,105,.3);z-index:60;display:flex;flex-direction:column;transition:width .25s cubic-bezier(.4,0,.2,1);overflow:hidden}
+    .sb:hover{width:220px}
+    .sb:hover .sb-group-label span,.sb:hover .sb-link span,.sb:hover .sb-status span:last-child{opacity:1;transform:translateX(0)}
+
+    /* Logo */
+    .sb-logo{padding:14px 12px;border-bottom:1px solid rgba(71,85,105,.25);display:flex;align-items:center;justify-content:center;min-height:56px;flex-shrink:0}
+    .sb-logo-img{height:36px;object-fit:contain;transition:height .25s}
+    .sb:hover .sb-logo-img{height:36px}
+
+    /* Nav */
+    .sb-nav{flex:1;padding:8px 10px;overflow-y:auto;overflow-x:hidden}
+    .sb-nav::-webkit-scrollbar{width:0}
+    .sb-group-label{padding:16px 8px 6px;white-space:nowrap;overflow:hidden}
+    .sb-group-label span{font-size:.6rem;font-weight:700;color:rgba(100,116,139,.6);text-transform:uppercase;letter-spacing:.12em;opacity:0;transform:translateX(-8px);transition:all .2s .05s}
+    .sb-link{display:flex;align-items:center;gap:12px;padding:9px 12px;border-radius:10px;color:#64748b;text-decoration:none;transition:all .15s;white-space:nowrap;position:relative}
+    .sb-link svg{flex-shrink:0;min-width:18px}
+    .sb-link span{font-size:.82rem;font-weight:500;opacity:0;transform:translateX(-8px);transition:all .2s .05s}
+    .sb-link:hover{color:#e2e8f0;background:rgba(6,182,212,.06)}
+    .sb-active{color:#22d3ee!important;background:rgba(6,182,212,.08)}
+    .sb-active::before{content:'';position:absolute;left:-10px;top:50%;transform:translateY(-50%);width:3px;height:20px;border-radius:0 3px 3px 0;background:#22d3ee}
+
+    /* Bottom */
+    .sb-bottom{padding:10px;border-top:1px solid rgba(71,85,105,.25);flex-shrink:0}
+    .sb-status{display:flex;align-items:center;gap:8px;padding:8px 12px;white-space:nowrap}
+    .sb-status span:last-child{font-size:.7rem;color:#475569;opacity:0;transform:translateX(-8px);transition:all .2s .05s}
+    .sb-dot{width:7px;height:7px;border-radius:50%;background:#22c55e;box-shadow:0 0 8px rgba(34,197,94,.4);flex-shrink:0}
+    .sb-logout{color:#f87171!important}
+    .sb-logout:hover{background:rgba(239,68,68,.06)!important}
+
+    /* Mobile */
+    .sb-hamburger{display:none;position:fixed;top:12px;left:12px;z-index:70;background:rgba(15,23,42,.85);backdrop-filter:blur(12px);border:1px solid rgba(71,85,105,.3);border-radius:10px;padding:8px;cursor:pointer}
+    .sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:55}
+
+    @media(max-width:768px){
+        .sb{width:0;border:none}
+        .sb.sb-open{width:240px;border-right:1px solid rgba(71,85,105,.3)}
+        .sb.sb-open .sb-group-label span,.sb.sb-open .sb-link span,.sb.sb-open .sb-status span:last-child{opacity:1;transform:translateX(0)}
+        .sb-hamburger{display:flex}
+        .sb.sb-open~.sb-overlay{display:block}
+    }
     </style>
-    <script>document.addEventListener('click',function(e){var m=document.getElementById('navMenu');if(m&&!e.target.closest('#navMenu')&&!e.target.closest('button'))m.classList.remove('nav-menu-open')})</script>
     {% endif %}
 
     <!-- Main Content -->
-    <main class="max-w-[1600px] mx-auto px-4 sm:px-6 py-6">
-        {% block content %}{% endblock %}
+    <main style="{% if not hide_nav %}margin-left:64px;{% endif %}transition:margin-left .25s cubic-bezier(.4,0,.2,1);min-height:100vh;padding:1.5rem 1.5rem">
+        <div style="max-width:1500px;margin:0 auto">
+            {% block content %}{% endblock %}
+        </div>
     </main>
 
     <!-- Toast notifications container -->
