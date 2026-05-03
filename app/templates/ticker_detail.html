@@ -1,48 +1,71 @@
 {% extends "base.html" %}
 {% set active_page = 'dashboard' %}
-
 {% block title %}{{ ticker_symbol }} Analysis{% endblock %}
 {% block meta_description %}TradingAgents analysis for {{ ticker_symbol }}{% endblock %}
 
 {% block content %}
 <style>
-.agent-card{background:rgba(15,23,42,.6);border:1px solid rgba(51,65,85,.4);border-radius:16px;overflow:hidden;margin-bottom:1.25rem;transition:border-color .2s}
-.agent-card:hover{border-color:rgba(99,102,241,.3)}
-.agent-header{display:flex;align-items:center;gap:14px;padding:18px 20px;border-bottom:1px solid rgba(51,65,85,.3)}
-.agent-avatar{width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid rgba(99,102,241,.4);flex-shrink:0}
-.agent-name{font-size:.9rem;font-weight:600;color:#e2e8f0;margin:0}
-.agent-title{font-size:.7rem;color:#64748b;margin:2px 0 0;text-transform:uppercase;letter-spacing:.06em;font-weight:500}
-.agent-body{padding:20px;font-size:.85rem;line-height:1.75;color:#94a3b8}
-.agent-body p{margin:0 0 .75rem}
-.stage-label{display:flex;align-items:center;gap:10px;margin:2rem 0 1rem;font-size:.7rem;font-weight:600;color:#6366f1;text-transform:uppercase;letter-spacing:.1em}
-.stage-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(99,102,241,.3),transparent)}
-.stage-num{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.3);font-size:.65rem;color:#818cf8}
-.verdict-card{background:linear-gradient(135deg,rgba(99,102,241,.08),rgba(139,92,246,.06));border:1px solid rgba(99,102,241,.25);border-radius:16px;overflow:hidden;margin-bottom:1.5rem}
-.verdict-card .agent-header{border-bottom-color:rgba(99,102,241,.15)}
+:root{--glass:rgba(15,23,42,.55);--glass-border:rgba(71,85,105,.25);--accent:99,102,241;--glow:rgba(99,102,241,.08)}
+.agent-card{background:var(--glass);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--glass-border);border-radius:20px;overflow:hidden;margin-bottom:1rem;transition:border-color .3s,box-shadow .3s}
+.agent-card:hover{border-color:rgba(var(--accent),.25);box-shadow:0 0 30px rgba(var(--accent),.04)}
+.agent-header{display:flex;align-items:center;gap:18px;padding:22px 24px;cursor:pointer;user-select:none;transition:background .2s}
+.agent-header:hover{background:rgba(var(--accent),.03)}
+.agent-avatar{width:72px;height:72px;border-radius:50%;object-fit:cover;border:2.5px solid rgba(var(--accent),.35);flex-shrink:0;box-shadow:0 0 20px rgba(var(--accent),.1)}
+.agent-info{flex:1;min-width:0}
+.agent-name{font-size:1.1rem;font-weight:700;color:#f1f5f9;margin:0;letter-spacing:-.01em}
+.agent-title{font-size:.72rem;color:rgba(var(--accent),1);margin:3px 0 0;text-transform:uppercase;letter-spacing:.08em;font-weight:600}
+.agent-summary{font-size:.82rem;color:#94a3b8;margin:8px 0 0;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.agent-toggle{width:32px;height:32px;border-radius:50%;background:rgba(var(--accent),.08);border:1px solid rgba(var(--accent),.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .3s}
+.agent-toggle svg{width:14px;height:14px;color:rgba(var(--accent),1);transition:transform .3s}
+.agent-card.expanded .agent-toggle{background:rgba(var(--accent),.15);border-color:rgba(var(--accent),.4)}
+.agent-card.expanded .agent-toggle svg{transform:rotate(180deg)}
+.agent-body{max-height:0;overflow:hidden;transition:max-height .5s cubic-bezier(.4,0,.2,1),padding .3s}
+.agent-card.expanded .agent-body{max-height:5000px;padding:0 24px 24px}
+.agent-content{font-size:.85rem;line-height:1.85;color:#94a3b8;padding-top:16px;border-top:1px solid rgba(71,85,105,.2)}
+.agent-content h2,.agent-content h3{color:#e2e8f0;font-size:.95rem;font-weight:600;margin:1.5rem 0 .5rem}
+.agent-content strong{color:#c4b5fd;font-weight:600}
+.agent-content p{margin:0 0 .75rem}
+.agent-content hr{border:none;border-top:1px solid rgba(71,85,105,.2);margin:1.5rem 0}
+.agent-content ul,.agent-content ol{margin:.5rem 0;padding-left:1.5rem}
+.agent-content li{margin-bottom:.3rem}
+.stage-label{display:flex;align-items:center;gap:10px;margin:2.5rem 0 1.25rem;font-size:.72rem;font-weight:700;color:rgba(var(--accent),1);text-transform:uppercase;letter-spacing:.12em}
+.stage-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(var(--accent),.3),transparent)}
+.stage-num{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:rgba(var(--accent),.1);border:1px solid rgba(var(--accent),.25);font-size:.7rem;color:rgba(var(--accent),.9)}
+.verdict-card{background:linear-gradient(135deg,rgba(var(--accent),.06),rgba(139,92,246,.04));border:1px solid rgba(var(--accent),.2);border-radius:20px;overflow:hidden;margin-bottom:1rem}
+.verdict-card .agent-header{cursor:default}
+.verdict-card .agent-avatar{border-color:rgba(var(--accent),.5);box-shadow:0 0 24px rgba(var(--accent),.15)}
+.verdict-card .agent-body{max-height:none;padding:0 24px 24px;overflow:visible}
+.verdict-summary{font-size:1rem;color:#c4b5fd;font-weight:600;line-height:1.6;margin:0 0 1rem;padding:16px 20px;background:rgba(var(--accent),.06);border-radius:12px;border-left:3px solid rgba(var(--accent),.4)}
 .debate-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
 @media(max-width:768px){.debate-grid{grid-template-columns:1fr}}
-.bull-card{border-color:rgba(34,197,94,.25)}
-.bull-card .agent-avatar{border-color:rgba(34,197,94,.4)}
-.bear-card{border-color:rgba(239,68,68,.25)}
-.bear-card .agent-avatar{border-color:rgba(239,68,68,.4)}
-.tv-chart{border-radius:12px;overflow:hidden;margin-bottom:1.5rem;border:1px solid rgba(51,65,85,.4);height:380px}
+.bull-card{border-color:rgba(34,197,94,.2)}.bull-card:hover{border-color:rgba(34,197,94,.35)}
+.bull-card .agent-avatar{border-color:rgba(34,197,94,.4);box-shadow:0 0 20px rgba(34,197,94,.08)}
+.bull-card .agent-title{color:#4ade80}
+.bull-card .agent-toggle{background:rgba(34,197,94,.08);border-color:rgba(34,197,94,.2)}
+.bull-card .agent-toggle svg{color:#4ade80}
+.bear-card{border-color:rgba(239,68,68,.2)}.bear-card:hover{border-color:rgba(239,68,68,.35)}
+.bear-card .agent-avatar{border-color:rgba(239,68,68,.4);box-shadow:0 0 20px rgba(239,68,68,.08)}
+.bear-card .agent-title{color:#f87171}
+.bear-card .agent-toggle{background:rgba(239,68,68,.08);border-color:rgba(239,68,68,.2)}
+.bear-card .agent-toggle svg{color:#f87171}
+.tv-chart{border-radius:16px;overflow:hidden;margin-bottom:1.5rem;border:1px solid var(--glass-border);height:400px;box-shadow:0 4px 30px rgba(0,0,0,.2)}
 .ticker-hero{display:flex;align-items:center;gap:16px;margin-bottom:1.5rem;flex-wrap:wrap}
-.ticker-hero h1{font-size:1.6rem;font-weight:700;color:#f1f5f9;margin:0}
-.rec-badge{display:inline-flex;align-items:center;padding:6px 14px;border-radius:10px;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
-.rec-buy{background:rgba(34,197,94,.15);color:#4ade80;border:1px solid rgba(34,197,94,.3)}
-.rec-overweight{background:rgba(74,222,128,.12);color:#86efac;border:1px solid rgba(74,222,128,.25)}
-.rec-hold{background:rgba(250,204,21,.12);color:#facc15;border:1px solid rgba(250,204,21,.25)}
-.rec-underweight{background:rgba(251,146,60,.12);color:#fb923c;border:1px solid rgba(251,146,60,.25)}
-.rec-sell{background:rgba(239,68,68,.12);color:#f87171;border:1px solid rgba(239,68,68,.25)}
-.run-meta{font-size:.75rem;color:#475569;margin-left:auto}
-.back-link{color:#64748b;text-decoration:none;transition:color .2s;display:inline-flex;align-items:center;gap:6px;font-size:.8rem;margin-bottom:1rem}
+.ticker-hero h1{font-size:1.8rem;font-weight:800;color:#f1f5f9;margin:0;letter-spacing:-.02em}
+.rec-badge{display:inline-flex;align-items:center;padding:7px 18px;border-radius:12px;font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+.rec-buy{background:rgba(34,197,94,.12);color:#4ade80;border:1px solid rgba(34,197,94,.25)}
+.rec-overweight{background:rgba(74,222,128,.1);color:#86efac;border:1px solid rgba(74,222,128,.2)}
+.rec-hold{background:rgba(250,204,21,.1);color:#facc15;border:1px solid rgba(250,204,21,.2)}
+.rec-underweight{background:rgba(251,146,60,.1);color:#fb923c;border:1px solid rgba(251,146,60,.2)}
+.rec-sell{background:rgba(239,68,68,.1);color:#f87171;border:1px solid rgba(239,68,68,.2)}
+.run-meta{font-size:.78rem;color:#475569;margin-left:auto}
+.back-link{color:#64748b;text-decoration:none;transition:color .2s;display:inline-flex;align-items:center;gap:6px;font-size:.82rem;margin-bottom:1rem}
 .back-link:hover{color:#e2e8f0}
-.rerun-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:10px;background:rgba(30,41,59,.8);border:1px solid rgba(51,65,85,.5);color:#94a3b8;font-size:.75rem;font-weight:500;cursor:pointer;transition:all .2s}
-.rerun-btn:hover{background:rgba(51,65,85,.6);color:#e2e8f0;border-color:rgba(99,102,241,.3)}
+.rerun-btn{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:12px;background:rgba(30,41,59,.8);border:1px solid rgba(51,65,85,.4);color:#94a3b8;font-size:.78rem;font-weight:500;cursor:pointer;transition:all .2s}
+.rerun-btn:hover{background:rgba(var(--accent),.08);color:#e2e8f0;border-color:rgba(var(--accent),.3)}
 .past-table{width:100%;font-size:.8rem;border-collapse:collapse}
-.past-table th{text-align:left;padding:10px 16px;font-size:.7rem;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid rgba(51,65,85,.4)}
-.past-table td{padding:10px 16px;color:#94a3b8;border-bottom:1px solid rgba(51,65,85,.2)}
-.past-table tr:hover td{background:rgba(30,41,59,.4);cursor:pointer}
+.past-table th{text-align:left;padding:12px 18px;font-size:.68rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid rgba(71,85,105,.3)}
+.past-table td{padding:12px 18px;color:#94a3b8;border-bottom:1px solid rgba(71,85,105,.15)}
+.past-table tr:hover td{background:rgba(var(--accent),.03);cursor:pointer}
 </style>
 
 <!-- Back -->
@@ -63,7 +86,7 @@
     </div>
     <button hx-post="/api/run/{{ ticker_symbol }}" hx-swap="none" class="rerun-btn">
         <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-        Re-run Analysis
+        Re-run
     </button>
 </div>
 
@@ -73,23 +96,7 @@
         <div id="tv_chart" style="height:100%;width:100%"></div>
         <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
         <script type="text/javascript">
-        new TradingView.widget({
-            "autosize": true,
-            "symbol": "{{ ticker_symbol }}",
-            "interval": "D",
-            "timezone": "America/New_York",
-            "theme": "dark",
-            "style": "1",
-            "locale": "en",
-            "toolbar_bg": "#0f172a",
-            "enable_publishing": false,
-            "hide_top_toolbar": false,
-            "hide_legend": false,
-            "save_image": false,
-            "container_id": "tv_chart",
-            "backgroundColor": "rgba(15, 23, 42, 0)",
-            "gridColor": "rgba(51, 65, 85, 0.2)"
-        });
+        new TradingView.widget({"autosize":true,"symbol":"{{ ticker_symbol }}","interval":"D","timezone":"America/New_York","theme":"dark","style":"1","locale":"en","toolbar_bg":"#0f172a","enable_publishing":false,"hide_top_toolbar":false,"save_image":false,"container_id":"tv_chart","backgroundColor":"rgba(15,23,42,0)","gridColor":"rgba(51,65,85,0.15)"});
         </script>
     </div>
 </div>
@@ -97,28 +104,29 @@
 {% if not run or not details %}
 <div class="agent-card" style="padding:3rem;text-align:center">
     <p style="color:#64748b;font-size:.9rem">No analysis data available for {{ ticker_symbol }}.</p>
-    <p style="color:#475569;font-size:.8rem;margin-top:.5rem">Run an analysis from the dashboard or wait for the daily cron.</p>
+    <p style="color:#475569;font-size:.8rem;margin-top:.5rem">Run an analysis or wait for the daily cron.</p>
 </div>
 {% else %}
 
-<!-- ===== STAGE 0: FINAL VERDICT (Victoria Lane) ===== -->
+<!-- FINAL VERDICT -->
 <div class="stage-label"><span class="stage-num">★</span> Final Verdict</div>
-
 <div class="verdict-card">
     <div class="agent-header">
         <img src="/static/avatars/brian_galvan.jpg" class="agent-avatar" alt="Brian Galvan" />
-        <div>
+        <div class="agent-info">
             <p class="agent-name">Brian Galvan</p>
             <p class="agent-title">Chief Portfolio Manager</p>
         </div>
     </div>
     <div class="agent-body">
-        {% if run.one_line_thesis %}<p style="color:#c4b5fd;font-weight:500;font-size:.95rem;margin-bottom:1rem">{{ run.one_line_thesis }}</p>{% endif %}
-        {% if details.final_trade_decision %}{{ details.final_trade_decision | replace('\n', '<br>') | safe }}{% endif %}
+        {% if run.one_line_thesis %}
+        <div class="verdict-summary">{{ run.one_line_thesis }}</div>
+        {% endif %}
+        <div class="agent-content" style="border-top:none;padding-top:0" id="verdict-content"></div>
     </div>
 </div>
 
-<!-- ===== STAGE 1: RESEARCH ANALYSTS ===== -->
+<!-- STAGE 1: RESEARCH ANALYSTS -->
 <div class="stage-label"><span class="stage-num">1</span> Research Analysts</div>
 
 {% set analysts = [
@@ -130,100 +138,95 @@
 
 {% for avatar, name, title, report in analysts %}
 {% if report %}
-<div class="agent-card">
+<div class="agent-card" onclick="toggleCard(this)">
     <div class="agent-header">
         <img src="/static/avatars/{{ avatar }}.png" class="agent-avatar" alt="{{ name }}" />
-        <div>
+        <div class="agent-info">
             <p class="agent-name">{{ name }}</p>
             <p class="agent-title">{{ title }}</p>
+            <p class="agent-summary">{{ report[:200] | replace('\n', ' ') | replace('**', '') | replace('##', '') | replace('#', '') }}</p>
         </div>
+        <div class="agent-toggle"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></div>
     </div>
-    <div class="agent-body">{{ report | replace('\n', '<br>') | safe }}</div>
+    <div class="agent-body"><div class="agent-content" data-raw="{{ report | replace('"', '&quot;') | replace('<', '&lt;') | replace('>', '&gt;') }}"></div></div>
 </div>
 {% endif %}
 {% endfor %}
 
-<!-- ===== STAGE 2: BULL/BEAR DEBATE ===== -->
+<!-- STAGE 2: INVESTMENT DEBATE -->
 <div class="stage-label"><span class="stage-num">2</span> Investment Debate</div>
-
 <div class="debate-grid">
-    <div class="agent-card bull-card">
+    <div class="agent-card bull-card" onclick="toggleCard(this)">
         <div class="agent-header">
             <img src="/static/avatars/david_park.png" class="agent-avatar" alt="David Park" />
-            <div>
+            <div class="agent-info">
                 <p class="agent-name">David Park</p>
-                <p class="agent-title" style="color:#4ade80">Bull Case Advocate</p>
+                <p class="agent-title">Bull Case Advocate</p>
+                <p class="agent-summary">{{ (details.bull_case_text or 'No bull case.')[:180] | replace('\n', ' ') | replace('**', '') | replace('##', '') }}</p>
             </div>
+            <div class="agent-toggle"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></div>
         </div>
-        <div class="agent-body">{{ (details.bull_case_text or 'No bull case available.') | replace('\n', '<br>') | safe }}</div>
+        <div class="agent-body"><div class="agent-content" data-raw="{{ (details.bull_case_text or '') | replace('"', '&quot;') | replace('<', '&lt;') | replace('>', '&gt;') }}"></div></div>
     </div>
-    <div class="agent-card bear-card">
+    <div class="agent-card bear-card" onclick="toggleCard(this)">
         <div class="agent-header">
             <img src="/static/avatars/catherine_walsh.png" class="agent-avatar" alt="Catherine Walsh" />
-            <div>
+            <div class="agent-info">
                 <p class="agent-name">Catherine Walsh</p>
-                <p class="agent-title" style="color:#f87171">Bear Case Advocate</p>
+                <p class="agent-title">Bear Case Advocate</p>
+                <p class="agent-summary">{{ (details.bear_case_text or 'No bear case.')[:180] | replace('\n', ' ') | replace('**', '') | replace('##', '') }}</p>
             </div>
+            <div class="agent-toggle"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></div>
         </div>
-        <div class="agent-body">{{ (details.bear_case_text or 'No bear case available.') | replace('\n', '<br>') | safe }}</div>
+        <div class="agent-body"><div class="agent-content" data-raw="{{ (details.bear_case_text or '') | replace('"', '&quot;') | replace('<', '&lt;') | replace('>', '&gt;') }}"></div></div>
     </div>
 </div>
 
-<!-- ===== STAGE 3: RESEARCH DIRECTOR ===== -->
+<!-- STAGE 3: RESEARCH DIRECTOR -->
 {% if details.debate_judge_decision %}
 <div class="stage-label"><span class="stage-num">3</span> Research Director Verdict</div>
-
-<div class="agent-card">
+<div class="agent-card" onclick="toggleCard(this)">
     <div class="agent-header">
         <img src="/static/avatars/michael_torres.png" class="agent-avatar" alt="Michael Torres" />
-        <div>
+        <div class="agent-info">
             <p class="agent-name">Michael Torres</p>
             <p class="agent-title">Research Director</p>
+            <p class="agent-summary">{{ details.debate_judge_decision[:200] | replace('\n', ' ') | replace('**', '') | replace('##', '') }}</p>
         </div>
+        <div class="agent-toggle"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></div>
     </div>
-    <div class="agent-body">{{ details.debate_judge_decision | replace('\n', '<br>') | safe }}</div>
+    <div class="agent-body"><div class="agent-content" data-raw="{{ details.debate_judge_decision | replace('"', '&quot;') | replace('<', '&lt;') | replace('>', '&gt;') }}"></div></div>
 </div>
 {% endif %}
 
-<!-- ===== STAGE 4: RISK ASSESSMENT ===== -->
+<!-- STAGE 4: RISK ASSESSMENT -->
 {% if details.risk_judge_decision %}
 <div class="stage-label"><span class="stage-num">4</span> Risk Assessment</div>
-
-<div class="agent-card">
+<div class="agent-card" onclick="toggleCard(this)">
     <div class="agent-header">
         <img src="/static/avatars/michael_torres.png" class="agent-avatar" alt="Risk Committee" />
-        <div>
+        <div class="agent-info">
             <p class="agent-name">Risk Committee</p>
             <p class="agent-title">Risk Assessment Panel</p>
+            <p class="agent-summary">{{ details.risk_judge_decision[:200] | replace('\n', ' ') | replace('**', '') | replace('##', '') }}</p>
         </div>
+        <div class="agent-toggle"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></div>
     </div>
     <div class="agent-body">
-        <p style="color:#c4b5fd;font-weight:500;margin-bottom:1rem">Judge Decision</p>
-        {{ details.risk_judge_decision | replace('\n', '<br>') | safe }}
+        <div class="agent-content" data-raw="{{ details.risk_judge_decision | replace('"', '&quot;') | replace('<', '&lt;') | replace('>', '&gt;') }}"></div>
         {% if details.risk_aggressive %}
-        <hr style="border:none;border-top:1px solid rgba(51,65,85,.3);margin:1.5rem 0">
-        <p style="color:#fb923c;font-weight:500;margin-bottom:.5rem">Aggressive View</p>
-        {{ details.risk_aggressive | replace('\n', '<br>') | safe }}
+        <div style="margin-top:1.5rem;padding-top:1rem;border-top:1px solid rgba(71,85,105,.2)">
+            <p style="color:#fb923c;font-weight:600;font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.5rem">Aggressive View</p>
+            <div class="agent-content" style="border:none;padding-top:0" data-raw="{{ details.risk_aggressive | replace('"', '&quot;') | replace('<', '&lt;') | replace('>', '&gt;') }}"></div>
+        </div>
         {% endif %}
         {% if details.risk_conservative %}
-        <hr style="border:none;border-top:1px solid rgba(51,65,85,.3);margin:1.5rem 0">
-        <p style="color:#60a5fa;font-weight:500;margin-bottom:.5rem">Conservative View</p>
-        {{ details.risk_conservative | replace('\n', '<br>') | safe }}
-        {% endif %}
-        {% if details.risk_neutral %}
-        <hr style="border:none;border-top:1px solid rgba(51,65,85,.3);margin:1.5rem 0">
-        <p style="color:#94a3b8;font-weight:500;margin-bottom:.5rem">Neutral View</p>
-        {{ details.risk_neutral | replace('\n', '<br>') | safe }}
+        <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid rgba(71,85,105,.2)">
+            <p style="color:#60a5fa;font-weight:600;font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.5rem">Conservative View</p>
+            <div class="agent-content" style="border:none;padding-top:0" data-raw="{{ details.risk_conservative | replace('"', '&quot;') | replace('<', '&lt;') | replace('>', '&gt;') }}"></div>
+        </div>
         {% endif %}
     </div>
-</div>
-{% endif %}
-
-<!-- ===== STAGE 5: TRADER PLAN ===== -->
-{% if details.trader_investment_plan %}
-<div class="stage-label"><span class="stage-num">5</span> Trader Investment Plan</div>
-<div class="agent-card">
-    <div class="agent-body">{{ details.trader_investment_plan | replace('\n', '<br>') | safe }}</div>
 </div>
 {% endif %}
 
@@ -237,11 +240,7 @@
         {% for past in past_runs %}
         <tr onclick="window.location.href='/ticker/{{ ticker_symbol }}?run_id={{ past.id }}'">
             <td style="white-space:nowrap">{{ past.run_date.strftime('%b %d, %Y') }}</td>
-            <td>
-                {% set pr = (past.final_recommendation or 'N/A')|lower %}
-                {% set cm = {'buy':'#4ade80','overweight':'#86efac','hold':'#facc15','underweight':'#fb923c','sell':'#f87171'} %}
-                <span style="color:{{ cm.get(pr, '#64748b') }};font-weight:600">{{ past.final_recommendation or 'N/A' }}</span>
-            </td>
+            <td>{% set pr = (past.final_recommendation or 'N/A')|lower %}{% set cm = {'buy':'#4ade80','overweight':'#86efac','hold':'#facc15','underweight':'#fb923c','sell':'#f87171'} %}<span style="color:{{ cm.get(pr,'#64748b') }};font-weight:600">{{ past.final_recommendation or 'N/A' }}</span></td>
             <td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ past.one_line_thesis or '' }}</td>
             <td style="text-align:right;font-family:monospace;color:#475569">{% if past.total_cost_usd and past.total_cost_usd > 0 %}${{ "%.4f"|format(past.total_cost_usd) }}{% endif %}</td>
         </tr>
@@ -250,6 +249,31 @@
     </table>
 </div>
 {% endif %}
-
 {% endif %}
+
+<script>
+function toggleCard(el){el.classList.toggle('expanded')}
+function renderMd(raw){
+    return raw
+        .replace(/^### (.+)$/gm,'<h3>$1</h3>')
+        .replace(/^## (.+)$/gm,'<h2>$1</h2>')
+        .replace(/^# (.+)$/gm,'<h2>$1</h2>')
+        .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+        .replace(/^\- (.+)$/gm,'<li>$1</li>')
+        .replace(/^(\d+)\. (.+)$/gm,'<li>$2</li>')
+        .replace(/^---$/gm,'<hr>')
+        .replace(/\n\n/g,'</p><p>')
+        .replace(/\n/g,'<br>');
+}
+document.querySelectorAll('.agent-content[data-raw]').forEach(el=>{
+    const raw=el.getAttribute('data-raw');
+    if(raw)el.innerHTML='<p>'+renderMd(raw)+'</p>';
+});
+// Render verdict separately
+const vEl=document.getElementById('verdict-content');
+if(vEl){
+    const raw=`{{ (details.final_trade_decision or '') | replace('\\', '\\\\') | replace('`', '\\`') | replace('\n', '\\n') }}`;
+    vEl.innerHTML='<p>'+renderMd(raw)+'</p>';
+}
+</script>
 {% endblock %}
