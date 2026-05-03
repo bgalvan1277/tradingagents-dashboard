@@ -175,7 +175,10 @@
     <aside id="sidebar" class="sb">
         <!-- Logo -->
         <div class="sb-logo">
-            <a href="/"><img src="/static/logo.png" alt="TradingAgents" class="sb-logo-img"></a>
+            <a href="/">
+                <img src="/static/logo-icon.png" alt="TradingAgents" class="sb-logo-icon">
+                <img src="/static/logo.png" alt="TradingAgents" class="sb-logo-full">
+            </a>
         </div>
 
         <!-- Nav Groups -->
@@ -250,8 +253,11 @@
 
     /* Logo */
     .sb-logo{padding:14px 12px;border-bottom:1px solid rgba(71,85,105,.25);display:flex;align-items:center;justify-content:center;min-height:56px;flex-shrink:0}
-    .sb-logo-img{height:36px;object-fit:contain;transition:height .25s}
-    .sb:hover .sb-logo-img{height:36px}
+    .sb-logo a{display:flex;align-items:center;justify-content:center}
+    .sb-logo-icon{height:34px;object-fit:contain;display:block;transition:opacity .15s}
+    .sb-logo-full{height:34px;object-fit:contain;display:none;transition:opacity .15s}
+    .sb:hover .sb-logo-icon{display:none}
+    .sb:hover .sb-logo-full{display:block}
 
     /* Nav */
     .sb-nav{flex:1;padding:8px 10px;overflow-y:auto;overflow-x:hidden}
