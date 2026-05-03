@@ -315,6 +315,78 @@ def _fetch_full_stock_data(ticker: str) -> dict:
         except Exception as e:
             logger.debug("Sector rotation failed for %s: %s", ticker, e)
 
+        # ── OPTIONS FLOW ──
+        try:
+            import numpy as np
+            exp_dates = tk.options
+            if exp_dates:
+                # Use the nearest expiration
+                nearest_exp = exp_dates[0]
+                chain = tk.option_chain(nearest_exp)
+                calls = chain.calls
+                puts = chain.puts
+
+                total_call_vol = int(calls["volume"].sum()) if "volume" in calls else 0
+                total_put_vol = int(puts["volume"].sum()) if "volume" in puts else 0
+                total_call_oi = int(calls["openInterest"].sum()) if "openInterest" in calls else 0
+                total_put_oi = int(puts["openInterest"].sum()) if "openInterest" in puts else 0
+
+                pc_ratio_vol = round(total_put_vol / total_call_vol, 2) if total_call_vol > 0 else 0
+                pc_ratio_oi = round(total_put_oi / total_call_oi, 2) if total_call_oi > 0 else 0
+
+                # Max Pain calculation
+                current = data["basics"].get("price", 0)
+                if current > 0 and len(calls) > 0 and len(puts) > 0:
+                    strikes = sorted(set(calls["strike"].tolist() + puts["strike"].tolist()))
+                    min_pain = float("inf")
+                    max_pain_strike = current
+                    for strike in strikes:
+                        call_pain = calls[calls["strike"] >= strike]["openInterest"].sum() * abs(strike - current) if "openInterest" in calls else 0
+                        put_pain = puts[puts["strike"] <= strike]["openInterest"].sum() * abs(strike - current) if "openInterest" in puts else 0
+                        total_pain = call_pain + put_pain
+                        if total_pain < min_pain:
+                            min_pain = total_pain
+                            max_pain_strike = strike
+                else:
+                    max_pain_strike = 0
+
+                # Top volume strikes (unusual activity)
+                top_calls = calls.nlargest(3, "volume")[["strike", "volume", "openInterest"]].to_dict("records") if "volume" in calls and len(calls) > 0 else []
+                top_puts = puts.nlargest(3, "volume")[["strike", "volume", "openInterest"]].to_dict("records") if "volume" in puts and len(puts) > 0 else []
+
+                data["options"] = {
+                    "nearest_expiry": nearest_exp,
+                    "total_call_volume": total_call_vol,
+                    "total_put_volume": total_put_vol,
+                    "total_call_oi": total_call_oi,
+                    "total_put_oi": total_put_oi,
+                    "pc_ratio_volume": pc_ratio_vol,
+                    "pc_ratio_oi": pc_ratio_oi,
+                    "max_pain": round(max_pain_strike, 2),
+                    "top_calls": top_calls,
+                    "top_puts": top_puts,
+                }
+        except Exception as e:
+            logger.debug("Options flow failed for %s: %s", ticker, e)
+
+        # ── INSIDER TRANSACTIONS (yfinance) ──
+        try:
+            insiders = tk.insider_transactions
+            if insiders is not None and not insiders.empty:
+                txns = []
+                for _, row in insiders.head(10).iterrows():
+                    txns.append({
+                        "name": str(row.get("Insider", row.get("insider", "Unknown"))),
+                        "relation": str(row.get("Position", row.get("position", ""))),
+                        "type": str(row.get("Transaction", row.get("transaction", ""))),
+                        "shares": int(row.get("Shares", row.get("shares", 0)) or 0),
+                        "value": float(row.get("Value", row.get("value", 0)) or 0),
+                        "date": str(row.get("Start Date", row.get("startDate", ""))),
+                    })
+                data["insider_txns"] = txns
+        except Exception as e:
+            logger.debug("Insider transactions failed for %s: %s", ticker, e)
+
     except Exception as e:
         logger.warning("yfinance comprehensive fetch failed for %s: %s", ticker, e)
         data["basics"] = {"company_name": ticker, "sector": "Unknown", "industry": "Unknown"}
@@ -333,6 +405,8 @@ def _format_briefing(ticker: str, stock_data: dict, insider_trades: list,
     technicals = stock_data.get("technicals", {})
     earnings = stock_data.get("earnings", {})
     sector = stock_data.get("sector_rotation", {})
+    options = stock_data.get("options", {})
+    insider_txns = stock_data.get("insider_txns", [])
 
     lines = []
     lines.append("=" * 72)
@@ -442,6 +516,56 @@ def _format_briefing(ticker: str, stock_data: dict, insider_trades: list,
     else:
         lines.append("  Sector rotation data unavailable.")
 
+    # ── OPTIONS FLOW ──
+    lines.append("\n─── OPTIONS FLOW ──────────────────────────────────────────────")
+    if options:
+        lines.append(f"  Nearest Expiry:  {options.get('nearest_expiry', 'N/A')}")
+        cv = options.get('total_call_volume', 0)
+        pv = options.get('total_put_volume', 0)
+        lines.append(f"  Call Volume:     {cv:,}")
+        lines.append(f"  Put Volume:      {pv:,}")
+        pcr = options.get('pc_ratio_volume', 0)
+        pcr_signal = "BEARISH" if pcr > 1.0 else "BULLISH" if pcr < 0.7 else "NEUTRAL"
+        lines.append(f"  P/C Ratio (Vol): {pcr:.2f}  [{pcr_signal}]")
+        pcr_oi = options.get('pc_ratio_oi', 0)
+        lines.append(f"  P/C Ratio (OI):  {pcr_oi:.2f}")
+        mp = options.get('max_pain', 0)
+        if mp > 0:
+            current = basics.get('price', 0)
+            mp_diff = ((current - mp) / mp * 100) if mp > 0 else 0
+            lines.append(f"  Max Pain:        ${mp:,.2f}  (Price {mp_diff:+.1f}% from max pain)")
+        top_calls = options.get('top_calls', [])
+        if top_calls:
+            lines.append("  Highest Volume Calls:")
+            for c in top_calls[:3]:
+                lines.append(f"    ${c.get('strike',0):,.0f}C  Vol: {int(c.get('volume',0)):,}  OI: {int(c.get('openInterest',0)):,}")
+        top_puts = options.get('top_puts', [])
+        if top_puts:
+            lines.append("  Highest Volume Puts:")
+            for p in top_puts[:3]:
+                lines.append(f"    ${p.get('strike',0):,.0f}P  Vol: {int(p.get('volume',0)):,}  OI: {int(p.get('openInterest',0)):,}")
+    else:
+        lines.append("  Options data not available for this ticker.")
+
+    # ── INSIDER ACTIVITY (yfinance) ──
+    lines.append(f"\n─── INSIDER ACTIVITY ({len(insider_txns)} transactions) ─────────────────")
+    if insider_txns:
+        buys = [t for t in insider_txns if 'buy' in t.get('type', '').lower() or 'purchase' in t.get('type', '').lower()]
+        sells = [t for t in insider_txns if 'sale' in t.get('type', '').lower() or 'sell' in t.get('type', '').lower()]
+        lines.append(f"  Buy Transactions:  {len(buys)}")
+        lines.append(f"  Sell Transactions: {len(sells)}")
+        ratio = "NET BUYING" if len(buys) > len(sells) else "NET SELLING" if len(sells) > len(buys) else "BALANCED"
+        lines.append(f"  Direction:         [{ratio}]")
+        for t in insider_txns[:6]:
+            val = t.get('value', 0)
+            val_str = f"${val:,.0f}" if val else ""
+            shares = t.get('shares', 0)
+            shares_str = f"{shares:,} shares" if shares else ""
+            txn_type = t.get('type', '')[:20]
+            lines.append(f"  [{t.get('date', '')}] {t.get('name', '')[:25]} - {txn_type} {shares_str} {val_str}")
+    else:
+        lines.append("  No recent insider transactions found.")
+
     # ── REDDIT SENTIMENT ──
     reddit = reddit or {}
     lines.append("\n─── REDDIT SENTIMENT (ApeWisdom) ──────────────────────────────")
@@ -550,6 +674,29 @@ def _format_briefing(ticker: str, stock_data: dict, insider_trades: list,
         elif r_change > 50:
             signals.append(f"[WATCH] Reddit mentions rising {r_change:+.0f}% in 24h. Growing retail interest.")
 
+    # Options flow signals
+    pcr_val = options.get('pc_ratio_volume')
+    if pcr_val and pcr_val > 1.5:
+        signals.append(f"[BEARISH] Put/Call ratio at {pcr_val:.2f}. Heavy put buying detected.")
+    elif pcr_val and pcr_val < 0.5:
+        signals.append(f"[BULLISH] Put/Call ratio at {pcr_val:.2f}. Strong call buying activity.")
+    mp_val = options.get('max_pain', 0)
+    cur_price = basics.get('price', 0)
+    if mp_val > 0 and cur_price > 0:
+        mp_pct = abs((cur_price - mp_val) / mp_val * 100)
+        if mp_pct > 10:
+            direction = "above" if cur_price > mp_val else "below"
+            signals.append(f"[OPTIONS] Price {mp_pct:.1f}% {direction} max pain (${mp_val:,.0f}). Potential gravity toward max pain by expiry.")
+
+    # Insider activity signals
+    if insider_txns:
+        buys = [t for t in insider_txns if 'buy' in t.get('type', '').lower() or 'purchase' in t.get('type', '').lower()]
+        sells = [t for t in insider_txns if 'sale' in t.get('type', '').lower() or 'sell' in t.get('type', '').lower()]
+        if len(buys) > len(sells) and len(buys) >= 3:
+            signals.append(f"[BULLISH] {len(buys)} insider buy transactions detected. Insiders accumulating.")
+        elif len(sells) > len(buys) * 2 and len(sells) >= 3:
+            signals.append(f"[CAUTION] {len(sells)} insider sell transactions detected. Insiders distributing.")
+
     if signals:
         for s in signals:
             lines.append(f"  {s}")
@@ -559,9 +706,10 @@ def _format_briefing(ticker: str, stock_data: dict, insider_trades: list,
     total_datapoints = (len(insider_trades) + len(material_events) + len(institutional)
                         + len(gov_contracts) + len(macro) + (1 if technicals else 0)
                         + (1 if earnings else 0) + (1 if sector else 0)
-                        + (1 if reddit.get('found') else 0))
+                        + (1 if reddit.get('found') else 0)
+                        + (1 if options else 0) + len(insider_txns))
     lines.append(f"\n  Total data points collected: {total_datapoints}")
-    lines.append(f"  Intelligence channels queried: 10")
+    lines.append(f"  Intelligence channels queried: 12")
     lines.append("  Classification: UNCLASSIFIED // OPEN SOURCE")
     lines.append("=" * 72)
 
