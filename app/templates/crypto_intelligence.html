@@ -1,0 +1,265 @@
+{% extends "base.html" %}
+{% set active_page = 'crypto' %}
+
+{% block title %}Crypto Intelligence{% endblock %}
+{% block meta_description %}Crypto intelligence gathering and on-chain data feeds{% endblock %}
+
+{% block content %}
+<style>
+.intel-hero{padding:1.5rem 0 2rem}
+.intel-hero h1{font-size:1.8rem;font-weight:800;color:#f1f5f9;margin:0 0 .35rem;letter-spacing:-.02em}
+.intel-hero p{font-size:.88rem;color:#64748b;max-width:600px;line-height:1.6;margin:0}
+.intel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.25rem;margin-top:.5rem}
+.intel-card{background:rgba(15,23,42,.55);backdrop-filter:blur(16px);border:1px solid rgba(71,85,105,.25);border-radius:20px;padding:28px;transition:all .25s;text-decoration:none;display:block;position:relative;overflow:hidden}
+.intel-card:hover{border-color:rgba(245,158,11,.2);box-shadow:0 0 30px rgba(245,158,11,.06);transform:translateY(-3px)}
+.intel-icon{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:18px}
+.intel-card h3{font-size:1.05rem;font-weight:700;color:#f1f5f9;margin:0 0 6px}
+.intel-card p{font-size:.82rem;color:#94a3b8;line-height:1.65;margin:0}
+.intel-status{display:inline-flex;align-items:center;gap:5px;font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;padding:4px 10px;border-radius:6px;position:absolute;top:16px;right:16px}
+.status-live{background:rgba(34,197,94,.1);color:#4ade80;border:1px solid rgba(34,197,94,.15)}
+.status-soon{background:rgba(251,146,60,.08);color:#fb923c;border:1px solid rgba(251,146,60,.12)}
+.section-label{display:flex;align-items:center;gap:10px;margin:2rem 0 1rem;font-size:.72rem;font-weight:700;color:rgba(245,158,11,.9);text-transform:uppercase;letter-spacing:.12em}
+.section-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(245,158,11,.2),transparent)}
+</style>
+
+<a href="/crypto" style="display:inline-flex;align-items:center;gap:6px;font-size:.78rem;color:#64748b;text-decoration:none;margin-bottom:.5rem">
+    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+    Back to Crypto Analysis
+</a>
+
+<div class="intel-hero">
+    <p style="font-size:.7rem;font-weight:700;color:rgba(245,158,11,.7);text-transform:uppercase;letter-spacing:.12em;margin-bottom:10px">Crypto Division</p>
+    <h1>Crypto Intelligence</h1>
+    <p>On-chain metrics, sentiment indicators, and decentralized market feeds. Independent reconnaissance channels dedicated to the digital asset ecosystem.</p>
+</div>
+
+<!-- Jake Summers Profile -->
+<div style="background:linear-gradient(135deg,rgba(245,158,11,.04),rgba(15,23,42,.55));backdrop-filter:blur(16px);border:1px solid rgba(245,158,11,.15);border-radius:20px;padding:32px;margin-bottom:2rem;display:flex;align-items:flex-start;gap:28px">
+    <img src="/static/avatars/jake_summers.png" alt="Jake Summers" style="width:120px;height:120px;border-radius:50%;object-fit:cover;border:2.5px solid rgba(245,158,11,.35);box-shadow:0 0 24px rgba(245,158,11,.1);flex-shrink:0" />
+    <div>
+        <p style="font-size:.65rem;font-weight:700;color:rgba(245,158,11,.7);text-transform:uppercase;letter-spacing:.12em;margin:0 0 6px">Division Lead</p>
+        <h2 style="font-size:1.35rem;font-weight:800;color:#f1f5f9;margin:0 0 4px;letter-spacing:-.01em">Jake Summers</h2>
+        <p style="font-size:.78rem;color:#f59e0b;font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin:0 0 16px">Crypto Research Officer</p>
+        <p style="font-size:.86rem;color:#cbd5e1;line-height:1.75;margin:0 0 12px">Welcome to the Crypto Intelligence Division. This is the operational hub for all digital asset intelligence within the TradingAgents ecosystem. Every data channel below is an active reconnaissance pipeline, continuously pulling signals from blockchain networks, decentralized exchanges, on-chain analytics platforms, and crypto-native sentiment indicators.</p>
+        <p style="font-size:.86rem;color:#94a3b8;line-height:1.75;margin:0 0 12px">As the Crypto Research Officer, my function within the multi-agent system is to execute a comprehensive digital asset sweep before any crypto analysis reaches the research analysts. When a crypto analysis is initiated, I pull real-time market-wide sentiment from the Fear & Greed Index, query CoinGecko for on-chain fundamentals and supply dynamics, monitor Bitcoin dominance shifts for capital rotation signals, and track trending coins for social momentum.</p>
+        <p style="font-size:.86rem;color:#94a3b8;line-height:1.75;margin:0">The intelligence briefing I compile becomes the foundational layer for all crypto-specific analytical decisions. The feeds below represent the raw data channels I draw from. Each one surfaces actionable intelligence that traditional equity analysis simply cannot capture.</p>
+    </div>
+</div>
+<style>
+@media(max-width:768px){
+    div[style*="Jake Summers"]{flex-direction:column!important;text-align:center!important}
+}
+</style>
+
+<!-- Sentiment & Market Feeds -->
+<div class="section-label">Sentiment & Market Data</div>
+<div class="intel-grid">
+    <div class="intel-card" id="fear-greed-card">
+        <span class="intel-status status-live"><span style="width:5px;height:5px;border-radius:50%;background:#4ade80"></span> Live</span>
+        <div class="intel-icon" style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.15)">
+            <svg width="24" height="24" fill="none" stroke="#f59e0b" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        </div>
+        <h3>Fear & Greed Index</h3>
+        <p>Market-wide crypto sentiment gauge (0-100). Aggregates volatility, momentum, social media, and BTC dominance into a single conviction score.</p>
+        <div id="fg-data" style="margin-top:16px;padding:16px;border-radius:12px;background:rgba(15,23,42,.5);border:1px solid rgba(71,85,105,.2)">
+            <div style="display:flex;align-items:center;justify-content:space-between">
+                <div>
+                    <span id="fg-value" style="font-size:2rem;font-weight:800;color:#f59e0b">--</span>
+                    <span id="fg-label" style="font-size:.75rem;font-weight:600;color:#94a3b8;margin-left:8px;text-transform:uppercase">Loading</span>
+                </div>
+                <div id="fg-updated" style="font-size:.65rem;color:#475569"></div>
+            </div>
+        </div>
+    </div>
+    <div class="intel-card" id="global-card">
+        <span class="intel-status status-live"><span style="width:5px;height:5px;border-radius:50%;background:#4ade80"></span> Live</span>
+        <div class="intel-icon" style="background:rgba(6,182,212,.08);border:1px solid rgba(6,182,212,.15)">
+            <svg width="24" height="24" fill="none" stroke="#22d3ee" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </div>
+        <h3>Global Market Data</h3>
+        <p>Total crypto market capitalization, 24-hour trading volume, and market-wide performance snapshot from CoinGecko.</p>
+        <div id="global-data" style="margin-top:16px;padding:16px;border-radius:12px;background:rgba(15,23,42,.5);border:1px solid rgba(71,85,105,.2)">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <div>
+                    <span style="font-size:.6rem;color:#475569;text-transform:uppercase;letter-spacing:.06em">Market Cap</span>
+                    <div id="gd-mcap" style="font-size:1rem;font-weight:700;color:#f1f5f9;margin-top:2px">--</div>
+                </div>
+                <div>
+                    <span style="font-size:.6rem;color:#475569;text-transform:uppercase;letter-spacing:.06em">24h Volume</span>
+                    <div id="gd-vol" style="font-size:1rem;font-weight:700;color:#f1f5f9;margin-top:2px">--</div>
+                </div>
+                <div>
+                    <span style="font-size:.6rem;color:#475569;text-transform:uppercase;letter-spacing:.06em">BTC Dominance</span>
+                    <div id="gd-btcd" style="font-size:1rem;font-weight:700;color:#f59e0b;margin-top:2px">--</div>
+                </div>
+                <div>
+                    <span style="font-size:.6rem;color:#475569;text-transform:uppercase;letter-spacing:.06em">Active Coins</span>
+                    <div id="gd-coins" style="font-size:1rem;font-weight:700;color:#f1f5f9;margin-top:2px">--</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- On-Chain Intelligence -->
+<div class="section-label">On-Chain Intelligence</div>
+<div class="intel-grid">
+    <div class="intel-card" id="btc-card">
+        <span class="intel-status status-live"><span style="width:5px;height:5px;border-radius:50%;background:#4ade80"></span> Live</span>
+        <div class="intel-icon" style="background:rgba(247,147,26,.08);border:1px solid rgba(247,147,26,.15)">
+            <svg width="24" height="24" fill="none" stroke="#f7931a" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </div>
+        <h3>Bitcoin Metrics</h3>
+        <p>Market cap rank, circulating supply, all-time high distance, and 24h price metrics for Bitcoin from CoinGecko.</p>
+        <div id="btc-data" style="margin-top:16px;padding:16px;border-radius:12px;background:rgba(15,23,42,.5);border:1px solid rgba(71,85,105,.2)">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <div>
+                    <span style="font-size:.6rem;color:#475569;text-transform:uppercase;letter-spacing:.06em">Price</span>
+                    <div id="btc-price" style="font-size:1rem;font-weight:700;color:#f1f5f9;margin-top:2px">--</div>
+                </div>
+                <div>
+                    <span style="font-size:.6rem;color:#475569;text-transform:uppercase;letter-spacing:.06em">24h Change</span>
+                    <div id="btc-change" style="font-size:1rem;font-weight:700;color:#94a3b8;margin-top:2px">--</div>
+                </div>
+                <div>
+                    <span style="font-size:.6rem;color:#475569;text-transform:uppercase;letter-spacing:.06em">ATH</span>
+                    <div id="btc-ath" style="font-size:1rem;font-weight:700;color:#f1f5f9;margin-top:2px">--</div>
+                </div>
+                <div>
+                    <span style="font-size:.6rem;color:#475569;text-transform:uppercase;letter-spacing:.06em">From ATH</span>
+                    <div id="btc-ath-pct" style="font-size:1rem;font-weight:700;color:#94a3b8;margin-top:2px">--</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="intel-card" id="eth-card">
+        <span class="intel-status status-live"><span style="width:5px;height:5px;border-radius:50%;background:#4ade80"></span> Live</span>
+        <div class="intel-icon" style="background:rgba(98,126,234,.08);border:1px solid rgba(98,126,234,.15)">
+            <svg width="24" height="24" fill="none" stroke="#627eea" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 2L3 12l9 5 9-5-9-10zM3 12l9 10 9-10"/></svg>
+        </div>
+        <h3>Ethereum Metrics</h3>
+        <p>Market cap, circulating supply, all-time high distance, and 24h price metrics for Ethereum from CoinGecko.</p>
+        <div id="eth-data" style="margin-top:16px;padding:16px;border-radius:12px;background:rgba(15,23,42,.5);border:1px solid rgba(71,85,105,.2)">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <div>
+                    <span style="font-size:.6rem;color:#475569;text-transform:uppercase;letter-spacing:.06em">Price</span>
+                    <div id="eth-price" style="font-size:1rem;font-weight:700;color:#f1f5f9;margin-top:2px">--</div>
+                </div>
+                <div>
+                    <span style="font-size:.6rem;color:#475569;text-transform:uppercase;letter-spacing:.06em">24h Change</span>
+                    <div id="eth-change" style="font-size:1rem;font-weight:700;color:#94a3b8;margin-top:2px">--</div>
+                </div>
+                <div>
+                    <span style="font-size:.6rem;color:#475569;text-transform:uppercase;letter-spacing:.06em">ATH</span>
+                    <div id="eth-ath" style="font-size:1rem;font-weight:700;color:#f1f5f9;margin-top:2px">--</div>
+                </div>
+                <div>
+                    <span style="font-size:.6rem;color:#475569;text-transform:uppercase;letter-spacing:.06em">From ATH</span>
+                    <div id="eth-ath-pct" style="font-size:1rem;font-weight:700;color:#94a3b8;margin-top:2px">--</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="intel-card" id="trending-card">
+        <span class="intel-status status-live"><span style="width:5px;height:5px;border-radius:50%;background:#4ade80"></span> Live</span>
+        <div class="intel-icon" style="background:rgba(168,85,247,.08);border:1px solid rgba(168,85,247,.15)">
+            <svg width="24" height="24" fill="none" stroke="#a78bfa" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+        </div>
+        <h3>Trending Coins</h3>
+        <p>Top trending cryptocurrencies by search volume on CoinGecko. Social momentum signals for breakout identification.</p>
+        <div id="trending-data" style="margin-top:16px;padding:16px;border-radius:12px;background:rgba(15,23,42,.5);border:1px solid rgba(71,85,105,.2)">
+            <div id="trending-list" style="display:flex;flex-direction:column;gap:8px">
+                <span style="font-size:.75rem;color:#475569">Loading trending coins...</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Fear & Greed Index
+fetch('https://api.alternative.me/fng/?limit=1')
+    .then(r=>r.json())
+    .then(d=>{
+        const item=d.data[0];
+        const val=parseInt(item.value);
+        const label=item.value_classification;
+        const color=val<=25?'#f87171':val<=45?'#fb923c':val<=55?'#fbbf24':val<=75?'#4ade80':'#22d3ee';
+        document.getElementById('fg-value').textContent=val;
+        document.getElementById('fg-value').style.color=color;
+        document.getElementById('fg-label').textContent=label;
+        document.getElementById('fg-updated').textContent='Updated: '+new Date(item.timestamp*1000).toLocaleDateString();
+    }).catch(()=>{document.getElementById('fg-value').textContent='N/A'});
+
+// Global Market Data
+fetch('https://api.coingecko.com/api/v3/global')
+    .then(r=>r.json())
+    .then(d=>{
+        const g=d.data;
+        const fmt=(n)=>{
+            if(n>=1e12)return '$'+( n/1e12).toFixed(2)+'T';
+            if(n>=1e9)return '$'+(n/1e9).toFixed(1)+'B';
+            return '$'+(n/1e6).toFixed(0)+'M';
+        };
+        document.getElementById('gd-mcap').textContent=fmt(g.total_market_cap.usd);
+        document.getElementById('gd-vol').textContent=fmt(g.total_volume.usd);
+        document.getElementById('gd-btcd').textContent=g.market_cap_percentage.btc.toFixed(1)+'%';
+        document.getElementById('gd-coins').textContent=g.active_cryptocurrencies.toLocaleString();
+    }).catch(()=>{});
+
+// Bitcoin Metrics
+fetch('https://api.coingecko.com/api/v3/coins/bitcoin?localization=false&tickers=false&community_data=false&developer_data=false')
+    .then(r=>r.json())
+    .then(d=>{
+        const m=d.market_data;
+        document.getElementById('btc-price').textContent='$'+m.current_price.usd.toLocaleString();
+        const c=m.price_change_percentage_24h;
+        const cel=document.getElementById('btc-change');
+        cel.textContent=(c>=0?'+':'')+c.toFixed(2)+'%';
+        cel.style.color=c>=0?'#4ade80':'#f87171';
+        document.getElementById('btc-ath').textContent='$'+m.ath.usd.toLocaleString();
+        const ap=m.ath_change_percentage.usd;
+        const ael=document.getElementById('btc-ath-pct');
+        ael.textContent=ap.toFixed(1)+'%';
+        ael.style.color=ap>=0?'#4ade80':'#f87171';
+    }).catch(()=>{});
+
+// Ethereum Metrics
+fetch('https://api.coingecko.com/api/v3/coins/ethereum?localization=false&tickers=false&community_data=false&developer_data=false')
+    .then(r=>r.json())
+    .then(d=>{
+        const m=d.market_data;
+        document.getElementById('eth-price').textContent='$'+m.current_price.usd.toLocaleString();
+        const c=m.price_change_percentage_24h;
+        const cel=document.getElementById('eth-change');
+        cel.textContent=(c>=0?'+':'')+c.toFixed(2)+'%';
+        cel.style.color=c>=0?'#4ade80':'#f87171';
+        document.getElementById('eth-ath').textContent='$'+m.ath.usd.toLocaleString();
+        const ap=m.ath_change_percentage.usd;
+        const ael=document.getElementById('eth-ath-pct');
+        ael.textContent=ap.toFixed(1)+'%';
+        ael.style.color=ap>=0?'#4ade80':'#f87171';
+    }).catch(()=>{});
+
+// Trending Coins
+fetch('https://api.coingecko.com/api/v3/search/trending')
+    .then(r=>r.json())
+    .then(d=>{
+        const list=document.getElementById('trending-list');
+        list.innerHTML='';
+        d.coins.slice(0,7).forEach((c,i)=>{
+            const coin=c.item;
+            const row=document.createElement('div');
+            row.style.cssText='display:flex;align-items:center;justify-content:space-between;padding:6px 0;'+(i<6?'border-bottom:1px solid rgba(71,85,105,.12)':'');
+            row.innerHTML=`
+                <div style="display:flex;align-items:center;gap:10px">
+                    <img src="${coin.small}" width="20" height="20" style="border-radius:50%">
+                    <span style="font-size:.78rem;font-weight:600;color:#f1f5f9">${coin.name}</span>
+                    <span style="font-size:.65rem;color:#475569;text-transform:uppercase">${coin.symbol}</span>
+                </div>
+                <span style="font-size:.68rem;color:#64748b">Rank #${coin.market_cap_rank||'--'}</span>
+            `;
+            list.appendChild(row);
+        });
+    }).catch(()=>{});
+</script>
+{% endblock %}

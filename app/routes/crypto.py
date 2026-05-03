@@ -70,3 +70,13 @@ async def crypto_analyzer(request: Request, db: AsyncSession = Depends(get_db)):
         "current_date": today.strftime("%A, %B %d, %Y"),
         "daily_cost": float(daily_cost),
     })
+
+
+@router.get("/crypto/intelligence", response_class=HTMLResponse)
+async def crypto_intelligence(request: Request):
+    """Crypto intelligence gathering hub."""
+    redirect = require_auth(request)
+    if redirect:
+        return redirect
+
+    return templates.TemplateResponse(request, "crypto_intelligence.html")

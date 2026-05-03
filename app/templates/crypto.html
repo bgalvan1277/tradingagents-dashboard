@@ -44,10 +44,16 @@
             <h1>Crypto Analysis</h1>
             <p>{{ current_date }} · {{ runs|length }} asset{{ 's' if runs|length != 1 else '' }} tracked</p>
         </div>
-        <a href="/run" style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:10px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);color:#f59e0b;font-size:.78rem;font-weight:600;text-decoration:none;transition:all .2s">
-            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-            New Analysis
-        </a>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <a href="/crypto/intelligence" style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:10px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);color:#f59e0b;font-size:.78rem;font-weight:600;text-decoration:none;transition:all .2s">
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                Intel Feeds
+            </a>
+            <a href="/run" style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:10px;background:rgba(71,85,105,.12);border:1px solid rgba(71,85,105,.25);color:#94a3b8;font-size:.78rem;font-weight:600;text-decoration:none;transition:all .2s">
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                New Analysis
+            </a>
+        </div>
     </div>
 </div>
 
