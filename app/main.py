@@ -31,8 +31,16 @@ app.mount("/static", StaticFiles(directory="app/static"), name="static")
 @app.on_event("startup")
 async def startup():
     """Run on application startup."""
-    # Database tables are managed by Alembic migrations, not auto-created here.
-    pass
+    # Auto-add new columns if they don't exist yet
+    from app.database import engine
+    from sqlalchemy import text
+    async with engine.begin() as conn:
+        try:
+            await conn.execute(text(
+                "ALTER TABLE run_details ADD COLUMN intelligence_briefing TEXT NULL"
+            ))
+        except Exception:
+            pass  # Column already exists
 
 
 @app.on_event("shutdown")

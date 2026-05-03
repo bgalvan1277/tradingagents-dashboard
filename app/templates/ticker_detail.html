@@ -164,7 +164,7 @@
 </style>
 
 <!-- STAGE 0: INTELLIGENCE GATHERING -->
-{% if details.intelligence_briefing %}
+{% if details and details.intelligence_briefing %}
 <div class="stage-label"><span class="stage-num" style="background:rgba(251,146,60,.1);border-color:rgba(251,146,60,.25);color:#fb923c">0</span> Intelligence Gathering</div>
 
 <div class="agent-card" onclick="toggleCard(this)" style="border-color:rgba(251,146,60,.12)">
