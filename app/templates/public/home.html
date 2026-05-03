@@ -32,17 +32,27 @@
 .stat-item .num{font-size:2.2rem;font-weight:900;letter-spacing:-.03em}
 .stat-item .lbl{font-size:.62rem;color:#64748b;text-transform:uppercase;letter-spacing:.1em;font-weight:600;margin-top:6px}
 
-/* ── FEATURES ────────────────────────────────────────────────── */
-.feat-section{padding:4rem 0}
-.feat-label{display:flex;align-items:center;gap:12px;font-size:.7rem;font-weight:700;color:rgba(6,182,212,.8);text-transform:uppercase;letter-spacing:.14em;margin-bottom:3rem;text-align:center;justify-content:center}
-.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem}
-.feat-card{background:rgba(15,23,42,.55);backdrop-filter:blur(16px);border:1px solid rgba(71,85,105,.2);border-radius:20px;padding:32px 28px;transition:all .3s;position:relative;overflow:hidden}
-.feat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:0;transition:opacity .3s}
-.feat-card:hover{border-color:rgba(6,182,212,.15);transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,.3)}
-.feat-card:hover::before{opacity:1}
-.feat-icon{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:20px}
-.feat-card h3{font-size:1rem;font-weight:700;color:#f1f5f9;margin:0 0 10px}
-.feat-card p{font-size:.82rem;color:#94a3b8;line-height:1.75;margin:0}
+/* ── CAPABILITIES TABS ────────────────────────────────────────── */
+.cap-section{padding:4rem 0}
+.cap-label{display:flex;align-items:center;gap:12px;font-size:.7rem;font-weight:700;color:rgba(6,182,212,.8);text-transform:uppercase;letter-spacing:.14em;margin-bottom:2.5rem;text-align:center;justify-content:center}
+.cap-wrap{display:grid;grid-template-columns:220px 1fr;gap:0;background:rgba(15,23,42,.55);backdrop-filter:blur(16px);border:1px solid rgba(71,85,105,.2);border-radius:20px;overflow:hidden;min-height:420px}
+.cap-tabs{display:flex;flex-direction:column;border-right:1px solid rgba(71,85,105,.15);background:rgba(10,14,23,.4)}
+.cap-tab{display:flex;align-items:center;gap:10px;padding:16px 20px;border:none;background:none;color:#64748b;font-size:.78rem;font-weight:600;font-family:inherit;cursor:pointer;text-align:left;transition:all .2s;border-left:2px solid transparent}
+.cap-tab:hover{color:#94a3b8;background:rgba(6,182,212,.03)}
+.cap-tab.active{color:#22d3ee;background:rgba(6,182,212,.05);border-left-color:#22d3ee}
+.cap-tab svg{flex-shrink:0;opacity:.5;transition:opacity .2s}
+.cap-tab.active svg{opacity:1;stroke:#22d3ee}
+.cap-panels{position:relative}
+.cap-panel{display:none;padding:36px 40px;animation:capFade .35s ease}
+.cap-panel.active{display:block}
+@keyframes capFade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.cap-eyebrow{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px}
+.cap-panel h3{font-size:1.3rem;font-weight:800;color:#f1f5f9;margin:0 0 14px;letter-spacing:-.02em}
+.cap-panel p{font-size:.88rem;color:#94a3b8;line-height:1.85;margin:0 0 18px}
+.cap-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px}
+.cap-tags span{padding:4px 10px;border-radius:6px;background:rgba(226,232,240,.04);border:1px solid rgba(71,85,105,.2);font-size:.62rem;font-weight:600;color:#64748b;letter-spacing:.04em}
+.cap-visual{position:relative;border-radius:12px;background:var(--vc,rgba(15,23,42,.4));border:1px solid var(--vb,rgba(71,85,105,.15));overflow:hidden;min-height:80px}
+.cap-v-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(226,232,240,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(226,232,240,.02) 1px,transparent 1px);background-size:30px 30px;pointer-events:none}
 
 /* ── SIMTRADER ───────────────────────────────────────────────── */
 .sim-section{padding:5rem 0;text-align:center}
@@ -70,7 +80,12 @@
     .hero h1{font-size:2.4rem}
     .hero{padding:6rem 1.5rem 4rem;min-height:100vh}
     .stats-bar{grid-template-columns:repeat(3,1fr)}
-    .feat-grid{grid-template-columns:1fr}
+    .cap-wrap{grid-template-columns:1fr}
+    .cap-tabs{flex-direction:row;overflow-x:auto;border-right:none;border-bottom:1px solid rgba(71,85,105,.15)}
+    .cap-tab{border-left:none;border-bottom:2px solid transparent;white-space:nowrap;padding:12px 16px;font-size:.7rem}
+    .cap-tab.active{border-left-color:transparent;border-bottom-color:#22d3ee}
+    .cap-tab span{display:none}
+    .cap-panel{padding:24px 20px}
     .sim-card{padding:32px 24px}
 }
 {% endblock %}
@@ -124,56 +139,67 @@
     </div>
 </div>
 
-<!-- Features -->
-<section class="feat-section">
+<!-- Capabilities (Tabbed) -->
+<section class="cap-section">
     <div class="section-wrap">
-        <div class="feat-label">Platform Capabilities</div>
-        <div class="feat-grid">
-            <div class="feat-card" style="--accent:rgba(6,182,212,.4)">
-                <div class="feat-icon" style="background:rgba(6,182,212,.08);border:1px solid rgba(6,182,212,.15)">
-                    <svg width="22" height="22" fill="none" stroke="#22d3ee" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
-                </div>
-                <h3>Proprietary OSINT Engine</h3>
-                <p>A custom-built intelligence layer sweeps 12 classified data channels in parallel before any AI analyst begins. SEC EDGAR filings, federal contract databases, Congressional trading disclosures, options flow, and macroeconomic feeds are synthesized into a structured briefing that no competitor replicates.</p>
+        <div class="cap-label">Platform Capabilities</div>
+        <div class="cap-wrap">
+            <div class="cap-tabs">
+                <button class="cap-tab active" data-tab="0"><svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg><span>OSINT Engine</span></button>
+                <button class="cap-tab" data-tab="1"><svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg><span>Adversarial Debate</span></button>
+                <button class="cap-tab" data-tab="2"><svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg><span>Risk Panel</span></button>
+                <button class="cap-tab" data-tab="3"><svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg><span>Autonomous Pipeline</span></button>
+                <button class="cap-tab" data-tab="4"><svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/></svg><span>Data Aggregation</span></button>
+                <button class="cap-tab" data-tab="5"><svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg><span>Audit Trail</span></button>
             </div>
-            <div class="feat-card" style="--accent:rgba(139,92,246,.4)">
-                <div class="feat-icon" style="background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.15)">
-                    <svg width="22" height="22" fill="none" stroke="#a78bfa" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+            <div class="cap-panels">
+                <div class="cap-panel active" data-panel="0">
+                    <div class="cap-eyebrow" style="color:#22d3ee">Intelligence Layer</div>
+                    <h3>Proprietary OSINT Engine</h3>
+                    <p>A custom-built intelligence layer sweeps 12 classified data channels in parallel before any AI analyst begins. SEC EDGAR filings, federal contract databases, Congressional trading disclosures, options flow, and macroeconomic feeds are synthesized into a structured briefing that no competitor replicates.</p>
+                    <div class="cap-tags"><span>SEC EDGAR</span><span>FRED</span><span>USASpending</span><span>Congressional Trades</span><span>FDA Calendars</span></div>
+                    <div class="cap-visual" style="--vc:rgba(6,182,212,.06);--vb:rgba(6,182,212,.12)"><div class="cap-v-grid"></div><svg width="100%" height="120" viewBox="0 0 500 120" fill="none" preserveAspectRatio="none"><path d="M0 80 Q60 30 120 60 T240 40 T360 70 T500 20" stroke="rgba(6,182,212,.4)" stroke-width="2"/><path d="M0 90 Q80 60 160 80 T320 50 T500 60" stroke="rgba(59,130,246,.25)" stroke-width="1.5"/></svg></div>
                 </div>
-                <h3>Adversarial Debate Architecture</h3>
-                <p>Two AI advocates are forced to construct opposing investment theses from identical research data. Neither is permitted to equivocate. This adversarial framework surfaces risks and opportunities that consensus-seeking models consistently miss. A judicial AI Director presides over the verdict.</p>
-            </div>
-            <div class="feat-card" style="--accent:rgba(251,146,60,.4)">
-                <div class="feat-icon" style="background:rgba(251,146,60,.08);border:1px solid rgba(251,146,60,.15)">
-                    <svg width="22" height="22" fill="none" stroke="#fb923c" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                <div class="cap-panel" data-panel="1">
+                    <div class="cap-eyebrow" style="color:#a78bfa">Debate Architecture</div>
+                    <h3>Adversarial Investment Debate</h3>
+                    <p>Two AI advocates are forced to construct opposing investment theses from identical research data. Neither is permitted to equivocate. This adversarial framework surfaces risks and opportunities that consensus-seeking models consistently miss. A judicial AI Director presides over the verdict, evaluating evidence quality and logical rigor.</p>
+                    <div class="cap-tags"><span>Bull Advocate</span><span>Bear Advocate</span><span>Judicial Review</span><span>Evidence Scoring</span></div>
+                    <div class="cap-visual" style="--vc:rgba(139,92,246,.06);--vb:rgba(139,92,246,.12)"><div class="cap-v-grid"></div><div style="display:flex;justify-content:center;align-items:center;gap:28px;padding:32px 0"><div style="text-align:center"><div style="width:48px;height:48px;border-radius:50%;background:rgba(34,197,94,.1);border:2px solid rgba(34,197,94,.3);margin:0 auto 8px;display:flex;align-items:center;justify-content:center"><svg width="20" height="20" fill="none" stroke="#4ade80" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg></div><div style="font-size:.65rem;color:#4ade80;font-weight:700">BULL</div></div><div style="font-size:1.2rem;color:rgba(139,92,246,.5);font-weight:800">VS</div><div style="text-align:center"><div style="width:48px;height:48px;border-radius:50%;background:rgba(239,68,68,.1);border:2px solid rgba(239,68,68,.3);margin:0 auto 8px;display:flex;align-items:center;justify-content:center"><svg width="20" height="20" fill="none" stroke="#f87171" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></div><div style="font-size:.65rem;color:#f87171;font-weight:700">BEAR</div></div></div></div>
                 </div>
-                <h3>Multi-Perspective Risk Panel</h3>
-                <p>Every position is stress-tested by a three-member AI risk board operating through aggressive, neutral, and conservative analytical lenses. A unified risk verdict is synthesized before any investment directive is issued, ensuring no blind spots survive the review process.</p>
-            </div>
-            <div class="feat-card" style="--accent:rgba(34,197,94,.4)">
-                <div class="feat-icon" style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.15)">
-                    <svg width="22" height="22" fill="none" stroke="#4ade80" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                <div class="cap-panel" data-panel="2">
+                    <div class="cap-eyebrow" style="color:#fb923c">Risk Assessment</div>
+                    <h3>Multi-Perspective Risk Panel</h3>
+                    <p>Every position is stress-tested by a three-member AI risk board operating through aggressive, neutral, and conservative analytical lenses. A unified risk verdict is synthesized before any investment directive is issued, ensuring no blind spots survive the review process.</p>
+                    <div class="cap-tags"><span>Aggressive</span><span>Conservative</span><span>Neutral</span><span>Risk Judge</span></div>
+                    <div class="cap-visual" style="--vc:rgba(251,146,60,.06);--vb:rgba(251,146,60,.12)"><div class="cap-v-grid"></div><div style="display:flex;justify-content:center;gap:16px;padding:24px 0"><div style="flex:1;max-width:100px;text-align:center;padding:14px 8px;background:rgba(239,68,68,.05);border:1px solid rgba(239,68,68,.15);border-radius:10px"><div style="font-size:.58rem;color:#f87171;font-weight:700;text-transform:uppercase;letter-spacing:.08em">High</div><div style="font-size:1.4rem;font-weight:800;color:#f87171;margin-top:4px">78</div></div><div style="flex:1;max-width:100px;text-align:center;padding:14px 8px;background:rgba(251,191,36,.05);border:1px solid rgba(251,191,36,.15);border-radius:10px"><div style="font-size:.58rem;color:#fbbf24;font-weight:700;text-transform:uppercase;letter-spacing:.08em">Med</div><div style="font-size:1.4rem;font-weight:800;color:#fbbf24;margin-top:4px">52</div></div><div style="flex:1;max-width:100px;text-align:center;padding:14px 8px;background:rgba(34,197,94,.05);border:1px solid rgba(34,197,94,.15);border-radius:10px"><div style="font-size:.58rem;color:#4ade80;font-weight:700;text-transform:uppercase;letter-spacing:.08em">Low</div><div style="font-size:1.4rem;font-weight:800;color:#4ade80;margin-top:4px">31</div></div></div></div>
                 </div>
-                <h3>Fully Autonomous Pipeline</h3>
-                <p>Zero manual intervention from data collection to final recommendation. AI agents independently research, argue, judge, and assess risk across 6 sequential stages. The only human in the loop is at the final portfolio decision, reviewing a fully documented analytical record.</p>
-            </div>
-            <div class="feat-card" style="--accent:rgba(59,130,246,.4)">
-                <div class="feat-icon" style="background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.15)">
-                    <svg width="22" height="22" fill="none" stroke="#3b82f6" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/></svg>
+                <div class="cap-panel" data-panel="3">
+                    <div class="cap-eyebrow" style="color:#4ade80">Automation</div>
+                    <h3>Fully Autonomous Pipeline</h3>
+                    <p>Zero manual intervention from data collection to final recommendation. AI agents independently research, argue, judge, and assess risk across 6 sequential stages. The only human in the loop is at the final portfolio decision, reviewing a fully documented analytical record.</p>
+                    <div class="cap-tags"><span>6 Stages</span><span>9 Agents</span><span>Zero Intervention</span><span>Full Automation</span></div>
+                    <div class="cap-visual" style="--vc:rgba(34,197,94,.06);--vb:rgba(34,197,94,.12)"><div class="cap-v-grid"></div><div style="display:flex;align-items:center;justify-content:center;gap:4px;padding:28px 0;flex-wrap:wrap"><div style="padding:6px 12px;border-radius:6px;background:rgba(251,146,60,.1);border:1px solid rgba(251,146,60,.2);font-size:.6rem;font-weight:700;color:#fb923c">OSINT</div><span style="color:rgba(6,182,212,.3);font-size:.7rem">&rarr;</span><div style="padding:6px 12px;border-radius:6px;background:rgba(6,182,212,.1);border:1px solid rgba(6,182,212,.2);font-size:.6rem;font-weight:700;color:#22d3ee">RESEARCH</div><span style="color:rgba(6,182,212,.3);font-size:.7rem">&rarr;</span><div style="padding:6px 12px;border-radius:6px;background:rgba(226,232,240,.06);border:1px solid rgba(71,85,105,.3);font-size:.6rem;font-weight:700;color:#e2e8f0">DEBATE</div><span style="color:rgba(6,182,212,.3);font-size:.7rem">&rarr;</span><div style="padding:6px 12px;border-radius:6px;background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.2);font-size:.6rem;font-weight:700;color:#a78bfa">VERDICT</div><span style="color:rgba(6,182,212,.3);font-size:.7rem">&rarr;</span><div style="padding:6px 12px;border-radius:6px;background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.2);font-size:.6rem;font-weight:700;color:#fbbf24">RISK</div><span style="color:rgba(6,182,212,.3);font-size:.7rem">&rarr;</span><div style="padding:6px 12px;border-radius:6px;background:rgba(6,182,212,.12);border:1px solid rgba(6,182,212,.25);font-size:.6rem;font-weight:700;color:#22d3ee">DECISION</div></div></div>
                 </div>
-                <h3>Proprietary Data Aggregation</h3>
-                <p>Beyond standard market APIs, the platform aggregates intelligence from SEC EDGAR, FRED, USASpending.gov, ApeWisdom, and derivatives positioning data into a unified analytical substrate. Each source is queried asynchronously and cross-referenced for signal validation.</p>
-            </div>
-            <div class="feat-card" style="--accent:rgba(236,72,153,.4)">
-                <div class="feat-icon" style="background:rgba(236,72,153,.08);border:1px solid rgba(236,72,153,.15)">
-                    <svg width="22" height="22" fill="none" stroke="#ec4899" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                <div class="cap-panel" data-panel="4">
+                    <div class="cap-eyebrow" style="color:#3b82f6">Data Infrastructure</div>
+                    <h3>Proprietary Data Aggregation</h3>
+                    <p>Beyond standard market APIs, the platform aggregates intelligence from SEC EDGAR, FRED, USASpending.gov, ApeWisdom, and derivatives positioning data into a unified analytical substrate. Each source is queried asynchronously and cross-referenced for signal validation.</p>
+                    <div class="cap-tags"><span>SEC EDGAR</span><span>FRED</span><span>ApeWisdom</span><span>Options Flow</span><span>Derivatives</span></div>
+                    <div class="cap-visual" style="--vc:rgba(59,130,246,.06);--vb:rgba(59,130,246,.12)"><div class="cap-v-grid"></div><svg width="100%" height="100" viewBox="0 0 500 100" fill="none" preserveAspectRatio="none"><rect x="20" y="60" width="40" height="30" rx="4" fill="rgba(59,130,246,.15)"/><rect x="80" y="40" width="40" height="50" rx="4" fill="rgba(59,130,246,.2)"/><rect x="140" y="50" width="40" height="40" rx="4" fill="rgba(59,130,246,.15)"/><rect x="200" y="20" width="40" height="70" rx="4" fill="rgba(59,130,246,.25)"/><rect x="260" y="35" width="40" height="55" rx="4" fill="rgba(59,130,246,.2)"/><rect x="320" y="45" width="40" height="45" rx="4" fill="rgba(59,130,246,.15)"/><rect x="380" y="25" width="40" height="65" rx="4" fill="rgba(59,130,246,.2)"/><rect x="440" y="55" width="40" height="35" rx="4" fill="rgba(59,130,246,.12)"/></svg></div>
                 </div>
-                <h3>Full Audit Trail</h3>
-                <p>Every analysis run produces 14 documented deliverables stored in a structured database with complete JSON state audit. Every agent's reasoning, every debate argument, and every risk assessment is preserved for compliance review and iterative improvement.</p>
+                <div class="cap-panel" data-panel="5">
+                    <div class="cap-eyebrow" style="color:#ec4899">Compliance</div>
+                    <h3>Full Audit Trail</h3>
+                    <p>Every analysis run produces 14 documented deliverables stored in a structured database with complete JSON state audit. Every agent's reasoning, every debate argument, and every risk assessment is preserved for compliance review and iterative improvement.</p>
+                    <div class="cap-tags"><span>14 Deliverables</span><span>JSON State</span><span>Full Transparency</span><span>Compliance Ready</span></div>
+                    <div class="cap-visual" style="--vc:rgba(236,72,153,.06);--vb:rgba(236,72,153,.12)"><div class="cap-v-grid"></div><div style="padding:20px 16px;display:flex;flex-direction:column;gap:6px"><div style="display:flex;align-items:center;gap:8px"><svg width="12" height="12" fill="none" stroke="#4ade80" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg><span style="font-size:.68rem;color:#94a3b8">intelligence_briefing.json</span></div><div style="display:flex;align-items:center;gap:8px"><svg width="12" height="12" fill="none" stroke="#4ade80" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg><span style="font-size:.68rem;color:#94a3b8">research_reports[4].json</span></div><div style="display:flex;align-items:center;gap:8px"><svg width="12" height="12" fill="none" stroke="#4ade80" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg><span style="font-size:.68rem;color:#94a3b8">debate_transcript.json</span></div><div style="display:flex;align-items:center;gap:8px"><svg width="12" height="12" fill="none" stroke="#4ade80" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg><span style="font-size:.68rem;color:#94a3b8">risk_assessment.json</span></div><div style="display:flex;align-items:center;gap:8px"><svg width="12" height="12" fill="none" stroke="#4ade80" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg><span style="font-size:.68rem;color:#94a3b8">full_state_audit.json</span></div></div></div>
+                </div>
             </div>
         </div>
     </div>
 </section>
+<script>document.querySelectorAll('.cap-tab').forEach(tab=>{tab.addEventListener('click',()=>{document.querySelectorAll('.cap-tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.cap-panel').forEach(p=>p.classList.remove('active'));tab.classList.add('active');document.querySelector('.cap-panel[data-panel="'+tab.dataset.tab+'"]').classList.add('active')})});</script>
 
 <!-- Pipeline Preview -->
 <section class="pipeline-preview">
