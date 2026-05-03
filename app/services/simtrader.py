@@ -120,8 +120,9 @@ async def execute_trade(
     shares: int,
     run_id: Optional[int] = None,
     note: Optional[str] = None,
+    custom_price: Optional[Decimal] = None,
 ) -> dict:
-    """Execute a simulated buy or sell at current market price.
+    """Execute a simulated buy or sell at current market price or a custom price.
 
     Returns dict with trade details or error message.
     """
@@ -133,10 +134,13 @@ async def execute_trade(
     if shares <= 0:
         return {"error": "Shares must be greater than 0"}
 
-    # Get live price
-    price = await get_live_price(symbol)
-    if not price:
-        return {"error": f"Could not fetch price for {symbol}. Verify the ticker is valid."}
+    # Use custom price if provided, otherwise fetch live
+    if custom_price and custom_price > 0:
+        price = custom_price.quantize(Decimal("0.0001"))
+    else:
+        price = await get_live_price(symbol)
+        if not price:
+            return {"error": f"Could not fetch price for {symbol}. Verify the ticker is valid."}
 
     total_value = _to_dec(price * shares)
 

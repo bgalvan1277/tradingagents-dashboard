@@ -48,15 +48,20 @@ async def execute_trade(
     shares: int = Form(...),
     run_id: Optional[int] = Form(None),
     note: Optional[str] = Form(None),
+    custom_price: Optional[float] = Form(None),
     db: AsyncSession = Depends(get_db),
 ):
     """Execute a simulated trade."""
     if not get_current_user(request):
         return RedirectResponse(url="/login", status_code=303)
 
+    from decimal import Decimal
+    cp = Decimal(str(custom_price)) if custom_price and custom_price > 0 else None
+
     result = await simtrader.execute_trade(
         db, ticker_symbol=ticker, side=side, shares=shares,
         run_id=run_id if run_id else None, note=note if note else None,
+        custom_price=cp,
     )
 
     if result.get("error"):

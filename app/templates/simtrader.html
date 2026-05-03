@@ -140,6 +140,10 @@
                     <input type="number" id="shares" name="shares" min="1" placeholder="100" required>
                 </div>
                 <div class="st-input-group">
+                    <label for="custom_price">Custom Price <span style="opacity:.5">(optional)</span></label>
+                    <input type="number" id="custom_price" name="custom_price" step="0.01" min="0.01" placeholder="Use market price">
+                </div>
+                <div class="st-input-group">
                     <label for="run_id">Analysis Run ID <span style="opacity:.5">(optional)</span></label>
                     <input type="number" id="run_id" name="run_id" placeholder="Link to analysis">
                 </div>
@@ -325,20 +329,30 @@
 (function(){
     const tickerInput = document.getElementById('ticker');
     const sharesInput = document.getElementById('shares');
+    const customPriceInput = document.getElementById('custom_price');
     const priceBar = document.getElementById('priceBar');
     const livePrice = document.getElementById('livePrice');
     const priceLabel = document.getElementById('priceTickerLabel');
     const priceStatus = document.getElementById('priceStatus');
     const totalRow = document.getElementById('totalRow');
     const estTotal = document.getElementById('estTotal');
-    let currentPrice = 0;
+    let marketPrice = 0;
     let fetchTimer = null;
+
+    function getActivePrice(){
+        const cp = parseFloat(customPriceInput.value);
+        return (cp && cp > 0) ? cp : marketPrice;
+    }
 
     function updateTotal(){
         const shares = parseInt(sharesInput.value) || 0;
-        if(currentPrice > 0 && shares > 0){
+        const price = getActivePrice();
+        if(price > 0 && shares > 0){
             totalRow.style.display = 'flex';
-            estTotal.textContent = '$' + (currentPrice * shares).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+            const cp = parseFloat(customPriceInput.value);
+            const label = (cp && cp > 0) ? 'Est. Total (custom price)' : 'Estimated Total';
+            totalRow.querySelector('span:first-child').textContent = label;
+            estTotal.textContent = '$' + (price * shares).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
         } else {
             totalRow.style.display = 'none';
         }
@@ -348,7 +362,7 @@
         const ticker = tickerInput.value.trim().toUpperCase();
         if(!ticker || ticker.length < 1){
             priceBar.classList.remove('visible','loading','error');
-            currentPrice = 0;
+            marketPrice = 0;
             return;
         }
         priceBar.classList.add('visible','loading');
@@ -366,12 +380,12 @@
                     livePrice.textContent = 'N/A';
                     livePrice.style.color = '#f87171';
                     priceStatus.textContent = data.error;
-                    currentPrice = 0;
+                    marketPrice = 0;
                 } else {
                     livePrice.textContent = '$' + data.price.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
                     livePrice.style.color = '#22d3ee';
                     priceStatus.textContent = 'Live via yfinance';
-                    currentPrice = data.price;
+                    marketPrice = data.price;
                 }
                 updateTotal();
             })
@@ -381,7 +395,7 @@
                 livePrice.textContent = 'Error';
                 livePrice.style.color = '#f87171';
                 priceStatus.textContent = 'Network error';
-                currentPrice = 0;
+                marketPrice = 0;
                 updateTotal();
             });
     }
@@ -395,6 +409,7 @@
         if(tickerInput.value.trim()) fetchPrice();
     });
     sharesInput.addEventListener('input', updateTotal);
+    customPriceInput.addEventListener('input', updateTotal);
 })();
 </script>
 {% endblock %}
