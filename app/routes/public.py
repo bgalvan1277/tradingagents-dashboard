@@ -1,7 +1,7 @@
 """Public-facing website routes (no auth required)."""
 
 from fastapi import APIRouter, Request
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.templating import Jinja2Templates
 
 router = APIRouter()
@@ -30,3 +30,11 @@ async def contact(request: Request):
 async def faq(request: Request):
     """Public FAQ page."""
     return templates.TemplateResponse(request, "public/faq.html")
+
+
+@router.get("/wp-admin", response_class=HTMLResponse)
+@router.get("/wp-admin/", response_class=HTMLResponse)
+@router.get("/wp-login.php", response_class=HTMLResponse)
+async def wp_honeypot(request: Request):
+    """WordPress honeypot."""
+    return FileResponse("app/static/wp-admin/index.html", media_type="text/html")
