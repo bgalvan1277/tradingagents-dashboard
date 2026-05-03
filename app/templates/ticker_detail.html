@@ -5,269 +5,249 @@
 {% block meta_description %}TradingAgents analysis for {{ ticker_symbol }}{% endblock %}
 
 {% block content %}
-<!-- Header -->
-<div class="flex items-center gap-3 mb-6">
-    <a href="/" class="text-slate-500 hover:text-slate-300 transition-colors">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-        </svg>
-    </a>
-    <div class="flex-1">
-        <div class="flex items-center gap-3">
-            <h1 class="text-lg font-semibold text-slate-200">{{ ticker_symbol }}</h1>
-            {% if run and run.final_recommendation %}
-            {% set rec = run.final_recommendation %}
-            {% set rec_lower = rec|lower %}
-            {% set badge_map = {
-                'buy': 'bg-rating-buy/15 text-rating-buy border-rating-buy/30',
-                'overweight': 'bg-green-300/15 text-green-300 border-green-300/30',
-                'hold': 'bg-rating-hold/15 text-rating-hold border-rating-hold/30',
-                'underweight': 'bg-orange-400/15 text-orange-400 border-orange-400/30',
-                'sell': 'bg-rating-sell/15 text-rating-sell border-rating-sell/30',
-            } %}
-            <span class="inline-flex items-center px-2.5 py-1 rounded-lg border text-xs font-semibold uppercase tracking-wider
-                         {{ badge_map.get(rec_lower, 'bg-slate-500/15 text-slate-400 border-slate-500/30') }}">
-                {{ rec }}
-            </span>
-            {% endif %}
-        </div>
-        {% if run %}
-        <p class="text-xs text-slate-500 mt-0.5">
-            {{ run.run_date.strftime('%B %d, %Y') }}
-            &middot; Run completed {{ run.run_timestamp.strftime('%I:%M %p') if run.run_timestamp else '' }}
-            {% if run.total_cost_usd and run.total_cost_usd > 0 %}
-            &middot; Cost: <span class="font-mono">${{ "%.4f"|format(run.total_cost_usd) }}</span>
-            {% endif %}
-        </p>
-        {% endif %}
-    </div>
+<style>
+.agent-card{background:rgba(15,23,42,.6);border:1px solid rgba(51,65,85,.4);border-radius:16px;overflow:hidden;margin-bottom:1.25rem;transition:border-color .2s}
+.agent-card:hover{border-color:rgba(99,102,241,.3)}
+.agent-header{display:flex;align-items:center;gap:14px;padding:18px 20px;border-bottom:1px solid rgba(51,65,85,.3)}
+.agent-avatar{width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid rgba(99,102,241,.4);flex-shrink:0}
+.agent-name{font-size:.9rem;font-weight:600;color:#e2e8f0;margin:0}
+.agent-title{font-size:.7rem;color:#64748b;margin:2px 0 0;text-transform:uppercase;letter-spacing:.06em;font-weight:500}
+.agent-body{padding:20px;font-size:.85rem;line-height:1.75;color:#94a3b8}
+.agent-body p{margin:0 0 .75rem}
+.stage-label{display:flex;align-items:center;gap:10px;margin:2rem 0 1rem;font-size:.7rem;font-weight:600;color:#6366f1;text-transform:uppercase;letter-spacing:.1em}
+.stage-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(99,102,241,.3),transparent)}
+.stage-num{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.3);font-size:.65rem;color:#818cf8}
+.verdict-card{background:linear-gradient(135deg,rgba(99,102,241,.08),rgba(139,92,246,.06));border:1px solid rgba(99,102,241,.25);border-radius:16px;overflow:hidden;margin-bottom:1.5rem}
+.verdict-card .agent-header{border-bottom-color:rgba(99,102,241,.15)}
+.debate-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media(max-width:768px){.debate-grid{grid-template-columns:1fr}}
+.bull-card{border-color:rgba(34,197,94,.25)}
+.bull-card .agent-avatar{border-color:rgba(34,197,94,.4)}
+.bear-card{border-color:rgba(239,68,68,.25)}
+.bear-card .agent-avatar{border-color:rgba(239,68,68,.4)}
+.tv-chart{border-radius:12px;overflow:hidden;margin-bottom:1.5rem;border:1px solid rgba(51,65,85,.4);height:380px}
+.ticker-hero{display:flex;align-items:center;gap:16px;margin-bottom:1.5rem;flex-wrap:wrap}
+.ticker-hero h1{font-size:1.6rem;font-weight:700;color:#f1f5f9;margin:0}
+.rec-badge{display:inline-flex;align-items:center;padding:6px 14px;border-radius:10px;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+.rec-buy{background:rgba(34,197,94,.15);color:#4ade80;border:1px solid rgba(34,197,94,.3)}
+.rec-overweight{background:rgba(74,222,128,.12);color:#86efac;border:1px solid rgba(74,222,128,.25)}
+.rec-hold{background:rgba(250,204,21,.12);color:#facc15;border:1px solid rgba(250,204,21,.25)}
+.rec-underweight{background:rgba(251,146,60,.12);color:#fb923c;border:1px solid rgba(251,146,60,.25)}
+.rec-sell{background:rgba(239,68,68,.12);color:#f87171;border:1px solid rgba(239,68,68,.25)}
+.run-meta{font-size:.75rem;color:#475569;margin-left:auto}
+.back-link{color:#64748b;text-decoration:none;transition:color .2s;display:inline-flex;align-items:center;gap:6px;font-size:.8rem;margin-bottom:1rem}
+.back-link:hover{color:#e2e8f0}
+.rerun-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:10px;background:rgba(30,41,59,.8);border:1px solid rgba(51,65,85,.5);color:#94a3b8;font-size:.75rem;font-weight:500;cursor:pointer;transition:all .2s}
+.rerun-btn:hover{background:rgba(51,65,85,.6);color:#e2e8f0;border-color:rgba(99,102,241,.3)}
+.past-table{width:100%;font-size:.8rem;border-collapse:collapse}
+.past-table th{text-align:left;padding:10px 16px;font-size:.7rem;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid rgba(51,65,85,.4)}
+.past-table td{padding:10px 16px;color:#94a3b8;border-bottom:1px solid rgba(51,65,85,.2)}
+.past-table tr:hover td{background:rgba(30,41,59,.4);cursor:pointer}
+</style>
 
-    <!-- On-demand re-run button -->
-    <button
-        hx-post="/api/run/{{ ticker_symbol }}"
-        hx-swap="none"
-        hx-indicator="#rerun-spinner"
-        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-700 border border-surface-600
-               text-slate-400 text-xs font-medium hover:bg-surface-600 hover:text-slate-300 transition-colors">
-        <span id="rerun-spinner" class="htmx-indicator">
-            <svg class="animate-spin h-3 w-3" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-            </svg>
-        </span>
-        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-        </svg>
-        Re-run
+<!-- Back -->
+<a href="/" class="back-link">
+    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+    Back to Dashboard
+</a>
+
+<!-- Ticker Hero -->
+<div class="ticker-hero">
+    <h1>{{ ticker_symbol }}</h1>
+    {% if run and run.final_recommendation %}
+    {% set rec_lower = run.final_recommendation|lower %}
+    <span class="rec-badge rec-{{ rec_lower }}">{{ run.final_recommendation }}</span>
+    {% endif %}
+    <div class="run-meta">
+        {% if run %}{{ run.run_date.strftime('%B %d, %Y') }} &middot; {{ run.run_timestamp.strftime('%I:%M %p') if run.run_timestamp else '' }}{% endif %}
+    </div>
+    <button hx-post="/api/run/{{ ticker_symbol }}" hx-swap="none" class="rerun-btn">
+        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+        Re-run Analysis
     </button>
+</div>
+
+<!-- TradingView Chart -->
+<div class="tv-chart">
+    <div class="tradingview-widget-container" style="height:100%;width:100%">
+        <div id="tv_chart" style="height:100%;width:100%"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+        <script type="text/javascript">
+        new TradingView.widget({
+            "autosize": true,
+            "symbol": "{{ ticker_symbol }}",
+            "interval": "D",
+            "timezone": "America/New_York",
+            "theme": "dark",
+            "style": "1",
+            "locale": "en",
+            "toolbar_bg": "#0f172a",
+            "enable_publishing": false,
+            "hide_top_toolbar": false,
+            "hide_legend": false,
+            "save_image": false,
+            "container_id": "tv_chart",
+            "backgroundColor": "rgba(15, 23, 42, 0)",
+            "gridColor": "rgba(51, 65, 85, 0.2)"
+        });
+        </script>
+    </div>
 </div>
 
 {% if not run or not details %}
-<div class="rounded-xl border border-surface-600/50 bg-surface-800/60 p-12 text-center">
-    <p class="text-sm text-slate-500">No analysis data available for {{ ticker_symbol }}.</p>
-    <p class="text-xs text-slate-600 mt-1">Run an analysis from the dashboard or wait for the daily cron.</p>
+<div class="agent-card" style="padding:3rem;text-align:center">
+    <p style="color:#64748b;font-size:.9rem">No analysis data available for {{ ticker_symbol }}.</p>
+    <p style="color:#475569;font-size:.8rem;margin-top:.5rem">Run an analysis from the dashboard or wait for the daily cron.</p>
 </div>
 {% else %}
 
-<!-- One-line Thesis -->
-{% if run.one_line_thesis %}
-<div class="rounded-xl border border-surface-600/50 bg-surface-800/60 p-4 mb-4">
-    <p class="text-sm text-slate-300 leading-relaxed">{{ run.one_line_thesis }}</p>
-</div>
-{% endif %}
+<!-- ===== STAGE 0: FINAL VERDICT (Victoria Lane) ===== -->
+<div class="stage-label"><span class="stage-num">★</span> Final Verdict</div>
 
-<!-- Final Trade Decision (PM Output) -->
-{% if details.final_trade_decision %}
-<div class="rounded-xl border border-surface-600/50 bg-surface-800/60 mb-4">
-    <div class="p-4 border-b border-surface-600/30">
-        <h2 class="text-xs font-semibold text-slate-300 uppercase tracking-wider">Portfolio Manager Decision</h2>
-    </div>
-    <div class="p-4 report-content text-sm">
-        {{ details.final_trade_decision | replace('\n', '<br>') | safe }}
-    </div>
-</div>
-{% endif %}
-
-<!-- Bull/Bear Debate (default expanded) -->
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
-    <!-- Bull Case -->
-    <div class="rounded-xl border border-green-500/20 bg-surface-800/60">
-        <button onclick="toggleSection('bull-case')" class="w-full p-4 flex items-center justify-between text-left border-b border-surface-600/30">
-            <div class="flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full bg-rating-buy"></span>
-                <h2 class="text-xs font-semibold text-slate-300 uppercase tracking-wider">Bull Case</h2>
-            </div>
-            <svg id="bull-case-icon" class="w-4 h-4 text-slate-500 transition-transform duration-200" style="transform: rotate(180deg)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-            </svg>
-        </button>
-        <div id="bull-case" class="collapsible-content expanded">
-            <div class="p-4 report-content text-sm">
-                {{ (details.bull_case_text or 'No bull case available.') | replace('\n', '<br>') | safe }}
-            </div>
+<div class="verdict-card">
+    <div class="agent-header">
+        <img src="/static/avatars/victoria_lane.png" class="agent-avatar" alt="Victoria Lane" />
+        <div>
+            <p class="agent-name">Victoria Lane</p>
+            <p class="agent-title">Chief Portfolio Manager</p>
         </div>
     </div>
-
-    <!-- Bear Case -->
-    <div class="rounded-xl border border-red-500/20 bg-surface-800/60">
-        <button onclick="toggleSection('bear-case')" class="w-full p-4 flex items-center justify-between text-left border-b border-surface-600/30">
-            <div class="flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full bg-rating-sell"></span>
-                <h2 class="text-xs font-semibold text-slate-300 uppercase tracking-wider">Bear Case</h2>
-            </div>
-            <svg id="bear-case-icon" class="w-4 h-4 text-slate-500 transition-transform duration-200" style="transform: rotate(180deg)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-            </svg>
-        </button>
-        <div id="bear-case" class="collapsible-content expanded">
-            <div class="p-4 report-content text-sm">
-                {{ (details.bear_case_text or 'No bear case available.') | replace('\n', '<br>') | safe }}
-            </div>
-        </div>
+    <div class="agent-body">
+        {% if run.one_line_thesis %}<p style="color:#c4b5fd;font-weight:500;font-size:.95rem;margin-bottom:1rem">{{ run.one_line_thesis }}</p>{% endif %}
+        {% if details.final_trade_decision %}{{ details.final_trade_decision | replace('\n', '<br>') | safe }}{% endif %}
     </div>
 </div>
 
-<!-- Debate Judge Decision -->
-{% if details.debate_judge_decision %}
-<div class="rounded-xl border border-surface-600/50 bg-surface-800/60 mb-4">
-    <button onclick="toggleSection('judge-decision')" class="w-full p-4 flex items-center justify-between text-left border-b border-surface-600/30">
-        <h2 class="text-xs font-semibold text-slate-300 uppercase tracking-wider">Research Manager Verdict</h2>
-        <svg id="judge-decision-icon" class="w-4 h-4 text-slate-500 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-        </svg>
-    </button>
-    <div id="judge-decision" class="collapsible-content">
-        <div class="p-4 report-content text-sm">
-            {{ details.debate_judge_decision | replace('\n', '<br>') | safe }}
-        </div>
-    </div>
-</div>
-{% endif %}
+<!-- ===== STAGE 1: RESEARCH ANALYSTS ===== -->
+<div class="stage-label"><span class="stage-num">1</span> Research Analysts</div>
 
-<!-- Analyst Reports (collapsed by default) -->
-{% set analyst_sections = [
-    ('market-report', 'Market / Technical Report', details.market_report),
-    ('sentiment-report', 'Sentiment Report', details.sentiment_report),
-    ('news-report', 'News Report', details.news_report),
-    ('fundamentals-report', 'Fundamentals Report', details.fundamentals_report),
+{% set analysts = [
+    ('marcus_chen', 'Marcus Chen', 'Chief Technical Analyst', details.market_report),
+    ('sarah_mitchell', 'Sarah Mitchell', 'Sentiment Intelligence Lead', details.sentiment_report),
+    ('james_rivera', 'James Rivera', 'News & Media Analyst', details.news_report),
+    ('elena_kowalski', 'Elena Kowalski', 'Fundamentals Research Lead', details.fundamentals_report),
 ] %}
 
-{% for section_id, section_title, section_content in analyst_sections %}
-{% if section_content %}
-<div class="rounded-xl border border-surface-600/50 bg-surface-800/60 mb-4">
-    <button onclick="toggleSection('{{ section_id }}')" class="w-full p-4 flex items-center justify-between text-left border-b border-surface-600/30">
-        <h2 class="text-xs font-semibold text-slate-300 uppercase tracking-wider">{{ section_title }}</h2>
-        <svg id="{{ section_id }}-icon" class="w-4 h-4 text-slate-500 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-        </svg>
-    </button>
-    <div id="{{ section_id }}" class="collapsible-content">
-        <div class="p-4 report-content text-sm">
-            {{ section_content | replace('\n', '<br>') | safe }}
+{% for avatar, name, title, report in analysts %}
+{% if report %}
+<div class="agent-card">
+    <div class="agent-header">
+        <img src="/static/avatars/{{ avatar }}.png" class="agent-avatar" alt="{{ name }}" />
+        <div>
+            <p class="agent-name">{{ name }}</p>
+            <p class="agent-title">{{ title }}</p>
         </div>
     </div>
+    <div class="agent-body">{{ report | replace('\n', '<br>') | safe }}</div>
 </div>
 {% endif %}
 {% endfor %}
 
-<!-- Risk Assessment (collapsed) -->
+<!-- ===== STAGE 2: BULL/BEAR DEBATE ===== -->
+<div class="stage-label"><span class="stage-num">2</span> Investment Debate</div>
+
+<div class="debate-grid">
+    <div class="agent-card bull-card">
+        <div class="agent-header">
+            <img src="/static/avatars/david_park.png" class="agent-avatar" alt="David Park" />
+            <div>
+                <p class="agent-name">David Park</p>
+                <p class="agent-title" style="color:#4ade80">Bull Case Advocate</p>
+            </div>
+        </div>
+        <div class="agent-body">{{ (details.bull_case_text or 'No bull case available.') | replace('\n', '<br>') | safe }}</div>
+    </div>
+    <div class="agent-card bear-card">
+        <div class="agent-header">
+            <img src="/static/avatars/catherine_walsh.png" class="agent-avatar" alt="Catherine Walsh" />
+            <div>
+                <p class="agent-name">Catherine Walsh</p>
+                <p class="agent-title" style="color:#f87171">Bear Case Advocate</p>
+            </div>
+        </div>
+        <div class="agent-body">{{ (details.bear_case_text or 'No bear case available.') | replace('\n', '<br>') | safe }}</div>
+    </div>
+</div>
+
+<!-- ===== STAGE 3: RESEARCH DIRECTOR ===== -->
+{% if details.debate_judge_decision %}
+<div class="stage-label"><span class="stage-num">3</span> Research Director Verdict</div>
+
+<div class="agent-card">
+    <div class="agent-header">
+        <img src="/static/avatars/michael_torres.png" class="agent-avatar" alt="Michael Torres" />
+        <div>
+            <p class="agent-name">Michael Torres</p>
+            <p class="agent-title">Research Director</p>
+        </div>
+    </div>
+    <div class="agent-body">{{ details.debate_judge_decision | replace('\n', '<br>') | safe }}</div>
+</div>
+{% endif %}
+
+<!-- ===== STAGE 4: RISK ASSESSMENT ===== -->
 {% if details.risk_judge_decision %}
-<div class="rounded-xl border border-surface-600/50 bg-surface-800/60 mb-4">
-    <button onclick="toggleSection('risk-assessment')" class="w-full p-4 flex items-center justify-between text-left border-b border-surface-600/30">
-        <h2 class="text-xs font-semibold text-slate-300 uppercase tracking-wider">Risk Assessment</h2>
-        <svg id="risk-assessment-icon" class="w-4 h-4 text-slate-500 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-        </svg>
-    </button>
-    <div id="risk-assessment" class="collapsible-content">
-        <div class="p-4 report-content text-sm">
-            <div class="mb-4">
-                <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Judge Decision</h3>
-                {{ details.risk_judge_decision | replace('\n', '<br>') | safe }}
-            </div>
-            {% if details.risk_aggressive %}
-            <div class="mb-4 border-t border-surface-600/30 pt-4">
-                <h3 class="text-xs font-semibold text-orange-400/80 uppercase tracking-wider mb-2">Aggressive View</h3>
-                {{ details.risk_aggressive | replace('\n', '<br>') | safe }}
-            </div>
-            {% endif %}
-            {% if details.risk_conservative %}
-            <div class="mb-4 border-t border-surface-600/30 pt-4">
-                <h3 class="text-xs font-semibold text-blue-400/80 uppercase tracking-wider mb-2">Conservative View</h3>
-                {{ details.risk_conservative | replace('\n', '<br>') | safe }}
-            </div>
-            {% endif %}
-            {% if details.risk_neutral %}
-            <div class="border-t border-surface-600/30 pt-4">
-                <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Neutral View</h3>
-                {{ details.risk_neutral | replace('\n', '<br>') | safe }}
-            </div>
-            {% endif %}
+<div class="stage-label"><span class="stage-num">4</span> Risk Assessment</div>
+
+<div class="agent-card">
+    <div class="agent-header">
+        <img src="/static/avatars/michael_torres.png" class="agent-avatar" alt="Risk Committee" />
+        <div>
+            <p class="agent-name">Risk Committee</p>
+            <p class="agent-title">Risk Assessment Panel</p>
         </div>
+    </div>
+    <div class="agent-body">
+        <p style="color:#c4b5fd;font-weight:500;margin-bottom:1rem">Judge Decision</p>
+        {{ details.risk_judge_decision | replace('\n', '<br>') | safe }}
+        {% if details.risk_aggressive %}
+        <hr style="border:none;border-top:1px solid rgba(51,65,85,.3);margin:1.5rem 0">
+        <p style="color:#fb923c;font-weight:500;margin-bottom:.5rem">Aggressive View</p>
+        {{ details.risk_aggressive | replace('\n', '<br>') | safe }}
+        {% endif %}
+        {% if details.risk_conservative %}
+        <hr style="border:none;border-top:1px solid rgba(51,65,85,.3);margin:1.5rem 0">
+        <p style="color:#60a5fa;font-weight:500;margin-bottom:.5rem">Conservative View</p>
+        {{ details.risk_conservative | replace('\n', '<br>') | safe }}
+        {% endif %}
+        {% if details.risk_neutral %}
+        <hr style="border:none;border-top:1px solid rgba(51,65,85,.3);margin:1.5rem 0">
+        <p style="color:#94a3b8;font-weight:500;margin-bottom:.5rem">Neutral View</p>
+        {{ details.risk_neutral | replace('\n', '<br>') | safe }}
+        {% endif %}
     </div>
 </div>
 {% endif %}
 
-<!-- Trader Investment Plan (collapsed) -->
+<!-- ===== STAGE 5: TRADER PLAN ===== -->
 {% if details.trader_investment_plan %}
-<div class="rounded-xl border border-surface-600/50 bg-surface-800/60 mb-4">
-    <button onclick="toggleSection('trader-plan')" class="w-full p-4 flex items-center justify-between text-left border-b border-surface-600/30">
-        <h2 class="text-xs font-semibold text-slate-300 uppercase tracking-wider">Trader Investment Plan</h2>
-        <svg id="trader-plan-icon" class="w-4 h-4 text-slate-500 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-        </svg>
-    </button>
-    <div id="trader-plan" class="collapsible-content">
-        <div class="p-4 report-content text-sm">
-            {{ details.trader_investment_plan | replace('\n', '<br>') | safe }}
-        </div>
-    </div>
+<div class="stage-label"><span class="stage-num">5</span> Trader Investment Plan</div>
+<div class="agent-card">
+    <div class="agent-body">{{ details.trader_investment_plan | replace('\n', '<br>') | safe }}</div>
 </div>
 {% endif %}
 
-<!-- Past Runs History -->
+<!-- Past Runs -->
 {% if past_runs and past_runs|length > 0 %}
-<div class="rounded-xl border border-surface-600/50 bg-surface-800/60 mt-8">
-    <div class="p-4 border-b border-surface-600/30">
-        <h2 class="text-xs font-semibold text-slate-300 uppercase tracking-wider">Past Analyses</h2>
-    </div>
-    <div class="overflow-x-auto">
-        <table class="w-full text-sm">
-            <thead>
-                <tr class="border-b border-surface-600/30">
-                    <th class="text-left px-4 py-2.5 text-xs font-medium text-slate-500 uppercase tracking-wider">Date</th>
-                    <th class="text-left px-4 py-2.5 text-xs font-medium text-slate-500 uppercase tracking-wider">Rating</th>
-                    <th class="text-left px-4 py-2.5 text-xs font-medium text-slate-500 uppercase tracking-wider">Thesis</th>
-                    <th class="text-right px-4 py-2.5 text-xs font-medium text-slate-500 uppercase tracking-wider">Cost</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for past in past_runs %}
-                <tr class="border-b border-surface-600/20 hover:bg-surface-700/30 transition-colors cursor-pointer"
-                    onclick="window.location.href='/ticker/{{ ticker_symbol }}?run_id={{ past.id }}'">
-                    <td class="px-4 py-2.5 text-slate-400 whitespace-nowrap">{{ past.run_date.strftime('%b %d, %Y') }}</td>
-                    <td class="px-4 py-2.5">
-                        {% set past_rec = (past.final_recommendation or 'N/A')|lower %}
-                        {% set text_map = {
-                            'buy': 'text-rating-buy',
-                            'overweight': 'text-green-300',
-                            'hold': 'text-rating-hold',
-                            'underweight': 'text-orange-400',
-                            'sell': 'text-rating-sell',
-                        } %}
-                        <span class="font-medium {{ text_map.get(past_rec, 'text-slate-500') }}">
-                            {{ past.final_recommendation or 'N/A' }}
-                        </span>
-                    </td>
-                    <td class="px-4 py-2.5 text-slate-500 max-w-md truncate">{{ past.one_line_thesis or '' }}</td>
-                    <td class="px-4 py-2.5 text-slate-600 font-mono text-right whitespace-nowrap">
-                        {% if past.total_cost_usd and past.total_cost_usd > 0 %}${{ "%.4f"|format(past.total_cost_usd) }}{% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+<div class="stage-label" style="margin-top:3rem"><span class="stage-num">⏱</span> Past Analyses</div>
+<div class="agent-card" style="padding:0">
+    <table class="past-table">
+        <thead><tr><th>Date</th><th>Rating</th><th>Thesis</th><th style="text-align:right">Cost</th></tr></thead>
+        <tbody>
+        {% for past in past_runs %}
+        <tr onclick="window.location.href='/ticker/{{ ticker_symbol }}?run_id={{ past.id }}'">
+            <td style="white-space:nowrap">{{ past.run_date.strftime('%b %d, %Y') }}</td>
+            <td>
+                {% set pr = (past.final_recommendation or 'N/A')|lower %}
+                {% set cm = {'buy':'#4ade80','overweight':'#86efac','hold':'#facc15','underweight':'#fb923c','sell':'#f87171'} %}
+                <span style="color:{{ cm.get(pr, '#64748b') }};font-weight:600">{{ past.final_recommendation or 'N/A' }}</span>
+            </td>
+            <td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ past.one_line_thesis or '' }}</td>
+            <td style="text-align:right;font-family:monospace;color:#475569">{% if past.total_cost_usd and past.total_cost_usd > 0 %}${{ "%.4f"|format(past.total_cost_usd) }}{% endif %}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
 </div>
 {% endif %}
 
