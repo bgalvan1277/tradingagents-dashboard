@@ -11,29 +11,33 @@
 .port-hero p{font-size:.82rem;color:#64748b;margin:0}
 .section-label{display:flex;align-items:center;gap:10px;margin:1.5rem 0 1rem;font-size:.72rem;font-weight:700;color:rgba(6,182,212,.9);text-transform:uppercase;letter-spacing:.12em}
 .section-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(6,182,212,.2),transparent)}
-.port-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:1rem}
-.port-card{background:rgba(15,23,42,.55);backdrop-filter:blur(16px);border:1px solid rgba(71,85,105,.25);border-radius:18px;overflow:hidden;text-decoration:none;display:block;transition:all .25s}
+.port-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem}
+.port-card{background:rgba(15,23,42,.55);backdrop-filter:blur(16px);border:1px solid rgba(71,85,105,.25);border-radius:18px;padding:22px;text-decoration:none;display:block;transition:all .25s;position:relative}
 .port-card:hover{border-color:rgba(6,182,212,.2);box-shadow:0 0 30px rgba(6,182,212,.04);transform:translateY(-2px)}
-.port-card-header{padding:20px 20px 0;display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
-.port-ticker{font-size:1.2rem;font-weight:800;color:#f1f5f9;letter-spacing:-.01em}
-.port-company{font-size:.72rem;color:#64748b;margin-top:2px;display:block}
-.port-price{font-size:.82rem;font-weight:600;color:#f1f5f9;text-align:right}
-.port-change{font-size:.7rem;font-weight:600;margin-top:2px;display:block}
+.port-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px}
+.port-ticker{font-size:1.3rem;font-weight:800;color:#f1f5f9;letter-spacing:-.01em;line-height:1}
+.port-company{font-size:.72rem;color:#64748b;margin-top:4px;display:block;min-height:14px}
+.port-price-block{text-align:right}
+.port-price{font-size:1.1rem;font-weight:700;color:#f1f5f9;line-height:1}
+.port-change{font-size:.72rem;font-weight:600;margin-top:4px;display:block}
 .port-change.up{color:#4ade80}
 .port-change.down{color:#f87171}
-.port-chart{height:120px;margin:8px 0 0;overflow:hidden}
-.port-card-footer{padding:12px 20px 16px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(71,85,105,.15)}
-.port-badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:6px;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.port-change.flat{color:#64748b}
+.port-divider{height:1px;background:rgba(71,85,105,.15);margin-bottom:14px}
+.port-bottom{display:flex;align-items:center;justify-content:space-between}
+.port-badge{display:inline-flex;align-items:center;padding:4px 12px;border-radius:8px;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
 .badge-buy,.badge-overweight{background:rgba(34,197,94,.1);color:#4ade80;border:1px solid rgba(34,197,94,.15)}
 .badge-hold{background:rgba(251,191,36,.1);color:#fbbf24;border:1px solid rgba(251,191,36,.15)}
 .badge-underweight{background:rgba(251,146,60,.1);color:#fb923c;border:1px solid rgba(251,146,60,.15)}
 .badge-sell{background:rgba(239,68,68,.1);color:#f87171;border:1px solid rgba(239,68,68,.15)}
 .badge-pending,.badge-running{background:rgba(100,116,139,.1);color:#94a3b8;border:1px solid rgba(100,116,139,.15)}
 .badge-failed{background:rgba(239,68,68,.08);color:#f87171;border:1px solid rgba(239,68,68,.12)}
-.port-thesis{font-size:.75rem;color:#94a3b8;line-height:1.5;max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.port-meta{display:flex;align-items:center;gap:8px}
+.port-date{font-size:.65rem;color:#475569}
 .port-arrow{color:#475569;transition:color .2s}
 .port-card:hover .port-arrow{color:#22d3ee}
-.port-date{font-size:.65rem;color:#475569}
+.port-skeleton{background:linear-gradient(90deg,rgba(71,85,105,.1) 25%,rgba(71,85,105,.2) 50%,rgba(71,85,105,.1) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:4px;display:inline-block}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 </style>
 
 <div class="port-hero">
@@ -50,83 +54,45 @@
     </div>
 </div>
 
+{% macro render_card(run) %}
+{% set rec = run.final_recommendation or 'Pending' %}
+{% set rec_lower = rec|lower %}
+{% set badge_class = 'badge-' + rec_lower if rec_lower in ['buy','overweight','hold','underweight','sell','pending','running','failed'] else 'badge-pending' %}
+<a href="/ticker/{{ run.ticker_symbol }}" class="port-card">
+    <div class="port-top">
+        <div>
+            <span class="port-ticker">{{ run.ticker_symbol }}</span>
+            <span class="port-company" id="name-{{ run.ticker_symbol }}"><span class="port-skeleton" style="width:100px;height:10px"></span></span>
+        </div>
+        <div class="port-price-block">
+            <span class="port-price" id="price-{{ run.ticker_symbol }}"><span class="port-skeleton" style="width:70px;height:14px"></span></span>
+            <span class="port-change flat" id="change-{{ run.ticker_symbol }}"><span class="port-skeleton" style="width:80px;height:10px"></span></span>
+        </div>
+    </div>
+    <div class="port-divider"></div>
+    <div class="port-bottom">
+        <div class="port-meta">
+            <span class="port-badge {{ badge_class }}">
+                {% if run.status == 'running' %}Running{% elif run.status == 'failed' %}Failed{% else %}{{ rec }}{% endif %}
+            </span>
+            <span class="port-date">{{ run.run_date.strftime('%b %d') if run.run_date else '' }}</span>
+        </div>
+        <svg class="port-arrow" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+    </div>
+</a>
+{% endmacro %}
+
 {% if grouped_runs %}
     {% for group_name, group_runs in grouped_runs.items() %}
     <div class="section-label">{{ group_name }}</div>
     <div class="port-grid">
-        {% for run in group_runs %}
-        {% set rec = run.final_recommendation or 'Pending' %}
-        {% set rec_lower = rec|lower %}
-        {% set badge_class = 'badge-' + rec_lower if rec_lower in ['buy','overweight','hold','underweight','sell','pending','running','failed'] else 'badge-pending' %}
-        <a href="/ticker/{{ run.ticker_symbol }}" class="port-card">
-            <div class="port-card-header">
-                <div>
-                    <span class="port-ticker">{{ run.ticker_symbol }}</span>
-                    <span class="port-company" id="name-{{ run.ticker_symbol }}"></span>
-                </div>
-                <div class="port-price">
-                    <span id="price-{{ run.ticker_symbol }}">—</span>
-                    <span class="port-change" id="change-{{ run.ticker_symbol }}"></span>
-                </div>
-            </div>
-            <div class="port-chart">
-                <div class="tradingview-widget-container" style="height:100%;width:100%">
-                    <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
-                    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js">
-                    {"symbol":"{{ run.ticker_symbol }}","width":"100%","height":"100%","locale":"en","dateRange":"1M","colorTheme":"dark","isTransparent":true,"autosize":true,"largeChartUrl":"","noTimeScale":true,"chartOnly":true}
-                    </script>
-                </div>
-            </div>
-            <div class="port-card-footer">
-                <div style="display:flex;align-items:center;gap:10px">
-                    <span class="port-badge {{ badge_class }}">
-                        {% if run.status == 'running' %}Running{% elif run.status == 'failed' %}Failed{% else %}{{ rec }}{% endif %}
-                    </span>
-                    <span class="port-date">{{ run.run_date.strftime('%b %d') if run.run_date else '' }}</span>
-                </div>
-                <svg class="port-arrow" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-            </div>
-        </a>
-        {% endfor %}
+        {% for run in group_runs %}{{ render_card(run) }}{% endfor %}
     </div>
     {% endfor %}
 
 {% elif runs %}
     <div class="port-grid">
-        {% for run in runs %}
-        {% set rec = run.final_recommendation or 'Pending' %}
-        {% set rec_lower = rec|lower %}
-        {% set badge_class = 'badge-' + rec_lower if rec_lower in ['buy','overweight','hold','underweight','sell','pending','running','failed'] else 'badge-pending' %}
-        <a href="/ticker/{{ run.ticker_symbol }}" class="port-card">
-            <div class="port-card-header">
-                <div>
-                    <span class="port-ticker">{{ run.ticker_symbol }}</span>
-                    <span class="port-company" id="name-{{ run.ticker_symbol }}"></span>
-                </div>
-                <div class="port-price">
-                    <span id="price-{{ run.ticker_symbol }}">—</span>
-                    <span class="port-change" id="change-{{ run.ticker_symbol }}"></span>
-                </div>
-            </div>
-            <div class="port-chart">
-                <div class="tradingview-widget-container" style="height:100%;width:100%">
-                    <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
-                    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js">
-                    {"symbol":"{{ run.ticker_symbol }}","width":"100%","height":"100%","locale":"en","dateRange":"1M","colorTheme":"dark","isTransparent":true,"autosize":true,"largeChartUrl":"","noTimeScale":true,"chartOnly":true}
-                    </script>
-                </div>
-            </div>
-            <div class="port-card-footer">
-                <div style="display:flex;align-items:center;gap:10px">
-                    <span class="port-badge {{ badge_class }}">
-                        {% if run.status == 'running' %}Running{% elif run.status == 'failed' %}Failed{% else %}{{ rec }}{% endif %}
-                    </span>
-                    <span class="port-date">{{ run.run_date.strftime('%b %d') if run.run_date else '' }}</span>
-                </div>
-                <svg class="port-arrow" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-            </div>
-        </a>
-        {% endfor %}
+        {% for run in runs %}{{ render_card(run) }}{% endfor %}
     </div>
 
 {% else %}
@@ -144,24 +110,24 @@
 {% endif %}
 
 <script>
-// Fetch stock data for each ticker card
 const tickers = [{% for run in runs %}"{{ run.ticker_symbol }}",{% endfor %}];
-tickers.forEach(async (sym) => {
-    try {
-        const resp = await fetch(`/api/quote/${sym}`);
-        if (!resp.ok) return;
-        const d = await resp.json();
+Promise.all(tickers.map(sym =>
+    fetch('/api/quote/' + sym).then(r => r.ok ? r.json() : null).catch(() => null)
+)).then(results => {
+    results.forEach((d, i) => {
+        if (!d) return;
+        const sym = tickers[i];
         const nameEl = document.getElementById('name-' + sym);
         const priceEl = document.getElementById('price-' + sym);
         const changeEl = document.getElementById('change-' + sym);
-        if (nameEl && d.name) nameEl.textContent = d.name;
-        if (priceEl && d.price) priceEl.textContent = d.price.toFixed(2) + ' USD';
+        if (nameEl) nameEl.textContent = d.name || '';
+        if (priceEl) priceEl.textContent = d.price ? d.price.toFixed(2) + ' USD' : '—';
         if (changeEl && d.change !== undefined) {
             const sign = d.change >= 0 ? '+' : '';
             changeEl.textContent = sign + d.change.toFixed(2) + ' (' + sign + d.pct.toFixed(2) + '%)';
-            changeEl.classList.add(d.change >= 0 ? 'up' : 'down');
+            changeEl.className = 'port-change ' + (d.change > 0 ? 'up' : d.change < 0 ? 'down' : 'flat');
         }
-    } catch(e) {}
+    });
 });
 </script>
 {% endblock %}
