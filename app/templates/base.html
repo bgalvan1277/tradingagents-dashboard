@@ -52,6 +52,14 @@
     <script src="https://unpkg.com/htmx.org@2.0.4" integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+" crossorigin="anonymous"></script>
 
     <style>
+        /* Hide TradingView branding */
+        .tradingview-widget-copyright,
+        .tradingview-widget-container__widget + div[style],
+        .tradingview-widget-container > div:last-child:not(.tradingview-widget-container__widget):not([id]) {
+            display: none !important;
+            height: 0 !important;
+            overflow: hidden !important;
+        }
         /* Base resets and dark theme */
         body {
             background-color: #0a0e17;
