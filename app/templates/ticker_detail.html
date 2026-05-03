@@ -141,12 +141,10 @@
                 <span class="rec-badge rec-{{ rec_lower }}" style="font-size:1.1rem;padding:12px 28px;font-weight:800">{{ run.final_recommendation }}</span>
                 {% endif %}
             </div>
-            {% if run.one_line_thesis %}
             <div style="display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap">
                 <span style="font-size:.82rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.1em;min-width:80px;padding-top:2px">Action</span>
-                <p style="font-size:1.15rem;font-weight:600;color:#e2e8f0;line-height:1.5;margin:0;flex:1">{{ run.one_line_thesis }}</p>
+                <p id="action-text" style="font-size:1.15rem;font-weight:600;color:#e2e8f0;line-height:1.5;margin:0;flex:1"></p>
             </div>
-            {% endif %}
         </div>
         <!-- Detailed synthesis (collapsible) -->
         <div style="border-top:1px solid rgba(71,85,105,.2);padding-top:12px">
@@ -308,11 +306,30 @@ document.querySelectorAll('.agent-content[data-raw]').forEach(el=>{
     const raw=el.getAttribute('data-raw');
     if(raw)el.innerHTML='<p>'+renderMd(raw)+'</p>';
 });
-// Render verdict separately
+// Render verdict
 const vEl=document.getElementById('verdict-content');
+const aEl=document.getElementById('action-text');
 if(vEl){
     const raw=`{{ (details.final_trade_decision or '') | replace('\\', '\\\\') | replace('`', '\\`') | replace('\n', '\\n') }}`;
-    vEl.innerHTML='<p>'+renderMd(raw)+'</p>';
+    const lines=raw.split('\n');
+    // Extract action line for the hero display
+    let actionText='';
+    const bodyLines=[];
+    let skipIntro=true;
+    for(const line of lines){
+        const trimmed=line.replace(/\*\*/g,'').trim();
+        if(trimmed.toLowerCase().startsWith('action:')){
+            actionText=trimmed.replace(/^action:\s*/i,'');
+            continue;
+        }
+        if(trimmed.toLowerCase().startsWith('decision:'))continue;
+        if(trimmed===''&&skipIntro)continue;
+        if(trimmed==='---'){skipIntro=false;continue;}
+        skipIntro=false;
+        bodyLines.push(line);
+    }
+    if(aEl)aEl.textContent=actionText||'{{ run.one_line_thesis or "" }}';
+    vEl.innerHTML='<p>'+renderMd(bodyLines.join('\n'))+'</p>';
 }
 </script>
 {% endblock %}
