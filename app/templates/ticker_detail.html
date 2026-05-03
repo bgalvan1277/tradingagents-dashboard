@@ -99,27 +99,30 @@
             </button>
         </div>
     </div>
-    <!-- Bottom row: Market status left, Last analysis right -->
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px">
+    <!-- Cost pill row (right-aligned) -->
+    {% if run %}
+    <div style="display:flex;justify-content:flex-end;margin-top:8px">
+        <div style="background:rgba(6,182,212,.05);border:1px solid rgba(6,182,212,.12);border-radius:8px;padding:4px 10px;display:inline-flex;align-items:center;gap:6px">
+            <svg width="11" height="11" fill="none" stroke="#22d3ee" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+            {% if run_cost %}
+            <span style="font-size:.68rem;color:#94a3b8;font-family:'JetBrains Mono',monospace">{{ "{:,}".format(run_cost.total_tokens) }} tokens</span>
+            <span style="font-size:.68rem;color:#334155">|</span>
+            <span style="font-size:.68rem;color:#22d3ee;font-weight:600;font-family:'JetBrains Mono',monospace">${{ "%.4f"|format(run_cost.cost_usd) }}</span>
+            {% elif run.total_cost_usd and run.total_cost_usd > 0 %}
+            <span style="font-size:.68rem;color:#22d3ee;font-weight:600;font-family:'JetBrains Mono',monospace">${{ "%.4f"|format(run.total_cost_usd) }}</span>
+            {% else %}
+            <span style="font-size:.68rem;color:#475569;font-family:'JetBrains Mono',monospace">Cost not tracked</span>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+    <!-- Market status left, Last analysis right -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px">
         <span style="font-size:.72rem;color:#475569">
             {% if quote %}{% if quote.market_state == 'REGULAR' %}Market Open{% elif quote.market_state == 'CLOSED' or quote.market_state == 'POST' %}Market Closed{% else %}{{ quote.market_state }}{% endif %}{% endif %}
         </span>
         {% if run %}
-        <div style="display:flex;align-items:center;gap:12px">
-            <div style="background:rgba(6,182,212,.05);border:1px solid rgba(6,182,212,.12);border-radius:8px;padding:4px 10px;display:inline-flex;align-items:center;gap:6px">
-                <svg width="11" height="11" fill="none" stroke="#22d3ee" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-                {% if run_cost %}
-                <span style="font-size:.68rem;color:#94a3b8;font-family:'JetBrains Mono',monospace">{{ "{:,}".format(run_cost.total_tokens) }} tokens</span>
-                <span style="font-size:.68rem;color:#334155">|</span>
-                <span style="font-size:.68rem;color:#22d3ee;font-weight:600;font-family:'JetBrains Mono',monospace">${{ "%.4f"|format(run_cost.cost_usd) }}</span>
-                {% elif run.total_cost_usd and run.total_cost_usd > 0 %}
-                <span style="font-size:.68rem;color:#22d3ee;font-weight:600;font-family:'JetBrains Mono',monospace">${{ "%.4f"|format(run.total_cost_usd) }}</span>
-                {% else %}
-                <span style="font-size:.68rem;color:#475569;font-family:'JetBrains Mono',monospace">Cost not tracked</span>
-                {% endif %}
-            </div>
-            <span style="font-size:.72rem;color:#64748b">Last analysis: {{ run.run_date.strftime('%b %d, %Y') }}{% if run.run_timestamp %} at {{ run.run_timestamp.strftime('%I:%M %p') }}{% endif %}</span>
-        </div>
+        <span style="font-size:.72rem;color:#64748b">Last analysis: {{ run.run_date.strftime('%b %d, %Y') }}{% if run.run_timestamp %} at {{ run.run_timestamp.strftime('%I:%M %p') }}{% endif %}</span>
         {% endif %}
     </div>
 </div>
