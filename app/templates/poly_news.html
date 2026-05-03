@@ -2,12 +2,28 @@
 {% set active_page = 'poly_news' %}
 
 {% block title %}Polymarket News{% endblock %}
-{% block meta_description %}Latest prediction market news and event coverage{% endblock %}
+{% block meta_description %}Latest prediction market news, new markets, and event coverage{% endblock %}
 
 {% block content %}
 <style>
 .section-label{display:flex;align-items:center;gap:10px;margin:2rem 0 1rem;font-size:.72rem;font-weight:700;color:rgba(139,92,246,.9);text-transform:uppercase;letter-spacing:.12em}
 .section-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(139,92,246,.2),transparent)}
+.widget-card{background:rgba(15,23,42,.55);backdrop-filter:blur(16px);border:1px solid rgba(71,85,105,.25);border-radius:16px;overflow:hidden;transition:border-color .3s}
+.widget-card:hover{border-color:rgba(139,92,246,.15)}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media(max-width:768px){.grid-2{grid-template-columns:1fr}}
+.news-card{background:rgba(15,23,42,.55);backdrop-filter:blur(16px);border:1px solid rgba(71,85,105,.25);border-radius:20px;padding:24px;transition:all .25s;overflow:hidden}
+.news-card:hover{border-color:rgba(139,92,246,.2);box-shadow:0 0 30px rgba(139,92,246,.04)}
+.market-item{display:flex;align-items:flex-start;gap:14px;padding:14px 0;border-bottom:1px solid rgba(71,85,105,.1)}
+.market-item:last-child{border-bottom:none}
+.market-q{font-size:.82rem;color:#e2e8f0;font-weight:500;line-height:1.5;flex:1}
+.market-meta{font-size:.62rem;color:#475569;margin-top:4px}
+.odds-pill{display:inline-flex;padding:3px 10px;border-radius:6px;font-size:.7rem;font-weight:700;flex-shrink:0;margin-top:2px}
+.odds-pill.yes{color:#4ade80;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.12)}
+.odds-pill.no{color:#f87171;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.12)}
+.new-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:4px;font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#a78bfa;background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.12);margin-bottom:6px}
+.skeleton-row{height:52px;background:linear-gradient(90deg,rgba(71,85,105,.08) 25%,rgba(71,85,105,.15) 50%,rgba(71,85,105,.08) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:8px;margin-bottom:8px}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 </style>
 
 <a href="/poly/analysis" style="display:inline-flex;align-items:center;gap:6px;font-size:.78rem;color:#64748b;text-decoration:none;margin-bottom:.5rem">
@@ -17,13 +33,174 @@
 
 <p style="font-size:.7rem;font-weight:700;color:rgba(139,92,246,.7);text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px">Prediction Division</p>
 <h1 style="font-size:1.5rem;font-weight:800;color:#f1f5f9;margin:0 0 .25rem;letter-spacing:-.02em">Polymarket News</h1>
-<p style="font-size:.82rem;color:#64748b;margin:0 0 1.5rem">Event coverage and prediction market commentary</p>
+<p style="font-size:.82rem;color:#64748b;margin:0 0 .5rem">New markets, event coverage, and prediction intelligence from across the ecosystem</p>
 
-<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6rem 2rem;text-align:center;background:rgba(15,23,42,.55);backdrop-filter:blur(16px);border:1px solid rgba(71,85,105,.25);border-radius:20px">
-    <div style="width:64px;height:64px;border-radius:18px;background:rgba(139,92,246,.08);display:flex;align-items:center;justify-content:center;margin-bottom:20px">
-        <svg width="28" height="28" fill="none" stroke="#a78bfa" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
+<!-- New Markets -->
+<div class="section-label">New Markets</div>
+<div class="news-card">
+    <p style="font-size:.72rem;color:#64748b;margin:0 0 12px">Recently created prediction markets on Polymarket. Fresh opportunities for early positioning.</p>
+    <div id="new-markets">
+        <div class="skeleton-row"></div><div class="skeleton-row"></div><div class="skeleton-row"></div>
+        <div class="skeleton-row"></div><div class="skeleton-row"></div><div class="skeleton-row"></div>
     </div>
-    <h2 style="font-size:1rem;font-weight:700;color:#e2e8f0;margin:0 0 6px">News Feed Coming Soon</h2>
-    <p style="font-size:.82rem;color:#64748b;max-width:400px;margin:0 0 20px;line-height:1.6">Curated prediction market news, event resolution tracking, and market commentary will be aggregated here.</p>
 </div>
+
+<!-- High Volume Movers + Event News -->
+<div class="grid-2" style="margin-top:.5rem">
+    <div>
+        <div class="section-label">Highest Volume (24h)</div>
+        <div class="news-card" style="min-height:480px">
+            <p style="font-size:.72rem;color:#64748b;margin:0 0 12px">Markets attracting the most trading volume right now.</p>
+            <div id="volume-markets">
+                <div class="skeleton-row"></div><div class="skeleton-row"></div><div class="skeleton-row"></div>
+                <div class="skeleton-row"></div><div class="skeleton-row"></div>
+            </div>
+        </div>
+    </div>
+    <div>
+        <div class="section-label">World News</div>
+        <div class="widget-card" style="height:480px">
+            <div class="tradingview-widget-container" style="height:100%;width:100%">
+                <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
+                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-timeline.js">
+                {"feedMode":"all_symbols","isTransparent":true,"displayMode":"regular","width":"100%","height":"100%","colorTheme":"dark","locale":"en"}
+                </script>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Competitive Odds + Crypto News -->
+<div class="grid-2" style="margin-top:.5rem">
+    <div>
+        <div class="section-label">Competitive Markets (Close Odds)</div>
+        <div class="news-card" style="min-height:480px">
+            <p style="font-size:.72rem;color:#64748b;margin:0 0 12px">Markets where YES and NO are nearly split. High uncertainty, potential edge.</p>
+            <div id="competitive-markets">
+                <div class="skeleton-row"></div><div class="skeleton-row"></div><div class="skeleton-row"></div>
+                <div class="skeleton-row"></div><div class="skeleton-row"></div>
+            </div>
+        </div>
+    </div>
+    <div>
+        <div class="section-label">Crypto News</div>
+        <div class="widget-card" style="height:480px">
+            <div class="tradingview-widget-container" style="height:100%;width:100%">
+                <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
+                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-timeline.js">
+                {"feedMode":"market","market":"crypto","isTransparent":true,"displayMode":"regular","width":"100%","height":"100%","colorTheme":"dark","locale":"en"}
+                </script>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Resolution Calendar -->
+<div class="section-label">Resolution Calendar</div>
+<div class="news-card">
+    <p style="font-size:.72rem;color:#64748b;margin:0 0 12px">Markets with upcoming resolution dates. Know when outcomes will be decided.</p>
+    <div id="calendar-markets">
+        <div class="skeleton-row"></div><div class="skeleton-row"></div><div class="skeleton-row"></div>
+        <div class="skeleton-row"></div><div class="skeleton-row"></div>
+    </div>
+</div>
+
+<script>
+const GAMMA='https://gamma-api.polymarket.com';
+
+function parseOdds(m){
+    if(!m.outcomePrices)return{yes:'--',no:'--'};
+    const p=JSON.parse(m.outcomePrices);
+    return{yes:(parseFloat(p[0])*100).toFixed(0),no:(100-parseFloat(p[0])*100).toFixed(0)};
+}
+
+function timeAgo(d){
+    if(!d)return'';
+    const s=Math.floor((Date.now()-new Date(d))/1000);
+    if(s<3600)return Math.floor(s/60)+'m ago';
+    if(s<86400)return Math.floor(s/3600)+'h ago';
+    return Math.floor(s/86400)+'d ago';
+}
+
+function fmtDate(d){
+    if(!d)return'TBD';
+    return new Date(d).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+}
+
+function fmtVol(n){
+    if(!n)return'$0';n=parseFloat(n);
+    if(n>=1e6)return'$'+(n/1e6).toFixed(1)+'M';
+    if(n>=1e3)return'$'+(n/1e3).toFixed(0)+'K';
+    return'$'+Math.round(n);
+}
+
+function renderMarket(m,extra){
+    const o=parseOdds(m);
+    return`<div class="market-item">
+        <div style="flex:1">
+            ${extra||''}
+            <div class="market-q">${m.question||'Untitled'}</div>
+            <div class="market-meta">${m.volume?'Vol: '+fmtVol(m.volume):''}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end">
+            <span class="odds-pill yes">YES ${o.yes}¢</span>
+            <span class="odds-pill no">NO ${o.no}¢</span>
+        </div>
+    </div>`;
+}
+
+// New markets (recently created)
+fetch(GAMMA+'/markets?limit=8&active=true&closed=false&order=startDate&ascending=false')
+    .then(r=>r.json())
+    .then(markets=>{
+        const el=document.getElementById('new-markets');
+        if(!markets.length){el.innerHTML='<p style="color:#475569;text-align:center;padding:20px;font-size:.78rem">No new markets</p>';return;}
+        el.innerHTML=markets.map(m=>renderMarket(m,`<span class="new-badge"><svg width="8" height="8" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="6"/></svg> New · ${timeAgo(m.startDate)}</span>`)).join('');
+    }).catch(()=>{document.getElementById('new-markets').innerHTML='<p style="color:#f87171;text-align:center;padding:20px;font-size:.78rem">Failed to load</p>';});
+
+// Highest volume
+fetch(GAMMA+'/markets?limit=8&active=true&closed=false&order=volume&ascending=false')
+    .then(r=>r.json())
+    .then(markets=>{
+        const el=document.getElementById('volume-markets');
+        if(!markets.length){el.innerHTML='<p style="color:#475569;text-align:center;padding:20px;font-size:.78rem">No data</p>';return;}
+        el.innerHTML=markets.map(m=>renderMarket(m)).join('');
+    }).catch(()=>{document.getElementById('volume-markets').innerHTML='<p style="color:#f87171;text-align:center;padding:20px;font-size:.78rem">Failed to load</p>';});
+
+// Competitive (close to 50/50)
+fetch(GAMMA+'/markets?limit=50&active=true&closed=false&order=volume&ascending=false')
+    .then(r=>r.json())
+    .then(markets=>{
+        const competitive=markets.filter(m=>{
+            if(!m.outcomePrices)return false;
+            const p=JSON.parse(m.outcomePrices);
+            const yes=parseFloat(p[0])*100;
+            return yes>=35&&yes<=65;
+        }).slice(0,8);
+        const el=document.getElementById('competitive-markets');
+        if(!competitive.length){el.innerHTML='<p style="color:#475569;text-align:center;padding:20px;font-size:.78rem">No competitive markets found</p>';return;}
+        el.innerHTML=competitive.map(m=>renderMarket(m)).join('');
+    }).catch(()=>{document.getElementById('competitive-markets').innerHTML='<p style="color:#f87171;text-align:center;padding:20px;font-size:.78rem">Failed to load</p>';});
+
+// Resolution calendar
+fetch(GAMMA+'/markets?limit=8&active=true&closed=false&order=endDate&ascending=true')
+    .then(r=>r.json())
+    .then(markets=>{
+        const el=document.getElementById('calendar-markets');
+        if(!markets.length){el.innerHTML='<p style="color:#475569;text-align:center;padding:20px;font-size:.78rem">No upcoming resolutions</p>';return;}
+        el.innerHTML=markets.map(m=>{
+            const o=parseOdds(m);
+            return`<div class="market-item">
+                <div style="flex:1">
+                    <div class="market-q">${m.question||'Untitled'}</div>
+                    <div class="market-meta">Resolves: ${fmtDate(m.endDate)}</div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end">
+                    <span class="odds-pill yes">YES ${o.yes}¢</span>
+                    <span style="font-size:.6rem;color:#475569">${fmtDate(m.endDate)}</span>
+                </div>
+            </div>`;
+        }).join('');
+    }).catch(()=>{document.getElementById('calendar-markets').innerHTML='<p style="color:#f87171;text-align:center;padding:20px;font-size:.78rem">Failed to load</p>';});
+</script>
 {% endblock %}
