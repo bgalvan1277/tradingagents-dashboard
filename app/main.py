@@ -3,7 +3,7 @@
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
-from app.routes import login, dashboard, ticker, watchlist, history, run, status
+from app.routes import login, dashboard, portfolio, ticker, watchlist, history, run, status
 
 app = FastAPI(
     title="TradingAgents Dashboard",
@@ -15,6 +15,7 @@ app = FastAPI(
 # Mount all route modules
 app.include_router(login.router)
 app.include_router(dashboard.router)
+app.include_router(portfolio.router)
 app.include_router(ticker.router)
 app.include_router(watchlist.router)
 app.include_router(history.router)
