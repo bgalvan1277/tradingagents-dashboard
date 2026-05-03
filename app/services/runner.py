@@ -134,6 +134,7 @@ def extract_state_to_detail(state: dict) -> dict:
         }
 
     return {
+        "intelligence_briefing": _to_str(state.get("intelligence_briefing", "")),
         "market_report": _to_str(state.get("market_report", "")),
         "sentiment_report": _to_str(state.get("sentiment_report", "")),
         "news_report": _to_str(state.get("news_report", "")),
@@ -159,7 +160,24 @@ def run_analysis_sync(ticker_symbol: str, trade_date: str) -> Tuple[dict, str]:
 
     Returns (state_dict, decision_string).
     This must run in a separate process/thread since it makes many LLM calls.
+
+    Phase 0 (Col. Wolfe): Intelligence sweep runs first, collecting OSINT data.
+    Phase 1-4 (TradingAgents): The intelligence briefing is injected into the
+    agent state so all downstream analysts have access to it.
     """
+    import asyncio
+    from app.services.colonel_wolfe import run_intelligence_sweep
+
+    # Phase 0: Colonel Wolfe's Intelligence Sweep
+    logger.info("Phase 0: Col. Wolfe intelligence sweep for %s", ticker_symbol)
+    try:
+        intel_briefing = asyncio.run(run_intelligence_sweep(ticker_symbol))
+        logger.info("Intelligence briefing compiled: %d chars", len(intel_briefing))
+    except Exception as e:
+        logger.error("Intelligence sweep failed for %s: %s", ticker_symbol, e)
+        intel_briefing = f"Intelligence sweep failed: {e}"
+
+    # Phase 1-4: TradingAgents Pipeline
     from tradingagents.graph.trading_graph import TradingAgentsGraph
     from tradingagents.default_config import DEFAULT_CONFIG
 
@@ -168,6 +186,9 @@ def run_analysis_sync(ticker_symbol: str, trade_date: str) -> Tuple[dict, str]:
 
     ta = TradingAgentsGraph(debug=False, config=config)
     state, decision = ta.propagate(ticker_symbol, trade_date)
+
+    # Inject the intelligence briefing into the state for storage
+    state["intelligence_briefing"] = intel_briefing
 
     return state, decision
 

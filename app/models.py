@@ -105,6 +105,9 @@ class RunDetail(Base):
         Integer, ForeignKey("runs.id", ondelete="CASCADE"), unique=True
     )
 
+    # Intelligence briefing (Col. Wolfe)
+    intelligence_briefing: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
     # Individual analyst reports
     market_report: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     sentiment_report: Mapped[Optional[str]] = mapped_column(Text, nullable=True)

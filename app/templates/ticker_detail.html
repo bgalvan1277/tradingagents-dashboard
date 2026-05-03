@@ -163,6 +163,24 @@
 .verdict-open .verdict-expand{max-height:5000px!important}
 </style>
 
+<!-- STAGE 0: INTELLIGENCE GATHERING -->
+{% if details.intelligence_briefing %}
+<div class="stage-label"><span class="stage-num" style="background:rgba(251,146,60,.1);border-color:rgba(251,146,60,.25);color:#fb923c">0</span> Intelligence Gathering</div>
+
+<div class="agent-card" onclick="toggleCard(this)" style="border-color:rgba(251,146,60,.12)">
+    <div class="agent-header">
+        <img src="/static/avatars/don_wolfe.png" class="agent-avatar" alt="Col. Don Wolfe" style="border-color:rgba(251,146,60,.35);box-shadow:0 0 20px rgba(251,146,60,.1)" />
+        <div class="agent-info">
+            <p class="agent-name">Col. Don Wolfe (RET)</p>
+            <p class="agent-title" style="color:#fb923c">Intelligence Officer</p>
+            <p class="agent-summary">{{ details.intelligence_briefing[:200] | replace('\n', ' ') | replace('=', '') }}</p>
+        </div>
+        <div class="agent-toggle" style="background:rgba(251,146,60,.08);border-color:rgba(251,146,60,.2)"><svg fill="none" stroke="#fb923c" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></div>
+    </div>
+    <div class="agent-body"><div class="agent-content" style="white-space:pre-wrap;font-family:'JetBrains Mono',monospace;font-size:.76rem;line-height:1.8;color:#94a3b8">{{ details.intelligence_briefing }}</div></div>
+</div>
+{% endif %}
+
 <!-- STAGE 1: RESEARCH ANALYSTS -->
 <div class="stage-label"><span class="stage-num">1</span> Research Analysts</div>
 
