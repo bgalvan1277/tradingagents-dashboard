@@ -84,10 +84,16 @@
             <p style="font-size:.85rem;color:#64748b;margin:2px 0 0">{{ quote.company_name or ticker_symbol }}</p>
             {% endif %}
         </div>
-        <button hx-post="/api/run/{{ ticker_symbol }}" hx-swap="none" class="rerun-btn">
-            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-            Re-run
-        </button>
+        <div id="rerun-container" style="display:flex;align-items:center;gap:10px">
+            <div id="run-status" style="display:none;align-items:center;gap:8px;padding:6px 14px;border-radius:10px;background:rgba(6,182,212,.08);border:1px solid rgba(6,182,212,.15)">
+                <svg id="run-spinner" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22d3ee" style="animation:spin 1s linear infinite"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                <span id="run-status-text" style="font-size:.72rem;font-weight:600;color:#22d3ee;text-transform:uppercase;letter-spacing:.05em">Queued</span>
+            </div>
+            <button id="rerun-btn" onclick="triggerRerun()" class="rerun-btn">
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                Re-run
+            </button>
+        </div>
     </div>
     <!-- Price row: price left, cost pill right -->
     {% if quote %}
@@ -372,6 +378,49 @@ if(vEl){
     }
     if(aEl)aEl.textContent=actionText||'{{ run.one_line_thesis or "" }}';
     vEl.innerHTML='<p>'+renderMd(bodyLines.join('\n'))+'</p>';
+}
+</script>
+<style>@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}</style>
+<script>
+function triggerRerun(){
+    const btn=document.getElementById('rerun-btn');
+    const statusEl=document.getElementById('run-status');
+    const statusText=document.getElementById('run-status-text');
+    btn.style.display='none';
+    statusEl.style.display='inline-flex';
+    statusText.textContent='Queued';
+    fetch('/api/run/{{ ticker_symbol }}',{method:'POST'})
+        .then(r=>r.json())
+        .then(data=>{
+            if(data.run_id){
+                statusText.textContent='Running';
+                pollRunStatus(data.run_id);
+            }else{
+                statusText.textContent='Error';
+                setTimeout(()=>{statusEl.style.display='none';btn.style.display='inline-flex';},3000);
+            }
+        })
+        .catch(()=>{
+            statusText.textContent='Error';
+            setTimeout(()=>{statusEl.style.display='none';btn.style.display='inline-flex';},3000);
+        });
+}
+function pollRunStatus(runId){
+    const statusText=document.getElementById('run-status-text');
+    const poll=setInterval(()=>{
+        fetch('/api/run/'+runId+'/status')
+            .then(r=>r.json())
+            .then(data=>{
+                if(data.status==='running')statusText.textContent='Running';
+                else if(data.status==='pending')statusText.textContent='Queued';
+                else{
+                    clearInterval(poll);
+                    statusText.textContent=data.status==='done'?'Done':'Failed';
+                    setTimeout(()=>location.reload(),1500);
+                }
+            })
+            .catch(()=>{clearInterval(poll);statusText.textContent='Error';});
+    },3000);
 }
 </script>
 {% endblock %}

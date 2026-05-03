@@ -249,3 +249,25 @@ async def cancel_run_redirect(
         await db.commit()
 
     return RedirectResponse(url="/run", status_code=303)
+
+
+@router.get("/api/run/{run_id}/status")
+async def api_run_status(
+    request: Request,
+    run_id: int,
+    db: AsyncSession = Depends(get_db),
+):
+    """Check the status of a run (used for polling)."""
+    if not get_current_user(request):
+        return JSONResponse({"error": "Unauthorized"}, status_code=401)
+
+    result = await db.execute(select(Run).where(Run.id == run_id))
+    run = result.scalar_one_or_none()
+    if not run:
+        return JSONResponse({"error": "Run not found"}, status_code=404)
+
+    return JSONResponse({
+        "run_id": run.id,
+        "status": run.status,
+        "symbol": run.ticker_symbol,
+    })
