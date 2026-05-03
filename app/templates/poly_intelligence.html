@@ -2,12 +2,33 @@
 {% set active_page = 'poly_intel' %}
 
 {% block title %}Poly Intelligence{% endblock %}
-{% block meta_description %}Polymarket prediction intelligence feeds{% endblock %}
+{% block meta_description %}Polymarket prediction intelligence feeds and live market data{% endblock %}
 
 {% block content %}
 <style>
+.intel-hero{padding:1.5rem 0 2rem}
+.intel-hero h1{font-size:1.8rem;font-weight:800;color:#f1f5f9;margin:0 0 .35rem;letter-spacing:-.02em}
+.intel-hero p{font-size:.88rem;color:#64748b;max-width:600px;line-height:1.6;margin:0}
 .section-label{display:flex;align-items:center;gap:10px;margin:2rem 0 1rem;font-size:.72rem;font-weight:700;color:rgba(139,92,246,.9);text-transform:uppercase;letter-spacing:.12em}
 .section-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(139,92,246,.2),transparent)}
+.intel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1.25rem}
+.intel-card{background:rgba(15,23,42,.55);backdrop-filter:blur(16px);border:1px solid rgba(71,85,105,.25);border-radius:20px;padding:28px;transition:all .25s;position:relative;overflow:hidden}
+.intel-card:hover{border-color:rgba(139,92,246,.2);box-shadow:0 0 30px rgba(139,92,246,.06)}
+.intel-card h3{font-size:1.05rem;font-weight:700;color:#f1f5f9;margin:0 0 6px}
+.intel-card>p{font-size:.82rem;color:#94a3b8;line-height:1.65;margin:0 0 16px}
+.data-box{padding:16px;border-radius:12px;background:rgba(15,23,42,.5);border:1px solid rgba(71,85,105,.2)}
+.market-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(71,85,105,.1)}
+.market-row:last-child{border-bottom:none}
+.market-q{font-size:.78rem;color:#e2e8f0;font-weight:500;flex:1;margin-right:12px;line-height:1.4}
+.market-odds{display:flex;gap:6px;flex-shrink:0}
+.odds-yes{font-size:.72rem;font-weight:700;color:#4ade80;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.12);padding:3px 10px;border-radius:6px}
+.odds-no{font-size:.72rem;font-weight:700;color:#f87171;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.12);padding:3px 10px;border-radius:6px}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.stat-label{font-size:.6rem;color:#475569;text-transform:uppercase;letter-spacing:.06em}
+.stat-value{font-size:1rem;font-weight:700;color:#f1f5f9;margin-top:2px}
+.cat-tag{display:inline-flex;padding:4px 10px;border-radius:6px;font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin:0 4px 4px 0}
+.skeleton-row{height:42px;background:linear-gradient(90deg,rgba(71,85,105,.08) 25%,rgba(71,85,105,.15) 50%,rgba(71,85,105,.08) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:8px;margin-bottom:6px}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 </style>
 
 <a href="/poly/analysis" style="display:inline-flex;align-items:center;gap:6px;font-size:.78rem;color:#64748b;text-decoration:none;margin-bottom:.5rem">
@@ -15,15 +36,173 @@
     Back to Poly Analysis
 </a>
 
-<p style="font-size:.7rem;font-weight:700;color:rgba(139,92,246,.7);text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px">Prediction Division</p>
-<h1 style="font-size:1.5rem;font-weight:800;color:#f1f5f9;margin:0 0 .25rem;letter-spacing:-.02em">Poly Intelligence</h1>
-<p style="font-size:.82rem;color:#64748b;margin:0 0 1.5rem">Data feeds and signal sources for prediction market analysis</p>
-
-<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6rem 2rem;text-align:center;background:rgba(15,23,42,.55);backdrop-filter:blur(16px);border:1px solid rgba(71,85,105,.25);border-radius:20px">
-    <div style="width:64px;height:64px;border-radius:18px;background:rgba(139,92,246,.08);display:flex;align-items:center;justify-content:center;margin-bottom:20px">
-        <svg width="28" height="28" fill="none" stroke="#a78bfa" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
-    </div>
-    <h2 style="font-size:1rem;font-weight:700;color:#e2e8f0;margin:0 0 6px">Intelligence Feeds Coming Soon</h2>
-    <p style="font-size:.82rem;color:#64748b;max-width:400px;margin:0 0 20px;line-height:1.6">Polymarket CLOB API integration, market volume analysis, odds movement tracking, and event correlation feeds will be configured here.</p>
+<div class="intel-hero">
+    <p style="font-size:.7rem;font-weight:700;color:rgba(139,92,246,.7);text-transform:uppercase;letter-spacing:.12em;margin-bottom:10px">Prediction Division</p>
+    <h1>Poly Intelligence</h1>
+    <p>Live data feeds from Polymarket prediction markets. Active reconnaissance on market odds, volume trends, and event resolution signals.</p>
 </div>
+
+<!-- Nadia Petrova Profile -->
+<div style="background:linear-gradient(135deg,rgba(139,92,246,.04),rgba(15,23,42,.55));backdrop-filter:blur(16px);border:1px solid rgba(139,92,246,.15);border-radius:20px;padding:32px;margin-bottom:2rem;display:flex;align-items:flex-start;gap:28px">
+    <img src="/static/avatars/nadia_petrova.png" alt="Nadia Petrova" style="width:120px;height:120px;border-radius:50%;object-fit:cover;border:2.5px solid rgba(139,92,246,.35);box-shadow:0 0 24px rgba(139,92,246,.1);flex-shrink:0" />
+    <div>
+        <p style="font-size:.65rem;font-weight:700;color:rgba(139,92,246,.7);text-transform:uppercase;letter-spacing:.12em;margin:0 0 6px">Division Lead</p>
+        <h2 style="font-size:1.35rem;font-weight:800;color:#f1f5f9;margin:0 0 4px;letter-spacing:-.01em">Nadia Petrova</h2>
+        <p style="font-size:.78rem;color:#a78bfa;font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin:0 0 16px">Chief Intelligence Analyst</p>
+        <p style="font-size:.86rem;color:#cbd5e1;line-height:1.75;margin:0 0 12px">Welcome to the Prediction Intelligence Division. Every feed below represents an active data channel I query before any prediction market analysis begins. When a market is flagged for review, I pull current odds and volume data from Polymarket's CLOB, cross-reference event timelines, assess historical resolution patterns for similar markets, and compile a comprehensive intelligence briefing for the adversarial debate team.</p>
+        <p style="font-size:.86rem;color:#94a3b8;line-height:1.75;margin:0">The data below updates in real-time from Polymarket's public API. Use these feeds to identify high-volume markets, track odds movements, and spot potential mispricings before running a full agent analysis.</p>
+    </div>
+</div>
+<style>@media(max-width:768px){div[style*="Nadia Petrova"]{flex-direction:column!important;text-align:center!important}}</style>
+
+<!-- Live Market Feeds -->
+<div class="section-label">Trending Markets by Volume</div>
+<div class="intel-card">
+    <h3>Top Active Markets</h3>
+    <p>Highest volume prediction markets currently trading on Polymarket, sorted by liquidity.</p>
+    <div class="data-box" id="top-markets">
+        <div class="skeleton-row"></div><div class="skeleton-row"></div><div class="skeleton-row"></div>
+        <div class="skeleton-row"></div><div class="skeleton-row"></div><div class="skeleton-row"></div>
+    </div>
+</div>
+
+<div class="section-label" style="margin-top:1.5rem">Market Intelligence</div>
+<div class="intel-grid">
+    <!-- Market Stats -->
+    <div class="intel-card" id="stats-card">
+        <h3>Platform Overview</h3>
+        <p>Aggregate Polymarket statistics from active markets.</p>
+        <div class="data-box">
+            <div class="stat-grid">
+                <div>
+                    <span class="stat-label">Active Markets</span>
+                    <div class="stat-value" id="stat-active">--</div>
+                </div>
+                <div>
+                    <span class="stat-label">Total Liquidity</span>
+                    <div class="stat-value" id="stat-liquidity">--</div>
+                </div>
+                <div>
+                    <span class="stat-label">Total Volume</span>
+                    <div class="stat-value" id="stat-volume">--</div>
+                </div>
+                <div>
+                    <span class="stat-label">Avg. Market Size</span>
+                    <div class="stat-value" id="stat-avg">--</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Closing Soon -->
+    <div class="intel-card">
+        <h3>Closing Soon</h3>
+        <p>Markets approaching resolution deadline, sorted by end date.</p>
+        <div class="data-box" id="closing-markets">
+            <div class="skeleton-row"></div><div class="skeleton-row"></div><div class="skeleton-row"></div>
+        </div>
+    </div>
+
+    <!-- Recently Resolved -->
+    <div class="intel-card">
+        <h3>Recently Resolved</h3>
+        <p>Markets that have recently resolved with final outcomes.</p>
+        <div class="data-box" id="resolved-markets">
+            <div class="skeleton-row"></div><div class="skeleton-row"></div><div class="skeleton-row"></div>
+        </div>
+    </div>
+
+    <!-- Categories -->
+    <div class="intel-card">
+        <h3>Market Categories</h3>
+        <p>Distribution of active prediction markets by topic category.</p>
+        <div class="data-box" id="categories-box">
+            <div class="skeleton-row"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+const GAMMA='https://gamma-api.polymarket.com';
+const fmt=(n)=>{if(!n)return'$0';if(n>=1e9)return'$'+(n/1e9).toFixed(1)+'B';if(n>=1e6)return'$'+(n/1e6).toFixed(1)+'M';if(n>=1e3)return'$'+(n/1e3).toFixed(0)+'K';return'$'+Math.round(n)};
+
+function renderMarketRow(m){
+    const yes=m.outcomePrices?JSON.parse(m.outcomePrices)[0]:null;
+    const yPct=yes?(parseFloat(yes)*100).toFixed(0):'--';
+    const nPct=yes?(100-parseFloat(yes)*100).toFixed(0):'--';
+    return `<div class="market-row">
+        <span class="market-q">${m.question||m.title||'Untitled'}</span>
+        <div class="market-odds">
+            <span class="odds-yes">YES ${yPct}¢</span>
+            <span class="odds-no">NO ${nPct}¢</span>
+        </div>
+    </div>`;
+}
+
+// Top markets by volume
+fetch(GAMMA+'/markets?limit=10&active=true&closed=false&order=volume&ascending=false')
+    .then(r=>r.json())
+    .then(markets=>{
+        const el=document.getElementById('top-markets');
+        if(!markets.length){el.innerHTML='<p style="font-size:.78rem;color:#475569;text-align:center;padding:20px">No markets available</p>';return;}
+        el.innerHTML=markets.map(m=>renderMarketRow(m)).join('');
+
+        // Calculate stats
+        let totalVol=0,totalLiq=0;
+        markets.forEach(m=>{totalVol+=parseFloat(m.volume||0);totalLiq+=parseFloat(m.liquidity||0);});
+        document.getElementById('stat-active').textContent=markets.length+'+ markets';
+        document.getElementById('stat-volume').textContent=fmt(totalVol);
+        document.getElementById('stat-liquidity').textContent=fmt(totalLiq);
+        document.getElementById('stat-avg').textContent=fmt(totalVol/markets.length);
+    })
+    .catch(()=>{document.getElementById('top-markets').innerHTML='<p style="font-size:.78rem;color:#f87171;text-align:center;padding:20px">Failed to load Polymarket data</p>';});
+
+// Closing soon
+fetch(GAMMA+'/markets?limit=6&active=true&closed=false&order=endDate&ascending=true')
+    .then(r=>r.json())
+    .then(markets=>{
+        const el=document.getElementById('closing-markets');
+        if(!markets.length){el.innerHTML='<p style="font-size:.78rem;color:#475569;text-align:center;padding:20px">No upcoming closings</p>';return;}
+        el.innerHTML=markets.map(m=>{
+            const end=m.endDate?new Date(m.endDate).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'TBD';
+            return `<div class="market-row">
+                <span class="market-q">${m.question||'Untitled'}</span>
+                <span style="font-size:.65rem;color:#fb923c;font-weight:600;white-space:nowrap">${end}</span>
+            </div>`;
+        }).join('');
+    }).catch(()=>{document.getElementById('closing-markets').innerHTML='<p style="font-size:.78rem;color:#f87171;text-align:center;padding:20px">Failed to load</p>';});
+
+// Recently resolved
+fetch(GAMMA+'/markets?limit=6&active=false&closed=true&order=endDate&ascending=false')
+    .then(r=>r.json())
+    .then(markets=>{
+        const el=document.getElementById('resolved-markets');
+        if(!markets.length){el.innerHTML='<p style="font-size:.78rem;color:#475569;text-align:center;padding:20px">No recent resolutions</p>';return;}
+        el.innerHTML=markets.map(m=>{
+            const outcomes=m.outcomePrices?JSON.parse(m.outcomePrices):[];
+            const yesWon=outcomes[0]&&parseFloat(outcomes[0])>0.5;
+            return `<div class="market-row">
+                <span class="market-q">${m.question||'Untitled'}</span>
+                <span style="font-size:.68rem;font-weight:700;padding:3px 10px;border-radius:6px;${yesWon?'color:#4ade80;background:rgba(34,197,94,.1)':'color:#f87171;background:rgba(239,68,68,.1)'}">${yesWon?'YES':'NO'}</span>
+            </div>`;
+        }).join('');
+    }).catch(()=>{document.getElementById('resolved-markets').innerHTML='<p style="font-size:.78rem;color:#f87171;text-align:center;padding:20px">Failed to load</p>';});
+
+// Categories
+fetch(GAMMA+'/markets?limit=100&active=true&closed=false')
+    .then(r=>r.json())
+    .then(markets=>{
+        const cats={};
+        markets.forEach(m=>{
+            const tags=m.tags||[];
+            if(tags.length){tags.forEach(t=>{cats[t]=(cats[t]||0)+1;});}
+            else{cats['Other']=(cats['Other']||0)+1;}
+        });
+        const sorted=Object.entries(cats).sort((a,b)=>b[1]-a[1]).slice(0,12);
+        const colors=['rgba(139,92,246,.15)','rgba(6,182,212,.15)','rgba(245,158,11,.15)','rgba(34,197,94,.15)','rgba(239,68,68,.15)','rgba(236,72,153,.15)','rgba(59,130,246,.15)','rgba(251,146,60,.15)','rgba(168,85,247,.15)','rgba(251,191,36,.15)','rgba(100,116,139,.15)','rgba(71,85,105,.15)'];
+        const textColors=['#a78bfa','#22d3ee','#f59e0b','#4ade80','#f87171','#f472b6','#60a5fa','#fb923c','#c084fc','#fbbf24','#94a3b8','#64748b'];
+        const el=document.getElementById('categories-box');
+        el.innerHTML=sorted.map((c,i)=>`<span class="cat-tag" style="background:${colors[i%colors.length]};color:${textColors[i%textColors.length]};border:1px solid ${colors[i%colors.length]}">${c[0]} (${c[1]})</span>`).join('');
+    }).catch(()=>{});
+</script>
 {% endblock %}
