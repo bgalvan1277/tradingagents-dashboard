@@ -76,6 +76,7 @@
 
 <!-- Ticker Hero -->
 <div style="margin-bottom:1.5rem">
+    <!-- Top row: ticker info left, Re-run + cost right -->
     <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px">
         <div>
             <h1 style="font-size:2rem;font-weight:800;color:#f1f5f9;margin:0;letter-spacing:-.02em">{{ ticker_symbol }}</h1>
@@ -89,40 +90,38 @@
                 </span>
                 {% endif %}
             </div>
-            <p style="font-size:.72rem;color:#475569;margin-top:3px">
-                {% if quote.market_state == 'REGULAR' %}Market Open{% elif quote.market_state == 'CLOSED' or quote.market_state == 'POST' %}Market Closed{% else %}{{ quote.market_state }}{% endif %}
-            </p>
             {% endif %}
         </div>
-        <!-- Right side: re-run button + cost + run info -->
-        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:16px">
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:10px">
             <button hx-post="/api/run/{{ ticker_symbol }}" hx-swap="none" class="rerun-btn">
                 <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
                 Re-run
             </button>
             {% if run %}
-            <!-- Cost + Last Analysis grouped together -->
-            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
-                <!-- Compute Cost -->
-                <div style="background:rgba(6,182,212,.05);border:1px solid rgba(6,182,212,.12);border-radius:10px;padding:6px 14px;display:inline-flex;align-items:center;gap:8px">
-                    <svg width="13" height="13" fill="none" stroke="#22d3ee" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-                    {% if run_cost %}
-                    <span style="font-size:.7rem;color:#94a3b8;font-family:'JetBrains Mono',monospace">{{ "{:,}".format(run_cost.total_tokens) }} tokens</span>
-                    <span style="font-size:.7rem;color:#334155">|</span>
-                    <span style="font-size:.7rem;color:#22d3ee;font-weight:600;font-family:'JetBrains Mono',monospace">${{ "%.4f"|format(run_cost.cost_usd) }}</span>
-                    {% elif run.total_cost_usd and run.total_cost_usd > 0 %}
-                    <span style="font-size:.7rem;color:#22d3ee;font-weight:600;font-family:'JetBrains Mono',monospace">${{ "%.4f"|format(run.total_cost_usd) }}</span>
-                    {% else %}
-                    <span style="font-size:.7rem;color:#475569;font-family:'JetBrains Mono',monospace">Cost not tracked</span>
-                    {% endif %}
-                </div>
-                <!-- Last Analysis Date -->
-                <span style="font-size:.7rem;color:#64748b">Last analysis: {{ run.run_date.strftime('%b %d, %Y') }}{% if run.run_timestamp %} at {{ run.run_timestamp.strftime('%I:%M %p') }}{% endif %}</span>
+            <div style="background:rgba(6,182,212,.05);border:1px solid rgba(6,182,212,.12);border-radius:10px;padding:6px 14px;display:inline-flex;align-items:center;gap:8px">
+                <svg width="13" height="13" fill="none" stroke="#22d3ee" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                {% if run_cost %}
+                <span style="font-size:.7rem;color:#94a3b8;font-family:'JetBrains Mono',monospace">{{ "{:,}".format(run_cost.total_tokens) }} tokens</span>
+                <span style="font-size:.7rem;color:#334155">|</span>
+                <span style="font-size:.7rem;color:#22d3ee;font-weight:600;font-family:'JetBrains Mono',monospace">${{ "%.4f"|format(run_cost.cost_usd) }}</span>
+                {% elif run.total_cost_usd and run.total_cost_usd > 0 %}
+                <span style="font-size:.7rem;color:#22d3ee;font-weight:600;font-family:'JetBrains Mono',monospace">${{ "%.4f"|format(run.total_cost_usd) }}</span>
+                {% else %}
+                <span style="font-size:.7rem;color:#475569;font-family:'JetBrains Mono',monospace">Cost not tracked</span>
+                {% endif %}
             </div>
             {% endif %}
         </div>
     </div>
-
+    <!-- Bottom row: Market status left, Last analysis right -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px">
+        <span style="font-size:.72rem;color:#475569">
+            {% if quote %}{% if quote.market_state == 'REGULAR' %}Market Open{% elif quote.market_state == 'CLOSED' or quote.market_state == 'POST' %}Market Closed{% else %}{{ quote.market_state }}{% endif %}{% endif %}
+        </span>
+        {% if run %}
+        <span style="font-size:.72rem;color:#64748b">Last analysis: {{ run.run_date.strftime('%b %d, %Y') }}{% if run.run_timestamp %} at {{ run.run_timestamp.strftime('%I:%M %p') }}{% endif %}</span>
+        {% endif %}
+    </div>
 </div>
 
 <!-- TradingView Chart -->
