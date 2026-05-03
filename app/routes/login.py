@@ -43,7 +43,7 @@ async def login_submit(request: Request, password: str = Form(...)):
 
     if fail_count >= 2:
         # Redirect to honeypot scare page
-        response = RedirectResponse(url="/wp-admin", status_code=303)
+        response = RedirectResponse(url="/wp-admin?t=1", status_code=303)
         response.delete_cookie("_fa")
         return response
 
