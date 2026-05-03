@@ -53,12 +53,13 @@ async def add_ticker(
     category: str = Form("watching"),
     group_name: str = Form("default"),
     model_tier: str = Form("pro"),
+    redirect: str = Form("/watchlist"),
     db: AsyncSession = Depends(get_db),
 ):
     """Add a new ticker to the watchlist."""
-    redirect = require_auth(request)
-    if redirect:
-        return redirect
+    redirect_auth = require_auth(request)
+    if redirect_auth:
+        return redirect_auth
 
     symbol = symbol.upper().strip()
 
@@ -108,7 +109,9 @@ async def add_ticker(
         db.add(wl_entry)
 
     await db.commit()
-    return RedirectResponse(url="/watchlist", status_code=303)
+    # Sanitize redirect to prevent open redirect
+    safe_redirect = redirect if redirect.startswith("/") else "/watchlist"
+    return RedirectResponse(url=safe_redirect, status_code=303)
 
 
 @router.post("/watchlist/remove/{symbol}")
