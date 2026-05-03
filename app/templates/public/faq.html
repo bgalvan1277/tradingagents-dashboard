@@ -1,0 +1,282 @@
+{% extends "public/base.html" %}
+{% set active_page = 'faq' %}
+{% block title %}Frequently Asked Questions{% endblock %}
+{% block meta_description %}Common questions about the TradingAgents autonomous AI research platform, its data sources, agent architecture, and how the multi-stage pipeline works.{% endblock %}
+
+{% block extra_css %}
+.faq-hero{text-align:center;padding:8rem 2rem 3rem;max-width:800px;margin:0 auto}
+.faq-hero h1{font-size:2.8rem;font-weight:900;color:#f1f5f9;letter-spacing:-.03em;margin-bottom:1rem}
+.faq-hero p{font-size:1rem;color:#64748b;line-height:1.85;max-width:640px;margin:0 auto}
+.faq-wrap{max-width:900px;margin:0 auto;padding:0 2rem 4rem}
+.faq-section-label{display:flex;align-items:center;gap:12px;margin:3rem 0 1.5rem;font-size:.72rem;font-weight:700;color:rgba(6,182,212,.9);text-transform:uppercase;letter-spacing:.12em}
+.faq-section-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(6,182,212,.2),transparent)}
+.faq-item{background:rgba(15,23,42,.55);backdrop-filter:blur(16px);border:1px solid rgba(71,85,105,.25);border-radius:16px;margin-bottom:.75rem;overflow:hidden;transition:border-color .3s}
+.faq-item:hover{border-color:rgba(6,182,212,.15)}
+.faq-q{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 24px;cursor:pointer;user-select:none}
+.faq-q h3{font-size:.92rem;font-weight:700;color:#f1f5f9;margin:0;line-height:1.5}
+.faq-q .faq-icon{flex-shrink:0;width:24px;height:24px;border-radius:50%;background:rgba(6,182,212,.08);display:flex;align-items:center;justify-content:center;transition:transform .3s}
+.faq-item.open .faq-icon{transform:rotate(45deg)}
+.faq-a{display:none;padding:0 24px 20px;font-size:.84rem;color:#94a3b8;line-height:1.85}
+.faq-item.open .faq-a{display:block}
+.faq-a p{margin:0 0 .75rem}.faq-a p:last-child{margin:0}
+.faq-a ul{margin:.5rem 0;padding-left:1.25rem}.faq-a li{margin-bottom:6px}
+.faq-a strong{color:#e2e8f0}
+.faq-agent-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:6px;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+@media(max-width:768px){.faq-hero h1{font-size:2rem}.faq-hero{padding:7rem 1.5rem 2.5rem}.faq-wrap{padding:0 1.25rem 3rem}}
+{% endblock %}
+
+{% block content %}
+<section class="faq-hero">
+    <p style="font-size:.7rem;font-weight:700;color:rgba(6,182,212,.7);text-transform:uppercase;letter-spacing:.12em;margin-bottom:12px">Knowledge Base</p>
+    <h1>Frequently Asked <span class="grad-text">Questions</span></h1>
+    <p>Everything you need to know about the TradingAgents platform, its data sources, and the autonomous AI agents powering the research pipeline.</p>
+</section>
+
+<div class="faq-wrap">
+
+<!-- ── GENERAL ────────────────────────────────────────────── -->
+<div class="faq-section-label">General Questions</div>
+
+<div class="faq-item">
+    <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+        <h3>Where does the platform get its information from?</h3>
+        <div class="faq-icon"><svg width="12" height="12" fill="none" stroke="#22d3ee" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg></div>
+    </div>
+    <div class="faq-a">
+        <p>TradingAgents pulls from <strong>12 distinct public data channels</strong> across two layers. The first layer is our proprietary OSINT sweep (Colonel Wolfe), which queries:</p>
+        <ul>
+            <li><strong>SEC EDGAR</strong> for Form 4 insider trades, 8-K material events, and 13-F institutional holdings</li>
+            <li><strong>USASpending.gov</strong> for federal government contract awards and amounts</li>
+            <li><strong>FRED (Federal Reserve Economic Data)</strong> for Fed funds rate, CPI, unemployment, Treasury yields, and the VIX</li>
+            <li><strong>ApeWisdom</strong> for Reddit retail mention volume, rank, and 24-hour momentum</li>
+            <li><strong>yfinance</strong> for company fundamentals, technicals (RSI, SMA, Bollinger Bands, MACD), earnings calendars, sector rotation, options flow (put/call ratios, max pain, unusual volume), and insider transaction history</li>
+        </ul>
+        <p>The second layer is the Tauric Research framework, where four specialized AI research agents independently process this data across technical, sentiment, news, and fundamental verticals. No paid data subscriptions are required. Everything runs through publicly available government and financial APIs.</p>
+    </div>
+</div>
+
+<div class="faq-item">
+    <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+        <h3>What is TradingAgents?</h3>
+        <div class="faq-icon"><svg width="12" height="12" fill="none" stroke="#22d3ee" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg></div>
+    </div>
+    <div class="faq-a">
+        <p>TradingAgents is an autonomous multi-agent research platform that deploys <strong>9 AI agents across 6 analytical stages</strong> to produce institutional-grade stock analysis. It extends the open-source TradingAgents framework from Tauric Research with a proprietary OSINT intelligence layer, custom agent architectures, and a full-stack analytical dashboard. The platform researches, debates, and assesses risk without human intervention, delivering a structured investment recommendation to the final human decision-maker.</p>
+    </div>
+</div>
+
+<div class="faq-item">
+    <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+        <h3>Is this real trading or simulated?</h3>
+        <div class="faq-icon"><svg width="12" height="12" fill="none" stroke="#22d3ee" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg></div>
+    </div>
+    <div class="faq-a">
+        <p>The platform produces <strong>research and recommendations only</strong>. It does not execute real trades or connect to any brokerage. Our SimTrader module (currently in beta) allows paper trading at live market prices to benchmark the quality of agent analysis over time. No real money is ever at risk through the platform itself. The final investment decision always rests with the human portfolio manager.</p>
+    </div>
+</div>
+
+<div class="faq-item">
+    <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+        <h3>What AI models power the agents?</h3>
+        <div class="faq-icon"><svg width="12" height="12" fill="none" stroke="#22d3ee" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg></div>
+    </div>
+    <div class="faq-a">
+        <p>The platform supports multiple LLM providers including <strong>Anthropic (Claude), OpenAI (GPT), Google Gemini, DeepSeek, and xAI Grok</strong>. Each analysis run can be configured with different model tiers. The default configuration uses DeepSeek for cost-efficient deep reasoning, but the architecture is model-agnostic. Any agent can be swapped to a different provider without changing the pipeline logic.</p>
+    </div>
+</div>
+
+<div class="faq-item">
+    <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+        <h3>How long does a full analysis take?</h3>
+        <div class="faq-icon"><svg width="12" height="12" fill="none" stroke="#22d3ee" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg></div>
+    </div>
+    <div class="faq-a">
+        <p>A complete 6-stage analysis for a single ticker typically takes <strong>3 to 8 minutes</strong>, depending on the model tier selected and the complexity of the adversarial debate. This includes the full OSINT intelligence sweep, all four research verticals, multiple rounds of bull/bear debate, judicial verdict, three-perspective risk assessment, and final consensus synthesis. Every step produces documented deliverables stored in the database.</p>
+    </div>
+</div>
+
+<div class="faq-item">
+    <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+        <h3>Can I run analysis on any stock?</h3>
+        <div class="faq-icon"><svg width="12" height="12" fill="none" stroke="#22d3ee" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg></div>
+    </div>
+    <div class="faq-a">
+        <p>Yes. The platform supports <strong>any publicly traded US equity</strong> with a valid ticker symbol. You can add tickers to your watchlist, set analysis frequency, and run on-demand or scheduled analysis. The OSINT layer adapts its intelligence sweep based on the company's sector, whether it holds government contracts, and the availability of options data for that symbol.</p>
+    </div>
+</div>
+
+<div class="faq-item">
+    <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+        <h3>Is my data private?</h3>
+        <div class="faq-icon"><svg width="12" height="12" fill="none" stroke="#22d3ee" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg></div>
+    </div>
+    <div class="faq-a">
+        <p>Absolutely. All analysis runs, watchlists, portfolio data, and SimTrader positions are stored in a <strong>private MySQL database</strong> accessible only through authenticated sessions. The platform does not share analysis results, trading activity, or watchlist data with any third party. LLM API calls are made directly to provider endpoints with no intermediary data brokers.</p>
+    </div>
+</div>
+
+<!-- ── AGENT DEEP DIVES ──────────────────────────────────── -->
+<div class="faq-section-label">Agent Deep Dives</div>
+
+<div class="faq-item">
+    <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+        <h3><span class="faq-agent-badge" style="background:rgba(251,146,60,.08);color:#fb923c;border:1px solid rgba(251,146,60,.2)">Stage 0</span> What does Colonel Don Wolfe do?</h3>
+        <div class="faq-icon"><svg width="12" height="12" fill="none" stroke="#22d3ee" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg></div>
+    </div>
+    <div class="faq-a">
+        <p><strong>Col. Don Wolfe (RET)</strong> is the Intelligence Officer and the first agent in the pipeline. Before any research analyst touches a ticker, he executes a full-spectrum open-source intelligence sweep across every available data channel.</p>
+        <p>His reconnaissance protocol includes:</p>
+        <ul>
+            <li><strong>SEC EDGAR queries</strong> for Form 4 insider trades (who is buying/selling company stock), 8-K material event filings (mergers, leadership changes, lawsuits), and 13-F institutional holdings (what hedge funds are accumulating or dumping)</li>
+            <li><strong>Federal contract searches</strong> via USASpending.gov to identify government revenue exposure, contract award amounts, and awarding agency relationships</li>
+            <li><strong>FRED macroeconomic indicators</strong> including the federal funds rate, CPI inflation data, unemployment rate, 10-year and 2-year Treasury yields (yield curve analysis), and the VIX volatility index</li>
+            <li><strong>Reddit retail sentiment</strong> via ApeWisdom, tracking mention volume, rank among all stocks, upvote momentum, and 24-hour mention velocity changes</li>
+            <li><strong>Comprehensive yfinance data</strong> including full company profile, market cap, P/E ratios, PEG ratio, price-to-book, 52-week range, beta, dividend yield, earnings calendar with EPS/revenue estimates, RSI, 20/50/200-day SMAs, Bollinger Bands, MACD, volume profile analysis, sector ETF rotation performance, options chain data (put/call ratios, max pain calculation, unusual volume strikes), and insider transaction history</li>
+        </ul>
+        <p>The Colonel compiles everything into a classified-style intelligence briefing document that serves as the foundational input for all downstream agents. No research analyst, debate advocate, or risk assessor operates without first reviewing his findings.</p>
+    </div>
+</div>
+
+<div class="faq-item">
+    <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+        <h3><span class="faq-agent-badge" style="background:rgba(6,182,212,.08);color:#22d3ee;border:1px solid rgba(6,182,212,.2)">Stage 1</span> What does Marcus Chen do?</h3>
+        <div class="faq-icon"><svg width="12" height="12" fill="none" stroke="#22d3ee" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg></div>
+    </div>
+    <div class="faq-a">
+        <p><strong>Marcus Chen</strong> is the Chief Technical Analyst operating in Stage 1. He specializes in quantitative price action analysis and multi-timeframe technical indicator synthesis.</p>
+        <p>Marcus processes the technical data from Colonel Wolfe's briefing and applies his own analysis layer:</p>
+        <ul>
+            <li><strong>Chart pattern recognition</strong> across daily, weekly, and monthly timeframes to identify trend direction and reversal signals</li>
+            <li><strong>RSI oscillation analysis</strong> to detect overbought/oversold conditions and divergence patterns against price action</li>
+            <li><strong>Moving average convergence</strong> evaluating the relationship between 20-day, 50-day, and 200-day SMAs, including golden cross and death cross signals</li>
+            <li><strong>Bollinger Band compression</strong> to identify volatility squeeze setups that precede significant directional moves</li>
+            <li><strong>Volume profile analysis</strong> comparing current trading volume against historical averages to validate price movements</li>
+            <li><strong>MACD signal interpretation</strong> including histogram divergences and centerline crossovers</li>
+        </ul>
+        <p>His output is a structured technical probability framework that quantifies the statistical likelihood of upside vs downside price movement based purely on price action data.</p>
+    </div>
+</div>
+
+<div class="faq-item">
+    <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+        <h3><span class="faq-agent-badge" style="background:rgba(6,182,212,.08);color:#22d3ee;border:1px solid rgba(6,182,212,.2)">Stage 1</span> What does Sarah Mitchell do?</h3>
+        <div class="faq-icon"><svg width="12" height="12" fill="none" stroke="#22d3ee" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg></div>
+    </div>
+    <div class="faq-a">
+        <p><strong>Sarah Mitchell</strong> is the Sentiment Intelligence Lead. She operates the sentiment quantification engine that processes both institutional and retail positioning data.</p>
+        <ul>
+            <li><strong>Options flow analysis</strong> including put/call ratios by volume and open interest, max pain calculations, and identification of unusual options activity at specific strikes</li>
+            <li><strong>Insider transaction monitoring</strong> tracking C-suite and board member buying/selling patterns, transaction sizes, and timing relative to earnings</li>
+            <li><strong>Reddit retail sentiment</strong> quantifying mention velocity, rank changes, and upvote momentum as a gauge of retail conviction</li>
+            <li><strong>Institutional positioning signals</strong> derived from 13-F filing patterns and changes in institutional ownership concentration</li>
+        </ul>
+        <p>Sarah constructs a composite sentiment score that captures conviction levels across both retail and institutional participants, fear/greed indicators, and short interest dynamics.</p>
+    </div>
+</div>
+
+<div class="faq-item">
+    <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+        <h3><span class="faq-agent-badge" style="background:rgba(6,182,212,.08);color:#22d3ee;border:1px solid rgba(6,182,212,.2)">Stage 1</span> What does James Rivera do?</h3>
+        <div class="faq-icon"><svg width="12" height="12" fill="none" stroke="#22d3ee" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg></div>
+    </div>
+    <div class="faq-a">
+        <p><strong>James Rivera</strong> is the News and Media Analyst. He monitors and processes real-time information streams to extract actionable intelligence from unstructured media data.</p>
+        <ul>
+            <li><strong>8-K material event filings</strong> from SEC EDGAR for mergers, acquisitions, leadership changes, and legal proceedings</li>
+            <li><strong>Earnings calendar analysis</strong> including upcoming report dates, consensus EPS/revenue estimates, and historical surprise patterns</li>
+            <li><strong>Macroeconomic event correlation</strong> connecting FRED indicators (rate decisions, inflation data, employment reports) to sector-specific impact assessments</li>
+            <li><strong>Federal contract intelligence</strong> flagging new government awards that could materially impact revenue projections</li>
+        </ul>
+        <p>James flags material catalysts, sector rotation triggers, and geopolitical risk vectors. His analysis identifies time-sensitive information that could alter the investment thesis before the market fully prices it in.</p>
+    </div>
+</div>
+
+<div class="faq-item">
+    <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+        <h3><span class="faq-agent-badge" style="background:rgba(6,182,212,.08);color:#22d3ee;border:1px solid rgba(6,182,212,.2)">Stage 1</span> What does Elena Kowalski do?</h3>
+        <div class="faq-icon"><svg width="12" height="12" fill="none" stroke="#22d3ee" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg></div>
+    </div>
+    <div class="faq-a">
+        <p><strong>Elena Kowalski</strong> is the Fundamentals Research Lead. She conducts deep-dive financial statement analysis and valuation modeling.</p>
+        <ul>
+            <li><strong>Revenue growth trajectory analysis</strong> evaluating quarter-over-quarter and year-over-year growth rates against sector benchmarks</li>
+            <li><strong>Margin structure assessment</strong> analyzing gross, operating, and net margins for expansion or contraction trends</li>
+            <li><strong>Valuation model scoring</strong> using P/E, forward P/E, PEG ratio, and price-to-book against historical averages and peer comparisons</li>
+            <li><strong>Balance sheet resilience</strong> evaluating debt-to-equity ratios, current ratio, and free cash flow generation capacity</li>
+            <li><strong>Capital allocation efficiency</strong> assessing dividend sustainability, share buyback programs, and R&D investment relative to revenue</li>
+        </ul>
+        <p>Elena produces a composite fundamentals score using proprietary scoring methodologies that weight each factor based on the company's sector and growth stage.</p>
+    </div>
+</div>
+
+<div class="faq-item">
+    <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+        <h3><span class="faq-agent-badge" style="background:rgba(34,197,94,.08);color:#4ade80;border:1px solid rgba(34,197,94,.2)">Stage 2</span> What does David Park do?</h3>
+        <div class="faq-icon"><svg width="12" height="12" fill="none" stroke="#22d3ee" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg></div>
+    </div>
+    <div class="faq-a">
+        <p><strong>David Park</strong> is the Bull Case Advocate operating in Stage 2 (Investment Debate). His role is to construct the strongest possible investment thesis in favor of each position.</p>
+        <p>David aggregates the most compelling evidence from all four research verticals (technical, sentiment, news, fundamentals) and builds a rigorous case for upside potential. He identifies:</p>
+        <ul>
+            <li><strong>Asymmetric risk/reward opportunities</strong> where downside is limited but upside potential is significant</li>
+            <li><strong>Margin-of-safety arguments</strong> based on valuation discounts to intrinsic value</li>
+            <li><strong>Catalyst timelines</strong> including upcoming earnings, product launches, or regulatory approvals that could trigger re-rating</li>
+            <li><strong>Institutional accumulation signals</strong> suggesting smart money is positioning ahead of a move</li>
+        </ul>
+        <p>David is not permitted to equivocate or present balanced analysis. His mandate is to present the most aggressive, evidence-backed bull thesis possible, which is then stress-tested by Catherine Walsh (Bear Advocate).</p>
+    </div>
+</div>
+
+<div class="faq-item">
+    <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+        <h3><span class="faq-agent-badge" style="background:rgba(239,68,68,.08);color:#f87171;border:1px solid rgba(239,68,68,.2)">Stage 2</span> What does Catherine Walsh do?</h3>
+        <div class="faq-icon"><svg width="12" height="12" fill="none" stroke="#22d3ee" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg></div>
+    </div>
+    <div class="faq-a">
+        <p><strong>Catherine Walsh</strong> is the Bear Case Advocate. She systematically deconstructs the investment thesis, stress-testing every assumption against downside scenarios.</p>
+        <ul>
+            <li><strong>Valuation risk identification</strong> flagging stretched multiples, revenue deceleration, or earnings quality concerns</li>
+            <li><strong>Competitive threat analysis</strong> evaluating market share erosion, pricing pressure, and technological disruption risks</li>
+            <li><strong>Macro headwind assessment</strong> connecting rising rates, inflation, or sector rotation away from the stock's category</li>
+            <li><strong>Insider selling patterns</strong> highlighting executive dumping ahead of potential negative catalysts</li>
+        </ul>
+        <p>Catherine forces the pipeline to confront uncomfortable data points that the bull thesis may have downplayed. This adversarial structure ensures that no investment recommendation passes through without surviving rigorous scrutiny from both sides.</p>
+    </div>
+</div>
+
+<div class="faq-item">
+    <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+        <h3><span class="faq-agent-badge" style="background:rgba(139,92,246,.08);color:#a78bfa;border:1px solid rgba(139,92,246,.2)">Stage 3</span> What does Michael Torres do?</h3>
+        <div class="faq-icon"><svg width="12" height="12" fill="none" stroke="#22d3ee" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg></div>
+    </div>
+    <div class="faq-a">
+        <p><strong>Michael Torres</strong> is the Research Director, operating in Stage 3. He presides over the adversarial debate between the bull and bear advocates like a judicial figure.</p>
+        <p>Michael does not have a predetermined bias. His role is to:</p>
+        <ul>
+            <li><strong>Evaluate evidence strength</strong> determining which advocate presented more substantive, data-backed arguments</li>
+            <li><strong>Assess logical consistency</strong> identifying circular reasoning, unsupported claims, or cherry-picked data points in either thesis</li>
+            <li><strong>Score analytical rigor</strong> weighing the quality of quantitative analysis against qualitative assertions</li>
+            <li><strong>Issue a binding verdict</strong> declaring which side, bull or bear, presented the more defensible thesis based on the available data</li>
+        </ul>
+        <p>His verdict determines the informational foundation upon which the final risk assessment and portfolio decision are built. The debate transcript and judicial decision are both preserved in the audit trail.</p>
+    </div>
+</div>
+
+<div class="faq-item">
+    <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">
+        <h3><span class="faq-agent-badge" style="background:rgba(251,191,36,.08);color:#fbbf24;border:1px solid rgba(251,191,36,.2)">Stage 4</span> How does the Risk Committee work?</h3>
+        <div class="faq-icon"><svg width="12" height="12" fill="none" stroke="#22d3ee" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg></div>
+    </div>
+    <div class="faq-a">
+        <p>The <strong>Risk Committee</strong> is a three-member evaluation board in Stage 4 that examines every position through three distinct analytical lenses simultaneously:</p>
+        <ul>
+            <li><strong>Aggressive Analyst</strong> quantifies maximum upside capture potential, optimal entry timing, and position sizing for maximum return. This perspective identifies what the portfolio stands to gain if the thesis plays out</li>
+            <li><strong>Conservative Analyst</strong> models worst-case drawdown scenarios, capital preservation thresholds, and stop-loss levels. This perspective quantifies what could go wrong and how much capital is at risk</li>
+            <li><strong>Neutral Analyst</strong> balances both perspectives against portfolio-level correlation risk, concentration limits, and sector exposure. This perspective ensures no single position creates outsized portfolio risk</li>
+        </ul>
+        <p>A <strong>Risk Judge</strong> then synthesizes all three inputs into a unified risk verdict that directly informs the final portfolio directive. The risk assessment considers not just the individual position, but how it interacts with the broader portfolio context.</p>
+    </div>
+</div>
+
+</div>
+{% endblock %}

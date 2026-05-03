@@ -24,3 +24,9 @@ async def about_us(request: Request):
 async def contact(request: Request):
     """Public Contact page."""
     return templates.TemplateResponse(request, "public/contact.html")
+
+
+@router.get("/faq", response_class=HTMLResponse)
+async def faq(request: Request):
+    """Public FAQ page."""
+    return templates.TemplateResponse(request, "public/faq.html")
