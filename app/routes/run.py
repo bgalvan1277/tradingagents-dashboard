@@ -103,3 +103,48 @@ async def api_trigger_run(
     await db.commit()
 
     return JSONResponse({"status": "queued", "run_id": run.id, "symbol": symbol})
+
+
+@router.post("/api/run/{run_id}/cancel")
+async def api_cancel_run(
+    request: Request,
+    run_id: int,
+    db: AsyncSession = Depends(get_db),
+):
+    """Cancel a stuck pending/running run."""
+    if not get_current_user(request):
+        return JSONResponse({"error": "Unauthorized"}, status_code=401)
+
+    result = await db.execute(select(Run).where(Run.id == run_id))
+    run = result.scalar_one_or_none()
+    if not run:
+        return JSONResponse({"error": "Run not found"}, status_code=404)
+
+    if run.status in ("pending", "running"):
+        run.status = "failed"
+        run.error_message = "Manually cancelled by user"
+        await db.commit()
+        return JSONResponse({"status": "cancelled", "run_id": run_id})
+
+    return JSONResponse({"error": "Run is not cancellable", "status": run.status}, status_code=400)
+
+
+@router.post("/run/{run_id}/cancel")
+async def cancel_run_redirect(
+    request: Request,
+    run_id: int,
+    db: AsyncSession = Depends(get_db),
+):
+    """Cancel a stuck run and redirect back to the run page."""
+    redirect = require_auth(request)
+    if redirect:
+        return redirect
+
+    result = await db.execute(select(Run).where(Run.id == run_id))
+    run = result.scalar_one_or_none()
+    if run and run.status in ("pending", "running"):
+        run.status = "failed"
+        run.error_message = "Manually cancelled by user"
+        await db.commit()
+
+    return RedirectResponse(url="/run", status_code=303)

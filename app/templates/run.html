@@ -64,7 +64,15 @@
                     <span class="text-xs text-slate-500 ml-2">{{ run.status }}</span>
                 </div>
             </div>
-            <span class="text-xs text-slate-600">{{ run.created_at.strftime('%I:%M %p') if run.created_at else '' }}</span>
+            <div class="flex items-center gap-3">
+                <span class="text-xs text-slate-600">{{ run.created_at.strftime('%I:%M %p') if run.created_at else '' }}</span>
+                <form method="POST" action="/run/{{ run.id }}/cancel" style="margin:0">
+                    <button type="submit" title="Cancel this run"
+                            class="w-6 h-6 rounded-md flex items-center justify-center text-slate-600 hover:text-red-400 hover:bg-red-500/10 transition-colors">
+                        <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </form>
+            </div>
         </div>
         {% endfor %}
     </div>
