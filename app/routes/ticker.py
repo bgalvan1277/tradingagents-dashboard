@@ -10,7 +10,7 @@ from sqlalchemy.orm import selectinload
 
 from app.auth import require_auth
 from app.database import get_db
-from app.models import Run, RunDetail
+from app.models import Run, RunDetail, CostLog
 
 router = APIRouter()
 templates = Jinja2Templates(directory="app/templates")
@@ -115,10 +115,28 @@ async def ticker_detail(
     if run:
         past_runs = [r for r in past_runs if r.id != run.id]
 
+    # Get cost data for current run
+    run_cost = None
+    if run:
+        cost_query = select(CostLog).where(CostLog.run_id == run.id)
+        cost_result = await db.execute(cost_query)
+        cost_entries = list(cost_result.scalars().all())
+        if cost_entries:
+            total_input = sum(c.input_tokens for c in cost_entries)
+            total_output = sum(c.output_tokens for c in cost_entries)
+            total_cost = sum(float(c.cost_usd) for c in cost_entries)
+            run_cost = {
+                "input_tokens": total_input,
+                "output_tokens": total_output,
+                "total_tokens": total_input + total_output,
+                "cost_usd": total_cost,
+            }
+
     return templates.TemplateResponse(request, "ticker_detail.html", context={
         "ticker_symbol": symbol,
         "quote": quote,
         "run": run,
         "details": details,
         "past_runs": past_runs,
+        "run_cost": run_cost,
     })
