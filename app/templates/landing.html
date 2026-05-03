@@ -104,7 +104,7 @@ a{text-decoration:none}
 <nav class="ln-nav">
     <div class="ln-nav-inner">
         <div class="ln-logo">
-            <div class="ln-logo-icon"><svg width="16" height="16" fill="none" stroke="#fff" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg></div>
+            <img src="/static/logo.png" alt="TradingAgents" style="width:32px;height:32px;object-fit:contain">
             TradingAgents
         </div>
         <a href="#login" class="ln-cta-btn">Access Dashboard</a>
@@ -246,9 +246,7 @@ a{text-decoration:none}
 <!-- Login -->
 <div class="ln-login" id="login">
     <div class="ln-login-card">
-        <div style="width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,#06b6d4,#3b82f6);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;box-shadow:0 0 24px rgba(6,182,212,.2)">
-            <svg width="22" height="22" fill="none" stroke="#fff" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
-        </div>
+        <img src="/static/logo.png" alt="TradingAgents" style="width:56px;height:56px;object-fit:contain;margin:0 auto 16px">
         <h2>Access Dashboard</h2>
         <p class="sub">Enter your password to access the research platform</p>
         {% if error %}<div class="err">{{ error }}</div>{% endif %}
