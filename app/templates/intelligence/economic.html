@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% set active_page = 'intelligence' %}
+
+{% block title %}Economic Data{% endblock %}
+
+{% block content %}
+<style>
+.econ-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1rem}
+@media(max-width:768px){.econ-grid{grid-template-columns:1fr}}
+.econ-card{background:rgba(15,23,42,.55);backdrop-filter:blur(16px);border:1px solid rgba(71,85,105,.25);border-radius:16px;overflow:hidden}
+.section-label{display:flex;align-items:center;gap:10px;margin:1.5rem 0 .75rem;font-size:.72rem;font-weight:700;color:rgba(6,182,212,.9);text-transform:uppercase;letter-spacing:.12em}
+.section-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(6,182,212,.2),transparent)}
+</style>
+
+<a href="/intelligence" style="display:inline-flex;align-items:center;gap:6px;font-size:.78rem;color:#64748b;text-decoration:none;margin-bottom:1rem">
+    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+    Back to Intelligence
+</a>
+<h1 style="font-size:1.5rem;font-weight:800;color:#f1f5f9;margin:0 0 .25rem;letter-spacing:-.02em">Economic Data</h1>
+<p style="font-size:.82rem;color:#64748b;margin:0 0 .5rem">Macro indicators, Fed decisions, and global economic events</p>
+
+<div class="section-label">Economic Calendar</div>
+<div class="econ-card" style="height:500px">
+    <div class="tradingview-widget-container" style="height:100%;width:100%">
+        <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-events.js">
+        {"colorTheme":"dark","isTransparent":true,"width":"100%","height":"100%","locale":"en","importanceFilter":"0,1"}
+        </script>
+    </div>
+</div>
+
+<div class="section-label">Key Macro Indicators</div>
+<div class="econ-grid">
+    <div class="econ-card" style="height:350px">
+        <div class="tradingview-widget-container" style="height:100%;width:100%">
+            <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
+            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js">
+            {"colorTheme":"dark","dateRange":"12M","showChart":true,"locale":"en","width":"100%","height":"100%","largeChartUrl":"","isTransparent":true,"showSymbolLogo":true,"showFloatingTooltip":false,"tabs":[{"title":"Bonds","symbols":[{"s":"TVC:US10Y","d":"US 10Y Yield"},{"s":"TVC:US02Y","d":"US 2Y Yield"},{"s":"TVC:US30Y","d":"US 30Y Yield"},{"s":"TVC:DE10Y","d":"Germany 10Y"},{"s":"TVC:JP10Y","d":"Japan 10Y"}]}]}
+            </script>
+        </div>
+    </div>
+    <div class="econ-card" style="height:350px">
+        <div class="tradingview-widget-container" style="height:100%;width:100%">
+            <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
+            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js">
+            {"colorTheme":"dark","dateRange":"12M","showChart":true,"locale":"en","width":"100%","height":"100%","largeChartUrl":"","isTransparent":true,"showSymbolLogo":true,"showFloatingTooltip":false,"tabs":[{"title":"Commodities","symbols":[{"s":"OANDA:XAUUSD","d":"Gold"},{"s":"TVC:USOIL","d":"Crude Oil"},{"s":"TVC:SILVER","d":"Silver"},{"s":"NYMEX:NG1!","d":"Natural Gas"},{"s":"CBOT:ZC1!","d":"Corn"}]}]}
+            </script>
+        </div>
+    </div>
+</div>
+{% endblock %}

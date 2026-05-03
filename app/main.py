@@ -3,7 +3,7 @@
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
-from app.routes import login, dashboard, portfolio, ticker, watchlist, history, run, status, about
+from app.routes import login, dashboard, portfolio, ticker, watchlist, history, run, status, about, intelligence
 
 app = FastAPI(
     title="TradingAgents Dashboard",
@@ -22,6 +22,7 @@ app.include_router(history.router)
 app.include_router(run.router)
 app.include_router(status.router)
 app.include_router(about.router)
+app.include_router(intelligence.router)
 
 # Serve static files (avatars, etc.)
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
