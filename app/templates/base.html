@@ -53,12 +53,32 @@
 
     <style>
         /* Hide TradingView branding */
-        .tradingview-widget-copyright,
-        .tradingview-widget-container__widget + div[style],
-        .tradingview-widget-container > div:last-child:not(.tradingview-widget-container__widget):not([id]) {
-            display: none !important;
-            height: 0 !important;
-            overflow: hidden !important;
+        .tradingview-widget-copyright { display: none !important; }
+        .widget-card { position: relative; }
+        .widget-card::after {
+            content: '';
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 36px;
+            height: 28px;
+            background: #0f1420;
+            border-radius: 6px;
+            z-index: 2;
+            pointer-events: none;
+        }
+        .tv-chart { position: relative; }
+        .tv-chart::after {
+            content: '';
+            position: absolute;
+            bottom: 28px;
+            left: 4px;
+            width: 36px;
+            height: 28px;
+            background: #0a0e17;
+            border-radius: 6px;
+            z-index: 2;
+            pointer-events: none;
         }
         /* Base resets and dark theme */
         body {
