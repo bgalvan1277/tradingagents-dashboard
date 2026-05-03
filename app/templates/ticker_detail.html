@@ -125,7 +125,7 @@
     <!-- Market status left, Last analysis right -->
     <div style="display:flex;align-items:center;justify-content:space-between;margin-top:3px">
         <span style="font-size:.72rem;color:#475569">
-            {% if quote %}{% if quote.market_state == 'REGULAR' %}Market Open{% elif quote.market_state == 'CLOSED' or quote.market_state == 'POST' %}Market Closed{% else %}{{ quote.market_state }}{% endif %}{% endif %}
+            {% if ticker_symbol.endswith('-USD') %}24/7 Market{% elif quote %}{% if quote.market_state == 'REGULAR' %}Market Open{% elif quote.market_state == 'CLOSED' or quote.market_state == 'POST' %}Market Closed{% else %}{{ quote.market_state }}{% endif %}{% endif %}
         </span>
         {% if run %}
         <span style="font-size:.72rem;color:#64748b">Last analysis: {{ run.run_date.strftime('%b %d, %Y') }}{% if run.run_timestamp %} at {{ run.run_timestamp.strftime('%I:%M %p') }}{% endif %}</span>
