@@ -35,13 +35,43 @@
 
 ## Hosting & Deployment
 
-- **Hosting:** cPanel-based hosting (NOT AWS)
+- **Hosting:** cPanel-based VPS (AlmaLinux 8)
+- **Server IP:** `162.248.48.164`
+- **SSH:** `ssh root@162.248.48.164`
 - **Domain:** `tradingagents.website`
+- **App path:** `/home/tradingagents/dashboard/`
+- **Python:** 3.11, virtual env at `/home/tradingagents/dashboard/venv/`
+- **Process manager:** systemd service named `tradingagents`
+- **Web server:** Apache reverse proxy -> uvicorn on port 8000
 - **Deploy method:** GitHub Actions -> FTP Deploy to cPanel on push to `main`
 - **Deploy workflow:** `.github/workflows/deploy.yml`
 - **FTP credentials:** Stored as GitHub Secrets (`FTP_SERVER`, `FTP_USERNAME`, `FTP_PASSWORD`)
 - **Excluded from deploy:** `.git`, `venv/`, `__pycache__/`, `.env`, `logs/`
-- **Server process:** Uvicorn on port 8000
+
+> **CRITICAL DEPLOYMENT RULE:**
+> FTP deploy only copies files. It does NOT restart the Python process.
+> - **HTML/CSS/JS template changes** take effect immediately (Jinja2 reads from disk)
+> - **Python code changes** (routes, services, models) require a server restart:
+>   ```bash
+>   ssh root@162.248.48.164
+>   cd /home/tradingagents/dashboard && git pull && systemctl restart tradingagents
+>   ```
+> - Always warn the user when a Python code change needs a restart.
+
+---
+
+## Server Commands Quick Reference
+
+| Task | Command |
+|---|---|
+| SSH in | `ssh root@162.248.48.164` |
+| Pull latest code | `cd /home/tradingagents/dashboard && git pull` |
+| Restart app | `systemctl restart tradingagents` |
+| Check status | `systemctl status tradingagents` |
+| View live logs | `journalctl -u tradingagents -f` |
+| Restart Apache | `/scripts/restartsrv_httpd` |
+| Run single analysis | `cd /home/tradingagents/dashboard && source venv/bin/activate && python scripts/run_single.py TICKER` |
+| Daily cron | `0 7 * * 1-5` (weekdays 7am, runs as tradingagents user) |
 
 ---
 

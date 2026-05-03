@@ -20,7 +20,8 @@
 1. **No frameworks.** Static HTML5, Vanilla CSS3, Vanilla JS. No React, no Tailwind, no Next.js.
 2. **No AI giveaway phrases.** Avoid "delve", "landscape", "leverage", "in today's world", "game-changer".
 3. **No EM dashes.** Use commas, periods, or semicolons instead.
-4. **Hosting is cPanel.** NOT AWS, NOT Vercel, NOT Heroku. Deploy via FTP through GitHub Actions.
+4. **Hosting is cPanel VPS.** Server IP `162.248.48.164`. SSH as root. NOT AWS, NOT Vercel, NOT Heroku.
+5. **FTP deploy does NOT restart Python.** Template changes (HTML/CSS/JS) auto-reload. Python code changes (routes, services, models) require `systemctl restart tradingagents`. **Always warn the user when a Python change needs a restart.**
 5. **Single-password auth.** No user accounts. One password for dashboard access.
 6. **DeepSeek is the LLM.** Not OpenAI, not Anthropic. Uses OpenAI-compatible API format via LangChain.
 7. **All public pages use 1100px max-width.** Consistency across home, how-it-works, about, contact, faq.
