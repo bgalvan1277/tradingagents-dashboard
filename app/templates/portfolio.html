@@ -124,11 +124,10 @@
                 </div>
                 <span class="port-date">{{ run.run_date.strftime('%b %d, %Y') if run.run_date else '' }}{% if run.run_timestamp %} at {{ run.run_timestamp.strftime('%I:%M %p') }}{% endif %}</span>
             </div>
-            <svg class="port-arrow" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
         </div>
     </a>
-    <form method="POST" action="/watchlist/remove/{{ run.ticker_symbol }}" style="position:absolute;top:10px;right:10px"
-          onsubmit="event.stopPropagation();return confirm('Remove {{ run.ticker_symbol }} from portfolio?')">
+    <form method="POST" action="/watchlist/remove/{{ run.ticker_symbol }}" style="position:absolute;bottom:14px;right:14px"
+          onsubmit="event.stopPropagation();return confirm('Are you sure you want to remove {{ run.ticker_symbol }}?')">
         <input type="hidden" name="redirect" value="/portfolio">
         <button type="submit" style="background:none;border:none;cursor:pointer;padding:4px;color:#475569;transition:color .2s" title="Remove {{ run.ticker_symbol }}"
                 onmouseover="this.style.color='#f87171'" onmouseout="this.style.color='#475569'">
