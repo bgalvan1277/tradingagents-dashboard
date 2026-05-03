@@ -18,3 +18,13 @@ async def about(request: Request):
         return redirect
 
     return templates.TemplateResponse(request, "about.html")
+
+
+@router.get("/the-process", response_class=HTMLResponse)
+async def the_process(request: Request):
+    """Show The Process walkthrough page."""
+    redirect = require_auth(request)
+    if redirect:
+        return redirect
+
+    return templates.TemplateResponse(request, "the_process.html")
