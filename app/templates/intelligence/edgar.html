@@ -8,8 +8,13 @@
 .feed-card{background:rgba(15,23,42,.55);backdrop-filter:blur(16px);border:1px solid rgba(71,85,105,.25);border-radius:16px;overflow:hidden;padding:24px}
 .section-label{display:flex;align-items:center;gap:10px;margin:1.5rem 0 .75rem;font-size:.72rem;font-weight:700;color:rgba(6,182,212,.9);text-transform:uppercase;letter-spacing:.12em}
 .section-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(6,182,212,.2),transparent)}
-.source-link{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:rgba(6,182,212,.06);border:1px solid rgba(6,182,212,.12);color:#22d3ee;font-size:.72rem;font-weight:600;text-decoration:none;transition:all .2s;margin-right:8px;margin-bottom:6px}
-.source-link:hover{background:rgba(6,182,212,.1);border-color:rgba(6,182,212,.25)}
+.source-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem}
+.source-card{background:rgba(15,23,42,.55);backdrop-filter:blur(16px);border:1px solid rgba(71,85,105,.25);border-radius:16px;padding:24px;text-decoration:none;display:block;transition:all .2s}
+.source-card:hover{border-color:rgba(6,182,212,.2);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.2)}
+.source-card h3{font-size:1rem;font-weight:700;color:#f1f5f9;margin:0 0 6px}
+.source-card p{font-size:.78rem;color:#94a3b8;line-height:1.6;margin:0 0 14px}
+.source-card .open-btn{display:inline-flex;align-items:center;gap:6px;font-size:.72rem;font-weight:600;color:#22d3ee;text-transform:uppercase;letter-spacing:.06em}
+.source-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:14px}
 </style>
 
 <a href="/intelligence" style="display:inline-flex;align-items:center;gap:6px;font-size:.78rem;color:#64748b;text-decoration:none;margin-bottom:1rem">
@@ -19,31 +24,58 @@
 <h1 style="font-size:1.5rem;font-weight:800;color:#f1f5f9;margin:0 0 .25rem;letter-spacing:-.02em">SEC EDGAR Filings</h1>
 <p style="font-size:.82rem;color:#64748b;margin:0 0 .5rem">Real-time SEC filings: 10-K, 10-Q, 8-K, Form 4, and 13F disclosures</p>
 
-<div class="section-label">Data Sources</div>
-<div style="margin-bottom:1rem">
-    <a href="https://www.sec.gov/cgi-bin/browse-edgar?action=getcurrent&type=&dateb=&owner=include&count=40&search_text=&action=getcurrent" target="_blank" class="source-link">
-        <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-        SEC EDGAR Full-Text Search
+<div class="section-label">Filing Types</div>
+<div class="source-grid">
+    <a href="https://www.sec.gov/cgi-bin/browse-edgar?action=getcurrent&type=4&dateb=&owner=include&count=40&search_text=&action=getcurrent" target="_blank" class="source-card">
+        <div class="source-icon" style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.15)">
+            <svg width="22" height="22" fill="none" stroke="#4ade80" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+        </div>
+        <h3>Form 4 (Insider Trades)</h3>
+        <p>Latest insider buy/sell filings. Directors, officers, and 10%+ owners must disclose transactions within 2 business days.</p>
+        <span class="open-btn">
+            View Latest
+            <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+        </span>
     </a>
-    <a href="https://efts.sec.gov/LATEST/search-index?q=&forms=4&dateRange=custom&startdt=2025-05-01" target="_blank" class="source-link">
-        <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-        Latest Form 4 (Insider)
+    <a href="https://www.sec.gov/cgi-bin/browse-edgar?action=getcurrent&type=13F-HR&dateb=&owner=include&count=40&search_text=&action=getcurrent" target="_blank" class="source-card">
+        <div class="source-icon" style="background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.15)">
+            <svg width="22" height="22" fill="none" stroke="#60a5fa" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+        </div>
+        <h3>13F Holdings (Institutions)</h3>
+        <p>Quarterly institutional holdings reports. See what hedge funds, pension funds, and asset managers above $100M are holding.</p>
+        <span class="open-btn">
+            View Latest
+            <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+        </span>
     </a>
-    <a href="https://efts.sec.gov/LATEST/search-index?q=&forms=13F-HR&dateRange=custom&startdt=2025-01-01" target="_blank" class="source-link">
-        <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-        13F Holdings
+    <a href="https://www.sec.gov/cgi-bin/browse-edgar?action=getcurrent&type=8-K&dateb=&owner=include&count=40&search_text=&action=getcurrent" target="_blank" class="source-card">
+        <div class="source-icon" style="background:rgba(251,146,60,.08);border:1px solid rgba(251,146,60,.15)">
+            <svg width="22" height="22" fill="none" stroke="#fb923c" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        </div>
+        <h3>8-K (Material Events)</h3>
+        <p>Breaking corporate events: M&A announcements, leadership changes, earnings restatements, and material agreements.</p>
+        <span class="open-btn">
+            View Latest
+            <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+        </span>
     </a>
-</div>
-
-<div class="section-label">EDGAR Full-Text Search</div>
-<div class="feed-card" style="height:calc(100vh - 320px);min-height:500px">
-    <iframe src="https://efts.sec.gov/LATEST/search-index?q=&dateRange=custom&startdt=2025-05-01" style="width:100%;height:100%;border:none;border-radius:12px;background:#0f1420" loading="lazy"></iframe>
+    <a href="https://efts.sec.gov/LATEST/search-index?q=&forms=10-K&dateRange=custom&startdt=2025-01-01" target="_blank" class="source-card">
+        <div class="source-icon" style="background:rgba(168,85,247,.08);border:1px solid rgba(168,85,247,.15)">
+            <svg width="22" height="22" fill="none" stroke="#a78bfa" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        </div>
+        <h3>10-K / 10-Q (Annual & Quarterly)</h3>
+        <p>Full financial reports with income statements, balance sheets, cash flow, and management discussion. The fundamental data backbone.</p>
+        <span class="open-btn">
+            Search Filings
+            <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+        </span>
+    </a>
 </div>
 
 <div class="section-label" style="margin-top:2rem">Intelligence Value</div>
 <div class="feed-card">
     <p style="font-size:.85rem;color:#94a3b8;line-height:1.7;margin:0">
-        SEC EDGAR is the primary source for all publicly filed corporate disclosures. <strong style="color:#67e8f9">Form 4</strong> filings reveal insider buys and sells within 2 business days of the transaction. <strong style="color:#67e8f9">13F filings</strong> (quarterly) show institutional holdings above $100M, revealing how hedge funds and pension funds are positioning. <strong style="color:#67e8f9">8-K filings</strong> capture material events: M&A announcements, leadership changes, earnings restatements, and material agreements. <strong style="color:#67e8f9">10-K/10-Q</strong> annual and quarterly reports provide the fundamental data backbone. The EDGAR full-text search API enables real-time monitoring of all filing types.
+        SEC EDGAR is the primary source for all publicly filed corporate disclosures. <strong style="color:#67e8f9">Form 4</strong> filings reveal insider buys and sells within 2 business days of the transaction. <strong style="color:#67e8f9">13F filings</strong> (quarterly) show institutional holdings above $100M, revealing how hedge funds and pension funds are positioning. <strong style="color:#67e8f9">8-K filings</strong> capture material events: M&A announcements, leadership changes, earnings restatements, and material agreements. <strong style="color:#67e8f9">10-K/10-Q</strong> annual and quarterly reports provide the fundamental data backbone.
     </p>
 </div>
 {% endblock %}
