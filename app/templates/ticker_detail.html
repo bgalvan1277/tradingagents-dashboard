@@ -76,32 +76,31 @@
 
 <!-- Ticker Hero -->
 <div style="margin-bottom:1.5rem">
-    <!-- Top row: ticker info left, Re-run + cost right -->
+    <!-- Top row: ticker left, Re-run right -->
     <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px">
         <div>
             <h1 style="font-size:2rem;font-weight:800;color:#f1f5f9;margin:0;letter-spacing:-.02em">{{ ticker_symbol }}</h1>
             {% if quote %}
             <p style="font-size:.85rem;color:#64748b;margin:2px 0 0">{{ quote.company_name or ticker_symbol }}</p>
-            <div style="display:flex;align-items:baseline;gap:10px;margin-top:6px">
-                <span style="font-size:1.6rem;font-weight:700;color:#f1f5f9;font-variant-numeric:tabular-nums">{{ quote.price }} {{ quote.currency }}</span>
-                {% if quote.change %}
-                <span style="font-size:.9rem;font-weight:600;color:{{ '#4ade80' if quote.change >= 0 else '#f87171' }}">
-                    {{ '+' if quote.change >= 0 else '' }}{{ quote.change }} ({{ quote.change_pct }}%)
-                </span>
-                {% endif %}
-            </div>
             {% endif %}
         </div>
-        <div>
-            <button hx-post="/api/run/{{ ticker_symbol }}" hx-swap="none" class="rerun-btn">
-                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                Re-run
-            </button>
-        </div>
+        <button hx-post="/api/run/{{ ticker_symbol }}" hx-swap="none" class="rerun-btn">
+            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            Re-run
+        </button>
     </div>
-    <!-- Cost pill row (right-aligned) -->
-    {% if run %}
-    <div style="display:flex;justify-content:flex-end;margin-top:8px">
+    <!-- Price row: price left, cost pill right -->
+    {% if quote %}
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;flex-wrap:wrap;gap:8px">
+        <div style="display:flex;align-items:baseline;gap:10px">
+            <span style="font-size:1.6rem;font-weight:700;color:#f1f5f9;font-variant-numeric:tabular-nums">{{ quote.price }} {{ quote.currency }}</span>
+            {% if quote.change %}
+            <span style="font-size:.9rem;font-weight:600;color:{{ '#4ade80' if quote.change >= 0 else '#f87171' }}">
+                {{ '+' if quote.change >= 0 else '' }}{{ quote.change }} ({{ quote.change_pct }}%)
+            </span>
+            {% endif %}
+        </div>
+        {% if run %}
         <div style="background:rgba(6,182,212,.05);border:1px solid rgba(6,182,212,.12);border-radius:8px;padding:4px 10px;display:inline-flex;align-items:center;gap:6px">
             <svg width="11" height="11" fill="none" stroke="#22d3ee" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
             {% if run_cost %}
@@ -114,10 +113,11 @@
             <span style="font-size:.68rem;color:#475569;font-family:'JetBrains Mono',monospace">Cost not tracked</span>
             {% endif %}
         </div>
+        {% endif %}
     </div>
     {% endif %}
     <!-- Market status left, Last analysis right -->
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:3px">
         <span style="font-size:.72rem;color:#475569">
             {% if quote %}{% if quote.market_state == 'REGULAR' %}Market Open{% elif quote.market_state == 'CLOSED' or quote.market_state == 'POST' %}Market Closed{% else %}{{ quote.market_state }}{% endif %}{% endif %}
         </span>
