@@ -33,6 +33,17 @@
 .st-submit:hover{opacity:.9}
 .st-error{margin-bottom:14px;padding:10px 14px;border-radius:10px;border:1px solid rgba(239,68,68,.3);background:rgba(239,68,68,.08);color:#f87171;font-size:.78rem}
 
+/* Price Preview */
+.st-price-bar{margin-top:10px;padding:12px 14px;border-radius:10px;background:rgba(6,182,212,.04);border:1px solid rgba(6,182,212,.12);display:none;transition:all .3s}
+.st-price-bar.visible{display:block}
+.st-price-bar.loading{opacity:.5}
+.st-price-bar.error{border-color:rgba(239,68,68,.2);background:rgba(239,68,68,.04)}
+.st-price-row{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.st-price-label{font-size:.62rem;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:.08em}
+.st-price-value{font-size:1rem;font-weight:800;color:#22d3ee}
+.st-price-total{font-size:.78rem;color:#94a3b8;margin-top:6px;padding-top:6px;border-top:1px solid rgba(71,85,105,.15);display:flex;justify-content:space-between}
+.st-price-total .est{font-weight:700;color:#f1f5f9}
+
 /* Performance */
 .st-perf{background:rgba(15,23,42,.55);backdrop-filter:blur(16px);border:1px solid rgba(71,85,105,.25);border-radius:16px;padding:24px}
 .st-perf h2{font-size:1rem;font-weight:700;color:#f1f5f9;margin:0 0 16px;display:flex;align-items:center;gap:8px}
@@ -135,6 +146,23 @@
                 <div class="st-input-group full">
                     <label for="note">Note <span style="opacity:.5">(optional)</span></label>
                     <input type="text" id="note" name="note" placeholder="Reason for trade...">
+                </div>
+            </div>
+            <!-- Price Preview -->
+            <div id="priceBar" class="st-price-bar">
+                <div class="st-price-row">
+                    <div>
+                        <div class="st-price-label">Market Price</div>
+                        <div class="st-price-value" id="livePrice">--</div>
+                    </div>
+                    <div style="text-align:right">
+                        <div class="st-price-label" id="priceTickerLabel">--</div>
+                        <div style="font-size:.68rem;color:#475569" id="priceStatus">Live via yfinance</div>
+                    </div>
+                </div>
+                <div class="st-price-total" id="totalRow" style="display:none">
+                    <span>Estimated Total</span>
+                    <span class="est" id="estTotal">--</span>
                 </div>
             </div>
             <button type="submit" class="st-submit">Execute Trade</button>
@@ -290,4 +318,83 @@
     </form>
 </div>
 
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function(){
+    const tickerInput = document.getElementById('ticker');
+    const sharesInput = document.getElementById('shares');
+    const priceBar = document.getElementById('priceBar');
+    const livePrice = document.getElementById('livePrice');
+    const priceLabel = document.getElementById('priceTickerLabel');
+    const priceStatus = document.getElementById('priceStatus');
+    const totalRow = document.getElementById('totalRow');
+    const estTotal = document.getElementById('estTotal');
+    let currentPrice = 0;
+    let fetchTimer = null;
+
+    function updateTotal(){
+        const shares = parseInt(sharesInput.value) || 0;
+        if(currentPrice > 0 && shares > 0){
+            totalRow.style.display = 'flex';
+            estTotal.textContent = '$' + (currentPrice * shares).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+        } else {
+            totalRow.style.display = 'none';
+        }
+    }
+
+    function fetchPrice(){
+        const ticker = tickerInput.value.trim().toUpperCase();
+        if(!ticker || ticker.length < 1){
+            priceBar.classList.remove('visible','loading','error');
+            currentPrice = 0;
+            return;
+        }
+        priceBar.classList.add('visible','loading');
+        priceBar.classList.remove('error');
+        livePrice.textContent = '...';
+        priceLabel.textContent = ticker;
+        priceStatus.textContent = 'Fetching...';
+
+        fetch('/api/simtrader/price/' + ticker)
+            .then(r => r.json())
+            .then(data => {
+                priceBar.classList.remove('loading');
+                if(data.error){
+                    priceBar.classList.add('error');
+                    livePrice.textContent = 'N/A';
+                    livePrice.style.color = '#f87171';
+                    priceStatus.textContent = data.error;
+                    currentPrice = 0;
+                } else {
+                    livePrice.textContent = '$' + data.price.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+                    livePrice.style.color = '#22d3ee';
+                    priceStatus.textContent = 'Live via yfinance';
+                    currentPrice = data.price;
+                }
+                updateTotal();
+            })
+            .catch(()=>{
+                priceBar.classList.remove('loading');
+                priceBar.classList.add('error');
+                livePrice.textContent = 'Error';
+                livePrice.style.color = '#f87171';
+                priceStatus.textContent = 'Network error';
+                currentPrice = 0;
+                updateTotal();
+            });
+    }
+
+    tickerInput.addEventListener('input', function(){
+        clearTimeout(fetchTimer);
+        fetchTimer = setTimeout(fetchPrice, 600);
+    });
+    tickerInput.addEventListener('blur', function(){
+        clearTimeout(fetchTimer);
+        if(tickerInput.value.trim()) fetchPrice();
+    });
+    sharesInput.addEventListener('input', updateTotal);
+})();
+</script>
 {% endblock %}

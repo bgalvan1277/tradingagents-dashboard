@@ -105,3 +105,19 @@ async def reset_account(request: Request, db: AsyncSession = Depends(get_db)):
 
     await simtrader.reset_account(db)
     return RedirectResponse(url="/simtrader", status_code=303)
+
+
+@router.get("/api/simtrader/price/{ticker}")
+async def get_price(request: Request, ticker: str):
+    """Return live price for a ticker symbol."""
+    if not get_current_user(request):
+        from fastapi.responses import JSONResponse
+        return JSONResponse({"error": "Unauthorized"}, status_code=401)
+
+    price = await simtrader.get_live_price(ticker.upper())
+    if price is None:
+        from fastapi.responses import JSONResponse
+        return JSONResponse({"error": f"Could not fetch price for {ticker.upper()}"}, status_code=404)
+
+    from fastapi.responses import JSONResponse
+    return JSONResponse({"ticker": ticker.upper(), "price": float(price)})
