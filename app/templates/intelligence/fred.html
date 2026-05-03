@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% set active_page = 'intelligence' %}
+
+{% block title %}FRED Economic Data{% endblock %}
+
+{% block content %}
+<style>
+.feed-card{background:rgba(15,23,42,.55);backdrop-filter:blur(16px);border:1px solid rgba(71,85,105,.25);border-radius:16px;overflow:hidden;padding:24px}
+.section-label{display:flex;align-items:center;gap:10px;margin:1.5rem 0 .75rem;font-size:.72rem;font-weight:700;color:rgba(6,182,212,.9);text-transform:uppercase;letter-spacing:.12em}
+.section-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(6,182,212,.2),transparent)}
+.fred-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media(max-width:768px){.fred-grid{grid-template-columns:1fr}}
+.fred-chart{background:rgba(15,23,42,.55);backdrop-filter:blur(16px);border:1px solid rgba(71,85,105,.25);border-radius:16px;overflow:hidden;height:320px}
+.source-link{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;background:rgba(6,182,212,.06);border:1px solid rgba(6,182,212,.12);color:#22d3ee;font-size:.72rem;font-weight:600;text-decoration:none;transition:all .2s;margin-right:8px;margin-bottom:6px}
+.source-link:hover{background:rgba(6,182,212,.1);border-color:rgba(6,182,212,.25)}
+</style>
+
+<a href="/intelligence" style="display:inline-flex;align-items:center;gap:6px;font-size:.78rem;color:#64748b;text-decoration:none;margin-bottom:1rem">
+    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+    Back to Intelligence
+</a>
+<h1 style="font-size:1.5rem;font-weight:800;color:#f1f5f9;margin:0 0 .25rem;letter-spacing:-.02em">FRED Economic Data</h1>
+<p style="font-size:.82rem;color:#64748b;margin:0 0 .5rem">Federal Reserve Economic Data: 800,000+ macroeconomic time series</p>
+
+<div class="section-label">Data Sources</div>
+<div style="margin-bottom:1rem">
+    <a href="https://fred.stlouisfed.org/" target="_blank" class="source-link">
+        <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+        FRED Database
+    </a>
+    <a href="https://fred.stlouisfed.org/docs/api/fred/" target="_blank" class="source-link">
+        <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+        FRED API Docs
+    </a>
+</div>
+
+<div class="section-label">Key Indicators</div>
+<div class="fred-grid">
+    <div class="fred-chart">
+        <iframe src="https://fred.stlouisfed.org/graph/graph-landing.php?g=1C7Ai&width=600&height=300" style="width:100%;height:100%;border:none" scrolling="no" loading="lazy"></iframe>
+    </div>
+    <div class="fred-chart">
+        <iframe src="https://fred.stlouisfed.org/graph/graph-landing.php?g=1C7Ak&width=600&height=300" style="width:100%;height:100%;border:none" scrolling="no" loading="lazy"></iframe>
+    </div>
+    <div class="fred-chart">
+        <iframe src="https://fred.stlouisfed.org/graph/graph-landing.php?g=1C7Am&width=600&height=300" style="width:100%;height:100%;border:none" scrolling="no" loading="lazy"></iframe>
+    </div>
+    <div class="fred-chart">
+        <iframe src="https://fred.stlouisfed.org/graph/graph-landing.php?g=1C7Ao&width=600&height=300" style="width:100%;height:100%;border:none" scrolling="no" loading="lazy"></iframe>
+    </div>
+</div>
+
+<div class="section-label" style="margin-top:2rem">Intelligence Value</div>
+<div class="feed-card">
+    <p style="font-size:.85rem;color:#94a3b8;line-height:1.7;margin:0">
+        FRED provides the quantitative backbone for macroeconomic analysis. Critical series include: <strong style="color:#67e8f9">Federal Funds Rate</strong> (monetary policy direction), <strong style="color:#67e8f9">CPI</strong> (inflation trajectory), <strong style="color:#67e8f9">10Y-2Y Treasury Spread</strong> (yield curve inversion/recession indicator), <strong style="color:#67e8f9">Unemployment Rate</strong> (labor market health), and <strong style="color:#67e8f9">M2 Money Supply</strong> (liquidity conditions). The FRED API (free with registration) supports programmatic access to all 800,000+ series with historical data going back decades. Integration into the agent pipeline would allow automated macro-regime detection and sector rotation signals.
+    </p>
+</div>
+{% endblock %}
