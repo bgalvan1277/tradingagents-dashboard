@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% set active_page = 'crypto' %}
 
-{% block title %}Crypto Analyzer{% endblock %}
+{% block title %}Crypto Analysis{% endblock %}
 {% block meta_description %}AI-powered cryptocurrency analysis dashboard{% endblock %}
 
 {% block content %}
@@ -41,7 +41,7 @@
     <p style="font-size:.7rem;font-weight:700;color:rgba(245,158,11,.7);text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px">Crypto Intelligence</p>
     <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px">
         <div>
-            <h1>Crypto Analyzer</h1>
+            <h1>Crypto Analysis</h1>
             <p>{{ current_date }} · {{ runs|length }} asset{{ 's' if runs|length != 1 else '' }} tracked</p>
         </div>
         <a href="/run" style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:10px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);color:#f59e0b;font-size:.78rem;font-weight:600;text-decoration:none;transition:all .2s">

@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% set active_page = 'portfolio' %}
 
-{% block title %}Portfolio{% endblock %}
-{% block meta_description %}TradingAgents portfolio overview{% endblock %}
+{% block title %}Stock Analysis{% endblock %}
+{% block meta_description %}AI-powered stock analysis dashboard{% endblock %}
 
 {% block content %}
 <style>
@@ -41,10 +41,10 @@
 </style>
 
 <div class="port-hero">
-    <p style="font-size:.7rem;font-weight:700;color:rgba(6,182,212,.7);text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px">Investment Portfolio</p>
+    <p style="font-size:.7rem;font-weight:700;color:rgba(6,182,212,.7);text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px">Stock Intelligence</p>
     <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px">
         <div>
-            <h1>Portfolio</h1>
+            <h1>Stock Analysis</h1>
             <p>{{ current_date }} · {{ runs|length }} active position{{ 's' if runs|length != 1 else '' }}</p>
         </div>
         <a href="/run" style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:10px;background:rgba(6,182,212,.08);border:1px solid rgba(6,182,212,.2);color:#22d3ee;font-size:.78rem;font-weight:600;text-decoration:none;transition:all .2s">
