@@ -118,12 +118,13 @@ async def add_ticker(
 async def remove_ticker(
     request: Request,
     symbol: str,
+    redirect: str = Form("/watchlist"),
     db: AsyncSession = Depends(get_db),
 ):
     """Remove a ticker from the watchlist (deactivate, don't delete data)."""
-    redirect = require_auth(request)
-    if redirect:
-        return redirect
+    redirect_auth = require_auth(request)
+    if redirect_auth:
+        return redirect_auth
 
     symbol = symbol.upper()
     result = await db.execute(select(Ticker).where(Ticker.symbol == symbol))
@@ -137,7 +138,8 @@ async def remove_ticker(
         )
         await db.commit()
 
-    return RedirectResponse(url="/watchlist", status_code=303)
+    safe_redirect = redirect if redirect.startswith("/") else "/watchlist"
+    return RedirectResponse(url=safe_redirect, status_code=303)
 
 
 @router.get("/api/ticker/{symbol}/rename")

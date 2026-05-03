@@ -102,28 +102,40 @@
 {% set rec = run.final_recommendation or 'Pending' %}
 {% set rec_lower = rec|lower %}
 {% set badge_class = 'badge-' + rec_lower if rec_lower in ['buy','overweight','hold','underweight','sell','pending','running','failed'] else 'badge-pending' %}
-<a href="/ticker/{{ run.ticker_symbol }}" class="port-card">
-    <div class="port-top">
-        <div>
-            <span class="port-ticker">{{ run.ticker_symbol }}</span>
-            <span class="port-company" id="name-{{ run.ticker_symbol }}"><span class="port-skeleton" style="width:100px;height:10px"></span></span>
+<div class="port-card" style="position:relative">
+    <a href="/ticker/{{ run.ticker_symbol }}" style="text-decoration:none;display:block">
+        <div class="port-top">
+            <div>
+                <span class="port-ticker">{{ run.ticker_symbol }}</span>
+                <span class="port-company" id="name-{{ run.ticker_symbol }}"><span class="port-skeleton" style="width:100px;height:10px"></span></span>
+            </div>
+            <div class="port-price-block">
+                <span class="port-price" id="price-{{ run.ticker_symbol }}"><span class="port-skeleton" style="width:70px;height:14px"></span></span>
+                <span class="port-change flat" id="change-{{ run.ticker_symbol }}"><span class="port-skeleton" style="width:80px;height:10px"></span></span>
+            </div>
         </div>
-        <div class="port-price-block">
-            <span class="port-price" id="price-{{ run.ticker_symbol }}"><span class="port-skeleton" style="width:70px;height:14px"></span></span>
-            <span class="port-change flat" id="change-{{ run.ticker_symbol }}"><span class="port-skeleton" style="width:80px;height:10px"></span></span>
+        <div class="port-divider"></div>
+        <div class="port-bottom">
+            <div class="port-meta" style="flex-direction:column;align-items:flex-start;gap:4px">
+                <div style="display:flex;align-items:center;gap:8px">
+                    <span class="port-badge {{ badge_class }}">
+                        {% if run.status == 'running' %}Running{% elif run.status == 'failed' %}Failed{% else %}{{ rec }}{% endif %}
+                    </span>
+                </div>
+                <span class="port-date">{{ run.run_date.strftime('%b %d, %Y') if run.run_date else '' }}{% if run.run_timestamp %} at {{ run.run_timestamp.strftime('%I:%M %p') }}{% endif %}</span>
+            </div>
+            <svg class="port-arrow" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
         </div>
-    </div>
-    <div class="port-divider"></div>
-    <div class="port-bottom">
-        <div class="port-meta">
-            <span class="port-badge {{ badge_class }}">
-                {% if run.status == 'running' %}Running{% elif run.status == 'failed' %}Failed{% else %}{{ rec }}{% endif %}
-            </span>
-            <span class="port-date">{{ run.run_date.strftime('%b %d') if run.run_date else '' }}</span>
-        </div>
-        <svg class="port-arrow" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-    </div>
-</a>
+    </a>
+    <form method="POST" action="/watchlist/remove/{{ run.ticker_symbol }}" style="position:absolute;top:10px;right:10px"
+          onsubmit="event.stopPropagation();return confirm('Remove {{ run.ticker_symbol }} from portfolio?')">
+        <input type="hidden" name="redirect" value="/portfolio">
+        <button type="submit" style="background:none;border:none;cursor:pointer;padding:4px;color:#475569;transition:color .2s" title="Remove {{ run.ticker_symbol }}"
+                onmouseover="this.style.color='#f87171'" onmouseout="this.style.color='#475569'">
+            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+    </form>
+</div>
 {% endmacro %}
 
 {% if grouped_runs %}
