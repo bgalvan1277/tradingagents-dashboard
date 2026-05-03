@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+{% set active_page = 'crypto_news' %}
+
+{% block title %}Crypto News{% endblock %}
+{% block meta_description %}Live cryptocurrency news, prices, and market data{% endblock %}
+
+{% block content %}
+<style>
+.widget-card{background:rgba(15,23,42,.55);backdrop-filter:blur(16px);border:1px solid rgba(71,85,105,.25);border-radius:16px;overflow:hidden;transition:border-color .3s}
+.widget-card:hover{border-color:rgba(245,158,11,.15)}
+.section-label{display:flex;align-items:center;gap:10px;margin:2rem 0 1rem;font-size:.72rem;font-weight:700;color:rgba(245,158,11,.9);text-transform:uppercase;letter-spacing:.12em}
+.section-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(245,158,11,.2),transparent)}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media(max-width:768px){.grid-2{grid-template-columns:1fr}}
+.coin-table{width:100%;border-collapse:collapse}
+.coin-table th{font-size:.6rem;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.08em;padding:10px 16px;text-align:left;border-bottom:1px solid rgba(71,85,105,.15)}
+.coin-table td{font-size:.82rem;color:#e2e8f0;padding:12px 16px;border-bottom:1px solid rgba(71,85,105,.08);transition:background .15s}
+.coin-table tr:hover td{background:rgba(245,158,11,.02)}
+.coin-table .coin-name{display:flex;align-items:center;gap:10px}
+.coin-table .coin-name img{width:24px;height:24px;border-radius:50%}
+.coin-table .coin-name .symbol{font-size:.65rem;color:#64748b;text-transform:uppercase;margin-left:2px}
+.coin-rank{font-size:.65rem;color:#475569;font-weight:600}
+.pct-up{color:#4ade80}
+.pct-down{color:#f87171}
+.skeleton{background:linear-gradient(90deg,rgba(71,85,105,.1) 25%,rgba(71,85,105,.2) 50%,rgba(71,85,105,.1) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:4px;display:inline-block;width:60px;height:12px}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+</style>
+
+<!-- Crypto Ticker Tape -->
+<div style="margin:-24px -16px 1.5rem;overflow:hidden;border-bottom:1px solid rgba(71,85,105,.15)">
+    <div class="tradingview-widget-container">
+        <div class="tradingview-widget-container__widget"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js">
+        {"symbols":[{"proName":"BITSTAMP:BTCUSD","title":"Bitcoin"},{"proName":"BITSTAMP:ETHUSD","title":"Ethereum"},{"proName":"BINANCE:SOLUSDT","title":"Solana"},{"proName":"BINANCE:XRPUSDT","title":"XRP"},{"proName":"BINANCE:DOGEUSDT","title":"Dogecoin"},{"proName":"BINANCE:ADAUSDT","title":"Cardano"},{"proName":"BINANCE:AVAXUSDT","title":"Avalanche"},{"proName":"BINANCE:DOTUSDT","title":"Polkadot"},{"proName":"BINANCE:LINKUSDT","title":"Chainlink"},{"proName":"BINANCE:MATICUSDT","title":"Polygon"}],"showSymbolLogo":true,"isTransparent":true,"displayMode":"adaptive","colorTheme":"dark","locale":"en"}
+        </script>
+    </div>
+</div>
+
+<p style="font-size:.7rem;font-weight:700;color:rgba(245,158,11,.7);text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px">Crypto Division</p>
+<h1 style="font-size:1.5rem;font-weight:800;color:#f1f5f9;margin:0 0 .25rem;letter-spacing:-.02em">Crypto News & Markets</h1>
+<p style="font-size:.82rem;color:#64748b;margin:0 0 .5rem">Live crypto prices, news, and market data. All markets trade 24/7.</p>
+
+<!-- Top 10 Cryptocurrencies -->
+<div class="section-label">Top 10 Cryptocurrencies</div>
+<div class="widget-card" style="padding:0">
+    <table class="coin-table" id="coin-table">
+        <thead>
+            <tr>
+                <th style="width:40px">#</th>
+                <th>Coin</th>
+                <th style="text-align:right">Price</th>
+                <th style="text-align:right">24h %</th>
+                <th style="text-align:right">7d %</th>
+                <th style="text-align:right">Market Cap</th>
+                <th style="text-align:right">24h Volume</th>
+            </tr>
+        </thead>
+        <tbody id="coin-tbody">
+            <tr><td colspan="7" style="text-align:center;padding:40px;color:#475569;font-size:.78rem">Loading market data...</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- News + Charts -->
+<div class="grid-2" style="margin-top:.5rem">
+    <!-- Crypto News Timeline -->
+    <div>
+        <div class="section-label">Latest Crypto News</div>
+        <div class="widget-card" style="height:520px">
+            <div class="tradingview-widget-container" style="height:100%;width:100%">
+                <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
+                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-timeline.js">
+                {"feedMode":"market","market":"crypto","isTransparent":true,"displayMode":"regular","width":"100%","height":"100%","colorTheme":"dark","locale":"en"}
+                </script>
+            </div>
+        </div>
+    </div>
+
+    <!-- BTC Chart -->
+    <div>
+        <div class="section-label">Bitcoin Chart</div>
+        <div class="widget-card" style="height:520px">
+            <div class="tradingview-widget-container" style="height:100%;width:100%">
+                <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
+                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js">
+                {"autosize":true,"symbol":"BITSTAMP:BTCUSD","interval":"D","timezone":"America/New_York","theme":"dark","style":"1","locale":"en","allow_symbol_change":true,"support_host":"https://www.tradingview.com","backgroundColor":"rgba(15,23,42,0)","gridColor":"rgba(71,85,105,0.1)","hide_volume":false}
+                </script>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Crypto Heatmap -->
+<div class="section-label" style="margin-top:1rem">Crypto Heatmap</div>
+<div class="widget-card" style="height:460px">
+    <div class="tradingview-widget-container" style="height:100%;width:100%">
+        <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-crypto-coins-heatmap.js">
+        {"dataSource":"Crypto","blockSize":"market_cap_calc","blockColor":"change","locale":"en","symbolUrl":"","colorTheme":"dark","hasTopBar":false,"isDataSetEnabled":false,"isZoomEnabled":true,"hasSymbolTooltip":true,"width":"100%","height":"100%"}
+        </script>
+    </div>
+</div>
+
+<!-- Mini Charts Grid -->
+<div class="section-label" style="margin-top:1rem">Major Crypto Assets</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem">
+    <div class="widget-card" style="height:200px">
+        <div class="tradingview-widget-container" style="height:100%;width:100%">
+            <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
+            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js">
+            {"symbol":"BITSTAMP:BTCUSD","width":"100%","height":"100%","locale":"en","dateRange":"1M","colorTheme":"dark","isTransparent":true,"autosize":true}
+            </script>
+        </div>
+    </div>
+    <div class="widget-card" style="height:200px">
+        <div class="tradingview-widget-container" style="height:100%;width:100%">
+            <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
+            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js">
+            {"symbol":"BITSTAMP:ETHUSD","width":"100%","height":"100%","locale":"en","dateRange":"1M","colorTheme":"dark","isTransparent":true,"autosize":true}
+            </script>
+        </div>
+    </div>
+    <div class="widget-card" style="height:200px">
+        <div class="tradingview-widget-container" style="height:100%;width:100%">
+            <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
+            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js">
+            {"symbol":"BINANCE:SOLUSDT","width":"100%","height":"100%","locale":"en","dateRange":"1M","colorTheme":"dark","isTransparent":true,"autosize":true}
+            </script>
+        </div>
+    </div>
+    <div class="widget-card" style="height:200px">
+        <div class="tradingview-widget-container" style="height:100%;width:100%">
+            <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
+            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js">
+            {"symbol":"BINANCE:XRPUSDT","width":"100%","height":"100%","locale":"en","dateRange":"1M","colorTheme":"dark","isTransparent":true,"autosize":true}
+            </script>
+        </div>
+    </div>
+</div>
+
+<script>
+// Top 10 from CoinGecko
+fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=10&page=1&sparkline=false&price_change_percentage=24h,7d')
+    .then(r=>r.json())
+    .then(coins=>{
+        const tbody=document.getElementById('coin-tbody');
+        tbody.innerHTML='';
+        coins.forEach(c=>{
+            const fmt=(n)=>{
+                if(n>=1e12)return '$'+(n/1e12).toFixed(2)+'T';
+                if(n>=1e9)return '$'+(n/1e9).toFixed(1)+'B';
+                if(n>=1e6)return '$'+(n/1e6).toFixed(0)+'M';
+                return '$'+n.toLocaleString();
+            };
+            const pct24=c.price_change_percentage_24h_in_currency;
+            const pct7=c.price_change_percentage_7d_in_currency;
+            const row=document.createElement('tr');
+            row.innerHTML=`
+                <td class="coin-rank">${c.market_cap_rank}</td>
+                <td>
+                    <div class="coin-name">
+                        <img src="${c.image}" alt="${c.name}">
+                        <span style="font-weight:600">${c.name}</span>
+                        <span class="symbol">${c.symbol}</span>
+                    </div>
+                </td>
+                <td style="text-align:right;font-weight:600;font-variant-numeric:tabular-nums">$${c.current_price.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:c.current_price<1?4:2})}</td>
+                <td style="text-align:right;font-weight:600;font-variant-numeric:tabular-nums" class="${pct24>=0?'pct-up':'pct-down'}">${pct24>=0?'+':''}${pct24?pct24.toFixed(2):'0.00'}%</td>
+                <td style="text-align:right;font-weight:600;font-variant-numeric:tabular-nums" class="${pct7>=0?'pct-up':'pct-down'}">${pct7>=0?'+':''}${pct7?pct7.toFixed(2):'0.00'}%</td>
+                <td style="text-align:right;font-variant-numeric:tabular-nums">${fmt(c.market_cap)}</td>
+                <td style="text-align:right;font-variant-numeric:tabular-nums">${fmt(c.total_volume)}</td>
+            `;
+            tbody.appendChild(row);
+        });
+    })
+    .catch(()=>{
+        document.getElementById('coin-tbody').innerHTML='<tr><td colspan="7" style="text-align:center;padding:30px;color:#f87171;font-size:.78rem">Failed to load market data. CoinGecko rate limit may apply.</td></tr>';
+    });
+</script>
+{% endblock %}

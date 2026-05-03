@@ -80,3 +80,13 @@ async def crypto_intelligence(request: Request):
         return redirect
 
     return templates.TemplateResponse(request, "crypto_intelligence.html")
+
+
+@router.get("/crypto/news", response_class=HTMLResponse)
+async def crypto_news(request: Request):
+    """Crypto news and market data hub."""
+    redirect = require_auth(request)
+    if redirect:
+        return redirect
+
+    return templates.TemplateResponse(request, "crypto_news.html")
