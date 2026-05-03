@@ -135,3 +135,28 @@ async def remove_ticker(
         await db.commit()
 
     return RedirectResponse(url="/watchlist", status_code=303)
+
+
+@router.get("/api/ticker/{symbol}/rename")
+async def rename_ticker(
+    request: Request,
+    symbol: str,
+    name: str,
+    db: AsyncSession = Depends(get_db),
+):
+    """Rename a ticker (must be logged in). Usage: /api/ticker/CRWV/rename?name=CoreWeave"""
+    from fastapi.responses import JSONResponse
+    from app.auth import get_current_user
+
+    if not get_current_user(request):
+        return JSONResponse({"error": "Unauthorized"}, status_code=401)
+
+    result = await db.execute(select(Ticker).where(Ticker.symbol == symbol.upper()))
+    ticker = result.scalar_one_or_none()
+    if not ticker:
+        return JSONResponse({"error": f"Ticker {symbol} not found"}, status_code=404)
+
+    old_name = ticker.name
+    ticker.name = name
+    await db.commit()
+    return JSONResponse({"symbol": symbol.upper(), "old_name": old_name, "new_name": name})
