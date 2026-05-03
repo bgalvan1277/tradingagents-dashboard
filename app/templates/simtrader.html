@@ -1,0 +1,293 @@
+{% extends "base.html" %}
+{% set active_page = 'simtrader' %}
+
+{% block title %}SimTrader{% endblock %}
+{% block meta_description %}Paper trading simulator for benchmarking AI agent analysis{% endblock %}
+
+{% block content %}
+<style>
+.st-hero{margin-bottom:2rem}
+.st-hero h1{font-size:1.8rem;font-weight:800;color:#f1f5f9;margin:0 0 4px;letter-spacing:-.02em}
+.st-hero p{font-size:.82rem;color:#64748b;margin:0}
+
+/* Account Summary */
+.st-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;margin-bottom:2rem}
+.st-card{background:rgba(15,23,42,.55);backdrop-filter:blur(16px);border:1px solid rgba(71,85,105,.25);border-radius:16px;padding:20px;text-align:center;transition:border-color .3s}
+.st-card:hover{border-color:rgba(6,182,212,.15)}
+.st-card .label{font-size:.62rem;color:#64748b;text-transform:uppercase;letter-spacing:.1em;font-weight:600;margin-bottom:6px}
+.st-card .value{font-size:1.4rem;font-weight:800;color:#f1f5f9}
+.st-card .value.pos{color:#4ade80}
+.st-card .value.neg{color:#f87171}
+
+/* Trade Form */
+.st-form-wrap{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2rem}
+.st-form{background:rgba(15,23,42,.55);backdrop-filter:blur(16px);border:1px solid rgba(71,85,105,.25);border-radius:16px;padding:24px}
+.st-form h2{font-size:1rem;font-weight:700;color:#f1f5f9;margin:0 0 16px;display:flex;align-items:center;gap:8px}
+.st-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.st-input-group{display:flex;flex-direction:column;gap:4px}
+.st-input-group.full{grid-column:1/-1}
+.st-input-group label{font-size:.65rem;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:.08em}
+.st-input-group input,.st-input-group select{padding:9px 12px;border-radius:8px;border:1px solid rgba(71,85,105,.35);background:rgba(10,14,23,.8);color:#e2e8f0;font-family:inherit;font-size:.82rem;outline:none;transition:border-color .2s}
+.st-input-group input:focus,.st-input-group select:focus{border-color:rgba(6,182,212,.4)}
+.st-submit{width:100%;padding:10px;border-radius:10px;border:none;background:linear-gradient(135deg,#06b6d4,#3b82f6);color:#fff;font-size:.82rem;font-weight:700;cursor:pointer;transition:opacity .2s;margin-top:10px}
+.st-submit:hover{opacity:.9}
+.st-error{margin-bottom:14px;padding:10px 14px;border-radius:10px;border:1px solid rgba(239,68,68,.3);background:rgba(239,68,68,.08);color:#f87171;font-size:.78rem}
+
+/* Performance */
+.st-perf{background:rgba(15,23,42,.55);backdrop-filter:blur(16px);border:1px solid rgba(71,85,105,.25);border-radius:16px;padding:24px}
+.st-perf h2{font-size:1rem;font-weight:700;color:#f1f5f9;margin:0 0 16px;display:flex;align-items:center;gap:8px}
+.st-perf-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px}
+.st-perf-item{text-align:center;padding:12px;background:rgba(30,41,59,.5);border-radius:10px}
+.st-perf-item .pl{font-size:.6rem;color:#64748b;text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:4px}
+.st-perf-item .pv{font-size:1.1rem;font-weight:800;color:#f1f5f9}
+
+/* Tables */
+.st-section{margin-bottom:2rem}
+.st-section h2{font-size:1rem;font-weight:700;color:#f1f5f9;margin:0 0 12px;display:flex;align-items:center;gap:8px}
+.st-table-wrap{background:rgba(15,23,42,.55);backdrop-filter:blur(16px);border:1px solid rgba(71,85,105,.25);border-radius:16px;overflow:hidden}
+.st-table{width:100%;border-collapse:collapse}
+.st-table th{padding:10px 14px;text-align:left;font-size:.62rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.08em;background:rgba(30,41,59,.5);border-bottom:1px solid rgba(71,85,105,.2)}
+.st-table td{padding:10px 14px;font-size:.8rem;color:#94a3b8;border-bottom:1px solid rgba(71,85,105,.1)}
+.st-table tr:last-child td{border:0}
+.st-table tr:hover td{background:rgba(6,182,212,.02)}
+.st-ticker{font-weight:700;color:#f1f5f9}
+.st-buy{color:#4ade80;font-weight:600;text-transform:uppercase;font-size:.68rem}
+.st-sell{color:#f87171;font-weight:600;text-transform:uppercase;font-size:.68rem}
+.st-close-btn{padding:4px 12px;border-radius:6px;border:1px solid rgba(239,68,68,.25);background:rgba(239,68,68,.06);color:#f87171;font-size:.68rem;font-weight:600;cursor:pointer;transition:all .2s}
+.st-close-btn:hover{background:rgba(239,68,68,.12)}
+.st-reset-btn{padding:6px 16px;border-radius:8px;border:1px solid rgba(71,85,105,.3);background:rgba(30,41,59,.5);color:#64748b;font-size:.72rem;font-weight:600;cursor:pointer;transition:all .2s}
+.st-reset-btn:hover{color:#f87171;border-color:rgba(239,68,68,.3)}
+.st-empty{text-align:center;padding:2rem;color:#475569;font-size:.82rem}
+
+@media(max-width:768px){
+    .st-form-wrap{grid-template-columns:1fr}
+    .st-summary{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+
+<div class="st-hero">
+    <h1>SimTrader <span style="font-size:.7rem;font-weight:700;color:#fbbf24;text-transform:uppercase;letter-spacing:.08em;vertical-align:middle;margin-left:8px">BETA</span></h1>
+    <p>Paper trading simulator. Execute simulated trades at live market prices to benchmark AI agent analysis.</p>
+</div>
+
+<!-- Account Summary -->
+<div class="st-summary">
+    <div class="st-card">
+        <div class="label">Starting Capital</div>
+        <div class="value">${{ "{:,.2f}".format(portfolio.starting_cash) }}</div>
+    </div>
+    <div class="st-card">
+        <div class="label">Cash Balance</div>
+        <div class="value">${{ "{:,.2f}".format(portfolio.cash) }}</div>
+    </div>
+    <div class="st-card">
+        <div class="label">Equity (Positions)</div>
+        <div class="value">${{ "{:,.2f}".format(portfolio.equity) }}</div>
+    </div>
+    <div class="st-card">
+        <div class="label">Total Value</div>
+        <div class="value">${{ "{:,.2f}".format(portfolio.total_value) }}</div>
+    </div>
+    <div class="st-card">
+        <div class="label">Total P&L</div>
+        <div class="value {{ 'pos' if portfolio.total_pnl >= 0 else 'neg' }}">
+            {{ "+" if portfolio.total_pnl >= 0 else "" }}${{ "{:,.2f}".format(portfolio.total_pnl) }}
+            <span style="font-size:.7rem;opacity:.7">({{ "{:+.2f}".format(portfolio.total_pnl_pct) }}%)</span>
+        </div>
+    </div>
+    <div class="st-card">
+        <div class="label">Open Positions</div>
+        <div class="value">{{ portfolio.positions_count }}</div>
+    </div>
+</div>
+
+<!-- Trade Form + Performance -->
+<div class="st-form-wrap">
+    <div class="st-form">
+        <h2>
+            <svg width="16" height="16" fill="none" stroke="#22d3ee" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            Execute Trade
+        </h2>
+        {% if trade_error %}
+        <div class="st-error">{{ trade_error }}</div>
+        {% endif %}
+        <form method="POST" action="/simtrader/trade">
+            <div class="st-form-grid">
+                <div class="st-input-group">
+                    <label for="ticker">Ticker</label>
+                    <input type="text" id="ticker" name="ticker" placeholder="AAPL" required style="text-transform:uppercase">
+                </div>
+                <div class="st-input-group">
+                    <label for="side">Side</label>
+                    <select id="side" name="side" required>
+                        <option value="buy">Buy</option>
+                        <option value="sell">Sell</option>
+                    </select>
+                </div>
+                <div class="st-input-group">
+                    <label for="shares">Shares</label>
+                    <input type="number" id="shares" name="shares" min="1" placeholder="100" required>
+                </div>
+                <div class="st-input-group">
+                    <label for="run_id">Analysis Run ID <span style="opacity:.5">(optional)</span></label>
+                    <input type="number" id="run_id" name="run_id" placeholder="Link to analysis">
+                </div>
+                <div class="st-input-group full">
+                    <label for="note">Note <span style="opacity:.5">(optional)</span></label>
+                    <input type="text" id="note" name="note" placeholder="Reason for trade...">
+                </div>
+            </div>
+            <button type="submit" class="st-submit">Execute Trade</button>
+        </form>
+    </div>
+
+    <div class="st-perf">
+        <h2>
+            <svg width="16" height="16" fill="none" stroke="#22d3ee" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+            Performance
+        </h2>
+        <div class="st-perf-grid">
+            <div class="st-perf-item">
+                <div class="pl">Total Trades</div>
+                <div class="pv">{{ performance.total_trades }}</div>
+            </div>
+            <div class="st-perf-item">
+                <div class="pl">Closed</div>
+                <div class="pv">{{ performance.closed_trades }}</div>
+            </div>
+            <div class="st-perf-item">
+                <div class="pl">Win Rate</div>
+                <div class="pv" style="color:{{ '#4ade80' if performance.win_rate > 50 else '#f87171' if performance.win_rate > 0 else '#94a3b8' }}">{{ performance.win_rate }}%</div>
+            </div>
+            <div class="st-perf-item">
+                <div class="pl">Avg Win</div>
+                <div class="pv" style="color:#4ade80">${{ "{:,.2f}".format(performance.avg_gain) }}</div>
+            </div>
+            <div class="st-perf-item">
+                <div class="pl">Avg Loss</div>
+                <div class="pv" style="color:#f87171">${{ "{:,.2f}".format(performance.avg_loss) }}</div>
+            </div>
+            <div class="st-perf-item">
+                <div class="pl">Realized P&L</div>
+                <div class="pv" style="color:{{ '#4ade80' if performance.total_realized_pnl >= 0 else '#f87171' }}">${{ "{:,.2f}".format(performance.total_realized_pnl) }}</div>
+            </div>
+        </div>
+        {% if performance.best_trade %}
+        <div style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(71,85,105,.2);display:flex;gap:16px;justify-content:center">
+            <div style="font-size:.72rem;color:#64748b">Best: <span style="color:#4ade80;font-weight:700">{{ performance.best_trade.ticker }} +${{ "{:,.2f}".format(performance.best_trade.pnl) }}</span></div>
+            <div style="font-size:.72rem;color:#64748b">Worst: <span style="color:#f87171;font-weight:700">{{ performance.worst_trade.ticker }} ${{ "{:,.2f}".format(performance.worst_trade.pnl) }}</span></div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Open Positions -->
+<div class="st-section">
+    <h2>
+        <svg width="16" height="16" fill="none" stroke="#22d3ee" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+        Open Positions
+    </h2>
+    <div class="st-table-wrap">
+        {% if positions %}
+        <table class="st-table">
+            <thead>
+                <tr>
+                    <th>Ticker</th>
+                    <th>Shares</th>
+                    <th>Avg Cost</th>
+                    <th>Current Price</th>
+                    <th>Cost Basis</th>
+                    <th>Market Value</th>
+                    <th>P&L</th>
+                    <th>% Change</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in positions %}
+                <tr>
+                    <td class="st-ticker">{{ p.ticker_symbol }}</td>
+                    <td>{{ p.shares }}</td>
+                    <td>${{ "{:,.2f}".format(p.avg_cost) }}</td>
+                    <td>${{ "{:,.2f}".format(p.current_price) }}</td>
+                    <td>${{ "{:,.2f}".format(p.total_cost_basis) }}</td>
+                    <td>${{ "{:,.2f}".format(p.current_value) }}</td>
+                    <td style="color:{{ '#4ade80' if p.unrealized_pnl >= 0 else '#f87171' }};font-weight:600">
+                        {{ "+" if p.unrealized_pnl >= 0 else "" }}${{ "{:,.2f}".format(p.unrealized_pnl) }}
+                    </td>
+                    <td style="color:{{ '#4ade80' if p.unrealized_pnl_pct >= 0 else '#f87171' }};font-weight:600">
+                        {{ "{:+.2f}".format(p.unrealized_pnl_pct) }}%
+                    </td>
+                    <td>
+                        <form method="POST" action="/simtrader/close/{{ p.ticker_symbol }}" style="display:inline">
+                            <button type="submit" class="st-close-btn" onclick="return confirm('Close entire {{ p.ticker_symbol }} position?')">Close</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="st-empty">No open positions. Execute a buy trade to get started.</div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Trade History -->
+<div class="st-section">
+    <h2>
+        <svg width="16" height="16" fill="none" stroke="#22d3ee" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        Trade History
+    </h2>
+    <div class="st-table-wrap">
+        {% if history %}
+        <table class="st-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Ticker</th>
+                    <th>Side</th>
+                    <th>Shares</th>
+                    <th>Price</th>
+                    <th>Total</th>
+                    <th>Realized P&L</th>
+                    <th>Note</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for t in history %}
+                <tr>
+                    <td>{{ t.executed_at.strftime('%b %d, %Y %H:%M') if t.executed_at else '-' }}</td>
+                    <td class="st-ticker">{{ t.ticker_symbol }}</td>
+                    <td><span class="{{ 'st-buy' if t.side == 'buy' else 'st-sell' }}">{{ t.side }}</span></td>
+                    <td>{{ t.shares }}</td>
+                    <td>${{ "{:,.2f}".format(t.price) }}</td>
+                    <td>${{ "{:,.2f}".format(t.total_value) }}</td>
+                    <td>
+                        {% if t.realized_pnl is not none %}
+                        <span style="color:{{ '#4ade80' if t.realized_pnl >= 0 else '#f87171' }};font-weight:600">
+                            {{ "+" if t.realized_pnl >= 0 else "" }}${{ "{:,.2f}".format(t.realized_pnl) }}
+                        </span>
+                        {% else %}-{% endif %}
+                    </td>
+                    <td style="font-size:.72rem;color:#64748b">{{ t.note or '-' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="st-empty">No trades yet. Use the form above to execute your first trade.</div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Reset -->
+<div style="text-align:right;margin-top:1rem">
+    <form method="POST" action="/simtrader/reset" style="display:inline">
+        <button type="submit" class="st-reset-btn" onclick="return confirm('Reset entire SimTrader account? All trades and positions will be deleted.')">
+            Reset Account to $100K
+        </button>
+    </form>
+</div>
+
+{% endblock %}

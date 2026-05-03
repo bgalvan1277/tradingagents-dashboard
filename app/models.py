@@ -187,3 +187,73 @@ class CronLog(Base):
     duration_seconds: Mapped[Optional[Decimal]] = mapped_column(
         Numeric(10, 2), nullable=True
     )
+
+
+# ── SimTrader Paper Trading ──────────────────────────────────────
+
+
+class SimAccount(Base):
+    """Paper trading account with cash balance."""
+    __tablename__ = "sim_account"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    starting_cash: Mapped[Decimal] = mapped_column(
+        Numeric(14, 2), default=Decimal("100000.00")
+    )
+    cash_balance: Mapped[Decimal] = mapped_column(
+        Numeric(14, 2), default=Decimal("100000.00")
+    )
+    inception_date: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now()
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now(), onupdate=func.now()
+    )
+
+
+class SimTrade(Base):
+    """Record of every simulated buy/sell execution."""
+    __tablename__ = "sim_trades"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    ticker_symbol: Mapped[str] = mapped_column(String(10), nullable=False, index=True)
+    side: Mapped[str] = mapped_column(String(4), nullable=False)  # "buy" or "sell"
+    shares: Mapped[int] = mapped_column(Integer, nullable=False)
+    price: Mapped[Decimal] = mapped_column(Numeric(12, 4), nullable=False)
+    total_value: Mapped[Decimal] = mapped_column(Numeric(14, 2), nullable=False)
+    realized_pnl: Mapped[Optional[Decimal]] = mapped_column(
+        Numeric(14, 2), nullable=True
+    )
+    run_id: Mapped[Optional[int]] = mapped_column(
+        Integer, ForeignKey("runs.id", ondelete="SET NULL"), nullable=True
+    )
+    note: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    executed_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now()
+    )
+
+    # Relationships
+    run: Mapped[Optional["Run"]] = relationship()
+
+    __table_args__ = (
+        Index("idx_sim_trades_executed", "executed_at"),
+    )
+
+
+class SimPosition(Base):
+    """Current open position for a single ticker."""
+    __tablename__ = "sim_positions"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    ticker_symbol: Mapped[str] = mapped_column(
+        String(10), nullable=False, unique=True, index=True
+    )
+    shares: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    avg_cost: Mapped[Decimal] = mapped_column(Numeric(12, 4), nullable=False)
+    total_cost_basis: Mapped[Decimal] = mapped_column(Numeric(14, 2), nullable=False)
+    opened_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now()
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now(), onupdate=func.now()
+    )
