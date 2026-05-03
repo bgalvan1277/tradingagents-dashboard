@@ -9,7 +9,7 @@ load_dotenv(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file_
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
-from app.routes import login, dashboard, portfolio, ticker, watchlist, history, run, status, about, intelligence, public, simtrader, briefing
+from app.routes import login, dashboard, portfolio, ticker, watchlist, history, run, status, about, intelligence, public, simtrader, briefing, crypto
 
 app = FastAPI(
     title="TradingAgents Dashboard",
@@ -22,6 +22,7 @@ app = FastAPI(
 app.include_router(login.router)
 app.include_router(dashboard.router)
 app.include_router(portfolio.router)
+app.include_router(crypto.router)
 app.include_router(ticker.router)
 app.include_router(watchlist.router)
 app.include_router(history.router)
