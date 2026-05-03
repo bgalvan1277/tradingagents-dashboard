@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% set active_page = 'poly_agents' %}
+
+{% block title %}Poly Agents{% endblock %}
+{% block meta_description %}Meet the autonomous AI agents powering Polymarket prediction analysis{% endblock %}
+
+{% block content %}
+<style>
+.poly-hero{padding:1.5rem 0 2rem}
+.poly-hero h1{font-size:1.8rem;font-weight:800;color:#f1f5f9;margin:0 0 .35rem;letter-spacing:-.02em}
+.poly-hero p{font-size:.88rem;color:#64748b;max-width:620px;line-height:1.6;margin:0}
+.section-label{display:flex;align-items:center;gap:10px;margin:2rem 0 1rem;font-size:.72rem;font-weight:700;color:rgba(139,92,246,.9);text-transform:uppercase;letter-spacing:.12em}
+.section-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(139,92,246,.2),transparent)}
+.agent-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.25rem}
+.agent-card{background:rgba(15,23,42,.55);backdrop-filter:blur(16px);border:1px solid rgba(71,85,105,.25);border-radius:20px;padding:28px;text-align:center;transition:all .3s}
+.agent-card:hover{border-color:rgba(139,92,246,.2);box-shadow:0 0 30px rgba(139,92,246,.06);transform:translateY(-3px)}
+.agent-card img{width:90px;height:90px;border-radius:50%;object-fit:cover;margin-bottom:16px;border:2.5px solid rgba(139,92,246,.25);box-shadow:0 0 20px rgba(139,92,246,.08)}
+.agent-card h3{font-size:1rem;font-weight:700;color:#f1f5f9;margin:0 0 4px}
+.agent-card .title{font-size:.72rem;font-weight:600;color:#a78bfa;text-transform:uppercase;letter-spacing:.06em;margin:0 0 14px}
+.agent-card p{font-size:.8rem;color:#94a3b8;line-height:1.65;margin:0;text-align:left}
+.flow-container{background:rgba(15,23,42,.55);backdrop-filter:blur(16px);border:1px solid rgba(71,85,105,.25);border-radius:20px;padding:32px;margin:2rem 0}
+.flow-step{display:flex;align-items:flex-start;gap:16px;padding:16px 0;border-bottom:1px solid rgba(71,85,105,.1)}
+.flow-step:last-child{border-bottom:none}
+.flow-num{width:32px;height:32px;border-radius:10px;background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.2);display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:800;color:#a78bfa;flex-shrink:0}
+.flow-step h4{font-size:.88rem;font-weight:700;color:#f1f5f9;margin:0 0 4px}
+.flow-step p{font-size:.78rem;color:#94a3b8;margin:0;line-height:1.6}
+</style>
+
+<a href="/poly/analysis" style="display:inline-flex;align-items:center;gap:6px;font-size:.78rem;color:#64748b;text-decoration:none;margin-bottom:.5rem">
+    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+    Back to Poly Analysis
+</a>
+
+<div class="poly-hero">
+    <p style="font-size:.7rem;font-weight:700;color:rgba(139,92,246,.7);text-transform:uppercase;letter-spacing:.12em;margin-bottom:10px">Prediction Division</p>
+    <h1>Poly Agents</h1>
+    <p>The autonomous AI team behind Polymarket prediction analysis. Each agent operates independently before entering a structured adversarial debate protocol to produce probability-weighted consensus.</p>
+</div>
+
+<!-- Pipeline Overview -->
+<div class="section-label">Adversarial Pipeline</div>
+<div class="flow-container">
+    <div class="flow-step">
+        <div class="flow-num">1</div>
+        <div>
+            <h4>Intelligence Gathering</h4>
+            <p>Nadia Petrova sweeps all available data sources: primary documents, historical precedent, expert commentary, polling data, and regulatory signals relevant to the prediction market question.</p>
+        </div>
+    </div>
+    <div class="flow-step">
+        <div class="flow-num">2</div>
+        <div>
+            <h4>Adversarial Advocacy</h4>
+            <p>Lena Torres (YES) and Ryan Ashford (NO) independently build their strongest cases for opposing outcomes. Each advocate works from the same intelligence briefing but constructs competing narratives.</p>
+        </div>
+    </div>
+    <div class="flow-step">
+        <div class="flow-num">3</div>
+        <div>
+            <h4>Contrarian Stress Test</h4>
+            <p>Derek Harmon deliberately attacks the consensus position, surfacing blind spots, base rate neglect, and anchoring bias. His role is to ensure no lazy assumptions survive the pipeline.</p>
+        </div>
+    </div>
+    <div class="flow-step">
+        <div class="flow-num">4</div>
+        <div>
+            <h4>Probability Synthesis</h4>
+            <p>Dr. Anika Patel weighs all arguments through a quantitative lens, applying Bayesian reasoning to assign a confidence-weighted probability estimate for each outcome.</p>
+        </div>
+    </div>
+    <div class="flow-step">
+        <div class="flow-num">5</div>
+        <div>
+            <h4>Edge Calculation</h4>
+            <p>Marco Chen compares the AI consensus probability against the current Polymarket price. If the divergence exceeds the minimum threshold, he flags an actionable edge with expected value calculations.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Agent Profiles -->
+<div class="section-label">Stage 0: Intelligence</div>
+<div class="agent-grid">
+    <div class="agent-card">
+        <img src="/static/avatars/nadia_petrova.png" alt="Nadia Petrova">
+        <h3>Nadia Petrova</h3>
+        <p class="title">Chief Intelligence Analyst</p>
+        <p>Executes comprehensive reconnaissance on every prediction market before analysis begins. Nadia queries primary source documents, cross-references historical precedent for similar events, pulls expert positioning data, and scans regulatory and policy signals. Her intelligence briefing establishes the factual foundation that all subsequent agents build upon. No analysis begins without her clearance.</p>
+    </div>
+</div>
+
+<div class="section-label">Stage 1: Adversarial Debate</div>
+<div class="agent-grid">
+    <div class="agent-card">
+        <img src="/static/avatars/lena_torres.png" alt="Lena Torres">
+        <h3>Lena Torres</h3>
+        <p class="title">YES Advocate / Conviction Strategist</p>
+        <p>Builds the strongest possible case for the YES outcome. Lena identifies catalysts, momentum signals, and structural factors that favor resolution in the affirmative. She constructs her argument from primary evidence, historical analogs, and forward-looking indicators. Her conviction score reflects how defensible she believes the YES position is under adversarial scrutiny.</p>
+    </div>
+    <div class="agent-card">
+        <img src="/static/avatars/ryan_ashford.png" alt="Ryan Ashford">
+        <h3>Ryan Ashford</h3>
+        <p class="title">NO Advocate / Risk Counsel</p>
+        <p>Constructs the most rigorous case for the NO outcome. Ryan identifies structural barriers, historical failure rates, regulatory headwinds, and timing risks that could prevent resolution. He stress-tests optimistic assumptions and quantifies downside scenarios. His conservative framework ensures the pipeline never underestimates the probability of non-occurrence.</p>
+    </div>
+    <div class="agent-card">
+        <img src="/static/avatars/derek_harmon.png" alt="Derek Harmon">
+        <h3>Derek Harmon</h3>
+        <p class="title">Devil's Advocate / Contrarian Analyst</p>
+        <p>Deliberately attacks whichever position appears to be winning the debate. Derek identifies anchoring bias, base rate neglect, recency bias, and information cascade effects. He surfaces scenarios that both advocates may have overlooked and challenges the consensus probability before it reaches synthesis. His interventions have historically shifted final estimates by 8-15 percentage points.</p>
+    </div>
+</div>
+
+<div class="section-label">Stage 2: Synthesis & Edge</div>
+<div class="agent-grid">
+    <div class="agent-card">
+        <img src="/static/avatars/anika_patel.png" alt="Dr. Anika Patel">
+        <h3>Dr. Anika Patel</h3>
+        <p class="title">Quantitative Director / Probability Synthesizer</p>
+        <p>Applies Bayesian probability frameworks to synthesize the adversarial debate into a single consensus probability estimate. Dr. Patel weighs argument quality, evidence strength, and historical calibration to produce a confidence-weighted output. She also generates uncertainty bands and identifies which new information would most change her estimate, enabling dynamic reassessment.</p>
+    </div>
+    <div class="agent-card">
+        <img src="/static/avatars/marco_chen.png" alt="Marco Chen">
+        <h3>Marco Chen</h3>
+        <p class="title">Alpha Strategist / Edge Calculator</p>
+        <p>Compares the AI consensus probability to the live Polymarket price and calculates expected value. Marco factors in liquidity depth, time decay, and correlation risk to determine whether an edge is actionable. He generates position sizing recommendations based on Kelly criterion and flags markets where the divergence between AI assessment and market price exceeds the minimum threshold for deployment.</p>
+    </div>
+</div>
+
+{% endblock %}

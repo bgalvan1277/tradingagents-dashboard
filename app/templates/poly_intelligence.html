@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% set active_page = 'poly_intel' %}
+
+{% block title %}Poly Intelligence{% endblock %}
+{% block meta_description %}Polymarket prediction intelligence feeds{% endblock %}
+
+{% block content %}
+<style>
+.section-label{display:flex;align-items:center;gap:10px;margin:2rem 0 1rem;font-size:.72rem;font-weight:700;color:rgba(139,92,246,.9);text-transform:uppercase;letter-spacing:.12em}
+.section-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(139,92,246,.2),transparent)}
+</style>
+
+<a href="/poly/analysis" style="display:inline-flex;align-items:center;gap:6px;font-size:.78rem;color:#64748b;text-decoration:none;margin-bottom:.5rem">
+    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+    Back to Poly Analysis
+</a>
+
+<p style="font-size:.7rem;font-weight:700;color:rgba(139,92,246,.7);text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px">Prediction Division</p>
+<h1 style="font-size:1.5rem;font-weight:800;color:#f1f5f9;margin:0 0 .25rem;letter-spacing:-.02em">Poly Intelligence</h1>
+<p style="font-size:.82rem;color:#64748b;margin:0 0 1.5rem">Data feeds and signal sources for prediction market analysis</p>
+
+<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6rem 2rem;text-align:center;background:rgba(15,23,42,.55);backdrop-filter:blur(16px);border:1px solid rgba(71,85,105,.25);border-radius:20px">
+    <div style="width:64px;height:64px;border-radius:18px;background:rgba(139,92,246,.08);display:flex;align-items:center;justify-content:center;margin-bottom:20px">
+        <svg width="28" height="28" fill="none" stroke="#a78bfa" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+    </div>
+    <h2 style="font-size:1rem;font-weight:700;color:#e2e8f0;margin:0 0 6px">Intelligence Feeds Coming Soon</h2>
+    <p style="font-size:.82rem;color:#64748b;max-width:400px;margin:0 0 20px;line-height:1.6">Polymarket CLOB API integration, market volume analysis, odds movement tracking, and event correlation feeds will be configured here.</p>
+</div>
+{% endblock %}

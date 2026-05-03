@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% set active_page = 'poly_analysis' %}
+
+{% block title %}Poly Analysis{% endblock %}
+{% block meta_description %}AI-powered Polymarket prediction analysis dashboard{% endblock %}
+
+{% block content %}
+<style>
+.section-label{display:flex;align-items:center;gap:10px;margin:2rem 0 1rem;font-size:.72rem;font-weight:700;color:rgba(139,92,246,.9);text-transform:uppercase;letter-spacing:.12em}
+.section-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(139,92,246,.2),transparent)}
+</style>
+
+<p style="font-size:.7rem;font-weight:700;color:rgba(139,92,246,.7);text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px">Prediction Division</p>
+<div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:1.5rem">
+    <div>
+        <h1 style="font-size:1.5rem;font-weight:800;color:#f1f5f9;margin:0 0 .25rem;letter-spacing:-.02em">Poly Analysis</h1>
+        <p style="font-size:.82rem;color:#64748b;margin:0">Prediction market analysis powered by adversarial AI agents</p>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <a href="/poly/agents" style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:10px;background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.2);color:#a78bfa;font-size:.78rem;font-weight:600;text-decoration:none;transition:all .2s">
+            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            Meet the Agents
+        </a>
+        <a href="/poly/intelligence" style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:10px;background:rgba(71,85,105,.12);border:1px solid rgba(71,85,105,.25);color:#94a3b8;font-size:.78rem;font-weight:600;text-decoration:none;transition:all .2s">
+            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            Intel Feeds
+        </a>
+    </div>
+</div>
+
+<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6rem 2rem;text-align:center;background:rgba(15,23,42,.55);backdrop-filter:blur(16px);border:1px solid rgba(71,85,105,.25);border-radius:20px">
+    <div style="width:64px;height:64px;border-radius:18px;background:rgba(139,92,246,.08);display:flex;align-items:center;justify-content:center;margin-bottom:20px">
+        <svg width="28" height="28" fill="none" stroke="#a78bfa" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+    </div>
+    <h2 style="font-size:1rem;font-weight:700;color:#e2e8f0;margin:0 0 6px">Polymarket Integration Coming Soon</h2>
+    <p style="font-size:.82rem;color:#64748b;max-width:400px;margin:0 0 20px;line-height:1.6">Live prediction markets from Polymarket's CLOB API will populate here. Track active markets, AI probability assessments, and edge calculations.</p>
+    <a href="/poly/agents" style="padding:8px 18px;border-radius:10px;background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.2);color:#a78bfa;font-size:.78rem;font-weight:600;text-decoration:none">Meet the Poly Agents</a>
+</div>
+{% endblock %}
