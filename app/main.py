@@ -1,7 +1,14 @@
 """FastAPI application entry point."""
 
+import logging
 import os
 from dotenv import load_dotenv
+
+# Configure app-level logging so services output is visible
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(levelname)s:    %(name)s - %(message)s",
+)
 
 # Load .env into os.environ so TradingAgents/LangChain can find API keys
 load_dotenv(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), ".env"))
