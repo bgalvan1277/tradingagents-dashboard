@@ -2,7 +2,7 @@
 {% set active_page = 'about' %}
 
 {% block title %}About Us{% endblock %}
-{% block meta_description %}Meet Brian Galvan, the creator of TradingAgents, and the 9 autonomous AI agents that power the research pipeline.{% endblock %}
+{% block meta_description %}Meet Brian Galvan, the creator of TradingAgents, and the autonomous AI agents that power the investment and prediction market pipelines.{% endblock %}
 
 {% block extra_css %}
 .about-hero{text-align:center;padding:8rem 2rem 3rem;max-width:1100px;margin:0 auto}
@@ -19,9 +19,39 @@
 .creator p{font-size:.88rem;color:#94a3b8;line-height:1.85;margin:0 0 1rem}
 .creator p:last-child{margin:0}
 
+/* Division Tabs */
+.div-tabs{display:flex;gap:0;margin:3rem 0 2rem;border-radius:16px;overflow:hidden;border:1px solid rgba(71,85,105,.25);background:rgba(15,23,42,.4)}
+.div-tab{flex:1;padding:20px 24px;cursor:pointer;text-align:center;transition:all .35s;position:relative;border:none;background:transparent}
+.div-tab::after{content:'';position:absolute;bottom:0;left:20%;right:20%;height:2px;background:transparent;transition:all .35s;border-radius:2px}
+.div-tab:first-child{border-right:1px solid rgba(71,85,105,.2)}
+.div-tab .tab-icon{font-size:1.5rem;margin-bottom:6px;display:block;opacity:.5;transition:opacity .35s}
+.div-tab .tab-title{font-size:.8rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#64748b;transition:color .35s}
+.div-tab .tab-sub{font-size:.68rem;color:#475569;margin-top:4px;transition:color .35s}
+.div-tab:hover .tab-title{color:#94a3b8}
+.div-tab.active{background:rgba(6,182,212,.04)}
+.div-tab.active .tab-icon{opacity:1}
+.div-tab.active .tab-title{color:#22d3ee}
+.div-tab.active .tab-sub{color:#64748b}
+.div-tab.active::after{background:linear-gradient(90deg,transparent,#22d3ee,transparent)}
+.div-tab.active.poly{background:rgba(139,92,246,.04)}
+.div-tab.active.poly .tab-title{color:#a78bfa}
+.div-tab.active.poly::after{background:linear-gradient(90deg,transparent,#a78bfa,transparent)}
+
+/* Tab Panels */
+.div-panel{display:none;animation:panelIn .4s ease}
+.div-panel.active{display:block}
+@keyframes panelIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* Agent count badge */
+.agent-count{display:inline-flex;align-items:center;gap:8px;font-size:.72rem;font-weight:700;color:#64748b;margin:0 0 2rem;padding:8px 16px;background:rgba(15,23,42,.4);border:1px solid rgba(71,85,105,.2);border-radius:10px}
+.agent-count span{color:#22d3ee}
+.agent-count.poly span{color:#a78bfa}
+
 /* Section */
 .team-label{display:flex;align-items:center;gap:12px;margin:3rem 0 1.5rem;font-size:.72rem;font-weight:700;color:rgba(6,182,212,.9);text-transform:uppercase;letter-spacing:.12em}
 .team-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(6,182,212,.2),transparent)}
+.team-label.poly{color:rgba(139,92,246,.9)}
+.team-label.poly::after{background:linear-gradient(90deg,rgba(139,92,246,.2),transparent)}
 
 /* Agent cards */
 .agent-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.25rem;margin-bottom:3rem}
@@ -34,6 +64,9 @@
 .agent-lead{grid-column:1 / -1;display:flex;align-items:center;gap:28px;text-align:left;padding:32px 36px}
 .agent-lead img{width:120px;height:120px;margin:0;flex-shrink:0}
 
+/* Poly agent hover */
+.poly .agent:hover{border-color:rgba(139,92,246,.2)}
+
 @media(max-width:768px){
     .about-hero h1{font-size:2rem}
     .about-hero{padding:7rem 1.5rem 2.5rem}
@@ -41,6 +74,7 @@
     .agent-lead{flex-direction:column;text-align:center}
     .agent-lead img{margin:0 auto}
     .about-wrap{padding:0 1.25rem}
+    .div-tab .tab-sub{display:none}
 }
 {% endblock %}
 
@@ -79,98 +113,208 @@
         </div>
     </div>
 
-    <!-- Intelligence Agent -->
-    <div class="team-label">Stage 0: Intelligence Gathering</div>
-    <div class="agent-grid">
-        <div class="agent agent-lead" style="border-color:rgba(251,146,60,.12)">
-            <img src="/static/avatars/don_wolfe.png" alt="Col. Don Wolfe" style="border-color:rgba(251,146,60,.3)">
-            <div>
-                <h3>Col. Don Wolfe (RET)</h3>
-                <div class="role" style="color:#fb923c">Intelligence Officer A.I. Agent</div>
-                <p>Before a single analyst touches a ticker, Colonel Wolfe conducts a full-spectrum open-source intelligence sweep across every available data channel. His reconnaissance protocol queries SEC EDGAR for insider transactions, scans government contract award databases for federal revenue exposure, cross-references Congressional trading disclosures for political positioning signals, monitors FDA regulatory calendars for biotech catalysts, and aggregates macroeconomic indicators that could impact the target sector. The Colonel's intelligence briefing is the foundational document upon which all subsequent analysis is built. No research analyst, debate advocate, or risk assessor operates without first reviewing his findings.</p>
-            </div>
+    <!-- ═══════════ Division Tabs ═══════════ -->
+    <div class="div-tabs" id="divisionTabs">
+        <div class="div-tab active" data-panel="investment" onclick="switchDivision('investment')">
+            <span class="tab-icon">📊</span>
+            <div class="tab-title">Investment Pipeline</div>
+            <div class="tab-sub">Stocks &amp; Crypto &middot; 10 Agents &middot; 5 Stages</div>
         </div>
-        <div class="agent agent-lead" style="border-color:rgba(245,158,11,.12)">
-            <img src="/static/avatars/jake_summers.png" alt="Jake Summers" style="border-color:rgba(245,158,11,.3)">
-            <div>
-                <h3>Jake Summers</h3>
-                <div class="role" style="color:#f59e0b">Crypto Analysis Officer A.I. Agent</div>
-                <p>When the target asset is a cryptocurrency or digital token, Jake Summers takes point on the intelligence operation. He executes a specialized reconnaissance protocol built for the decentralized markets: scanning on-chain whale wallet movements, monitoring exchange inflow/outflow ratios for accumulation or distribution signals, tracking DeFi protocol TVL shifts, aggregating social sentiment across crypto-native channels, and cross-referencing token unlock schedules and governance proposals. Jake operates independently from the traditional equity pipeline, delivering a crypto-specific intelligence briefing that accounts for the unique volatility drivers, liquidity dynamics, and narrative cycles that define digital asset markets.</p>
-            </div>
+        <div class="div-tab poly" data-panel="polymarket" onclick="switchDivision('polymarket')">
+            <span class="tab-icon">🔮</span>
+            <div class="tab-title">Prediction Markets</div>
+            <div class="tab-sub">Polymarket &middot; 6 Agents &middot; Adversarial Analysis</div>
         </div>
     </div>
 
-    <!-- Research Analysts -->
-    <div class="team-label">Stage 1: Research Analysts</div>
-    <div class="agent-grid">
-        <div class="agent">
-            <img src="/static/avatars/marcus_chen.png" alt="Marcus Chen">
-            <h3>Marcus Chen</h3>
-            <div class="role" style="color:#22d3ee">Chief Technical Analyst</div>
-            <p>Specializes in quantitative price action analysis, chart pattern recognition, and multi-timeframe technical indicator synthesis. Marcus processes candlestick formations, Bollinger Band compressions, MACD divergences, RSI oscillations, and volume profile anomalies to construct a technical probability framework for each equity.</p>
-        </div>
-        <div class="agent">
-            <img src="/static/avatars/sarah_mitchell.png" alt="Sarah Mitchell">
-            <h3>Sarah Mitchell</h3>
-            <div class="role" style="color:#22d3ee">Sentiment Intelligence Lead</div>
-            <p>Operates the sentiment quantification engine, processing institutional positioning data, options flow analysis, social media signal aggregation, and insider transaction monitoring. Sarah constructs a composite sentiment score that captures both retail and institutional conviction levels, fear/greed indicators, and short interest dynamics.</p>
-        </div>
-        <div class="agent">
-            <img src="/static/avatars/james_rivera.png" alt="James Rivera">
-            <h3>James Rivera</h3>
-            <div class="role" style="color:#22d3ee">News &amp; Media Analyst</div>
-            <p>Monitors and processes real-time news feeds, earnings call transcripts, regulatory filings, and macroeconomic event signals. James applies natural language understanding to extract actionable intelligence from unstructured media data, flagging material catalysts, sector rotation triggers, and geopolitical risk vectors.</p>
-        </div>
-        <div class="agent">
-            <img src="/static/avatars/elena_kowalski.png" alt="Elena Kowalski">
-            <h3>Elena Kowalski</h3>
-            <div class="role" style="color:#22d3ee">Fundamentals Research Lead</div>
-            <p>Conducts deep-dive financial statement analysis, valuation modeling, and competitive positioning assessment. Elena evaluates revenue growth trajectories, margin structures, free cash flow generation, balance sheet resilience, and capital allocation efficiency using proprietary composite scoring methodologies.</p>
-        </div>
-    </div>
+    <!-- ═══════════ PANEL 1: Investment Pipeline ═══════════ -->
+    <div class="div-panel active" id="panel-investment">
 
-    <!-- Debate -->
-    <div class="team-label">Stage 2: Investment Debate</div>
-    <div class="agent-grid">
-        <div class="agent" style="border-color:rgba(34,197,94,.12)">
-            <img src="/static/avatars/david_park.png" alt="David Park" style="border-color:rgba(34,197,94,.3)">
-            <h3>David Park</h3>
-            <div class="role" style="color:#4ade80">Bull Case Advocate</div>
-            <p>Constructs the strongest possible investment thesis in favor of each position. David aggregates the most compelling evidence from all four research verticals to build a rigorous case for upside potential, identifying asymmetric risk/reward opportunities, margin-of-safety arguments, and catalyst timelines that support accumulation.</p>
-        </div>
-        <div class="agent" style="border-color:rgba(239,68,68,.12)">
-            <img src="/static/avatars/catherine_walsh.png" alt="Catherine Walsh" style="border-color:rgba(239,68,68,.3)">
-            <h3>Catherine Walsh</h3>
-            <div class="role" style="color:#f87171">Bear Case Advocate</div>
-            <p>Systematically deconstructs the investment thesis, stress-testing every assumption against downside scenarios. Catherine identifies valuation risks, competitive threats, earnings quality concerns, and macro headwinds that could impair performance, forcing the pipeline to confront uncomfortable data points.</p>
-        </div>
-    </div>
+        <div class="agent-count"><span>10</span> autonomous agents across <span>5</span> pipeline stages</div>
 
-    <!-- Research Director -->
-    <div class="team-label">Stage 3: Research Director</div>
-    <div class="agent-grid">
-        <div class="agent agent-lead">
-            <img src="/static/avatars/michael_torres.png" alt="Michael Torres">
-            <div>
-                <h3>Michael Torres</h3>
-                <div class="role" style="color:#a78bfa">Research Director</div>
-                <p>Presides over the adversarial debate between the bull and bear advocates, evaluating the strength of evidence, logical consistency, and analytical rigor of each argument. Michael does not have a predetermined bias; his role is to identify which side presented the more defensible thesis based on the available data. His verdict determines the informational foundation upon which the final risk assessment and portfolio decision are built.</p>
+        <!-- Stage 0: Intelligence -->
+        <div class="team-label">Stage 0: Intelligence Gathering</div>
+        <div class="agent-grid">
+            <div class="agent agent-lead" style="border-color:rgba(251,146,60,.12)">
+                <img src="/static/avatars/don_wolfe.png" alt="Col. Don Wolfe" style="border-color:rgba(251,146,60,.3)">
+                <div>
+                    <h3>Col. Don Wolfe (RET)</h3>
+                    <div class="role" style="color:#fb923c">Intelligence Officer A.I. Agent</div>
+                    <p>Before a single analyst touches a ticker, Colonel Wolfe conducts a full-spectrum open-source intelligence sweep across every available data channel. His reconnaissance protocol queries SEC EDGAR for insider transactions, scans government contract award databases for federal revenue exposure, cross-references Congressional trading disclosures for political positioning signals, monitors FDA regulatory calendars for biotech catalysts, and aggregates macroeconomic indicators that could impact the target sector. The Colonel's intelligence briefing is the foundational document upon which all subsequent analysis is built. No research analyst, debate advocate, or risk assessor operates without first reviewing his findings.</p>
+                </div>
+            </div>
+            <div class="agent agent-lead" style="border-color:rgba(245,158,11,.12)">
+                <img src="/static/avatars/jake_summers.png" alt="Jake Summers" style="border-color:rgba(245,158,11,.3)">
+                <div>
+                    <h3>Jake Summers</h3>
+                    <div class="role" style="color:#f59e0b">Crypto Analysis Officer A.I. Agent</div>
+                    <p>When the target asset is a cryptocurrency or digital token, Jake Summers takes point on the intelligence operation. He executes a specialized reconnaissance protocol built for the decentralized markets: scanning on-chain whale wallet movements, monitoring exchange inflow/outflow ratios for accumulation or distribution signals, tracking DeFi protocol TVL shifts, aggregating social sentiment across crypto-native channels, and cross-referencing token unlock schedules and governance proposals. Jake operates independently from the traditional equity pipeline, delivering a crypto-specific intelligence briefing that accounts for the unique volatility drivers, liquidity dynamics, and narrative cycles that define digital asset markets.</p>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- Risk Panel -->
-    <div class="team-label">Stage 4: Risk Assessment</div>
-    <div class="agent-grid">
-        <div class="agent agent-lead" style="border-color:rgba(251,191,36,.12)">
-            <img src="/static/avatars/risk_committee.png" alt="Risk Committee" style="border-color:rgba(251,191,36,.3);border-radius:16px;width:160px;height:auto">
-            <div>
-                <h3>Risk Committee</h3>
-                <div class="role" style="color:#fbbf24">Multi-Perspective Risk Board</div>
-                <p>A three-member risk evaluation board examines every position through aggressive, conservative, and neutral analytical lenses. The aggressive analyst quantifies maximum upside capture potential and optimal entry timing. The conservative analyst models worst-case drawdown scenarios and capital preservation thresholds. The neutral analyst balances both perspectives against portfolio-level correlation and concentration risk. A Risk Judge synthesizes all three inputs into a unified risk verdict that directly informs the final portfolio directive.</p>
+        <!-- Stage 1: Research Analysts -->
+        <div class="team-label">Stage 1: Research Analysts</div>
+        <div class="agent-grid">
+            <div class="agent">
+                <img src="/static/avatars/marcus_chen.png" alt="Marcus Chen">
+                <h3>Marcus Chen</h3>
+                <div class="role" style="color:#22d3ee">Chief Technical Analyst</div>
+                <p>Specializes in quantitative price action analysis, chart pattern recognition, and multi-timeframe technical indicator synthesis. Marcus processes candlestick formations, Bollinger Band compressions, MACD divergences, RSI oscillations, and volume profile anomalies to construct a technical probability framework for each equity.</p>
+            </div>
+            <div class="agent">
+                <img src="/static/avatars/sarah_mitchell.png" alt="Sarah Mitchell">
+                <h3>Sarah Mitchell</h3>
+                <div class="role" style="color:#22d3ee">Sentiment Intelligence Lead</div>
+                <p>Operates the sentiment quantification engine, processing institutional positioning data, options flow analysis, social media signal aggregation, and insider transaction monitoring. Sarah constructs a composite sentiment score that captures both retail and institutional conviction levels, fear/greed indicators, and short interest dynamics.</p>
+            </div>
+            <div class="agent">
+                <img src="/static/avatars/james_rivera.png" alt="James Rivera">
+                <h3>James Rivera</h3>
+                <div class="role" style="color:#22d3ee">News &amp; Media Analyst</div>
+                <p>Monitors and processes real-time news feeds, earnings call transcripts, regulatory filings, and macroeconomic event signals. James applies natural language understanding to extract actionable intelligence from unstructured media data, flagging material catalysts, sector rotation triggers, and geopolitical risk vectors.</p>
+            </div>
+            <div class="agent">
+                <img src="/static/avatars/elena_kowalski.png" alt="Elena Kowalski">
+                <h3>Elena Kowalski</h3>
+                <div class="role" style="color:#22d3ee">Fundamentals Research Lead</div>
+                <p>Conducts deep-dive financial statement analysis, valuation modeling, and competitive positioning assessment. Elena evaluates revenue growth trajectories, margin structures, free cash flow generation, balance sheet resilience, and capital allocation efficiency using proprietary composite scoring methodologies.</p>
             </div>
         </div>
+
+        <!-- Stage 2: Debate -->
+        <div class="team-label">Stage 2: Investment Debate</div>
+        <div class="agent-grid">
+            <div class="agent" style="border-color:rgba(34,197,94,.12)">
+                <img src="/static/avatars/david_park.png" alt="David Park" style="border-color:rgba(34,197,94,.3)">
+                <h3>David Park</h3>
+                <div class="role" style="color:#4ade80">Bull Case Advocate</div>
+                <p>Constructs the strongest possible investment thesis in favor of each position. David aggregates the most compelling evidence from all four research verticals to build a rigorous case for upside potential, identifying asymmetric risk/reward opportunities, margin-of-safety arguments, and catalyst timelines that support accumulation.</p>
+            </div>
+            <div class="agent" style="border-color:rgba(239,68,68,.12)">
+                <img src="/static/avatars/catherine_walsh.png" alt="Catherine Walsh" style="border-color:rgba(239,68,68,.3)">
+                <h3>Catherine Walsh</h3>
+                <div class="role" style="color:#f87171">Bear Case Advocate</div>
+                <p>Systematically deconstructs the investment thesis, stress-testing every assumption against downside scenarios. Catherine identifies valuation risks, competitive threats, earnings quality concerns, and macro headwinds that could impair performance, forcing the pipeline to confront uncomfortable data points.</p>
+            </div>
+        </div>
+
+        <!-- Stage 3: Research Director -->
+        <div class="team-label">Stage 3: Research Director</div>
+        <div class="agent-grid">
+            <div class="agent agent-lead">
+                <img src="/static/avatars/michael_torres.png" alt="Michael Torres">
+                <div>
+                    <h3>Michael Torres</h3>
+                    <div class="role" style="color:#a78bfa">Research Director</div>
+                    <p>Presides over the adversarial debate between the bull and bear advocates, evaluating the strength of evidence, logical consistency, and analytical rigor of each argument. Michael does not have a predetermined bias; his role is to identify which side presented the more defensible thesis based on the available data. His verdict determines the informational foundation upon which the final risk assessment and portfolio decision are built.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stage 4: Risk -->
+        <div class="team-label">Stage 4: Risk Assessment</div>
+        <div class="agent-grid">
+            <div class="agent agent-lead" style="border-color:rgba(251,191,36,.12)">
+                <img src="/static/avatars/risk_committee.png" alt="Risk Committee" style="border-color:rgba(251,191,36,.3);border-radius:16px;width:160px;height:auto">
+                <div>
+                    <h3>Risk Committee</h3>
+                    <div class="role" style="color:#fbbf24">Multi-Perspective Risk Board</div>
+                    <p>A three-member risk evaluation board examines every position through aggressive, conservative, and neutral analytical lenses. The aggressive analyst quantifies maximum upside capture potential and optimal entry timing. The conservative analyst models worst-case drawdown scenarios and capital preservation thresholds. The neutral analyst balances both perspectives against portfolio-level correlation and concentration risk. A Risk Judge synthesizes all three inputs into a unified risk verdict that directly informs the final portfolio directive.</p>
+                </div>
+            </div>
+        </div>
+
     </div>
+
+    <!-- ═══════════ PANEL 2: Prediction Markets ═══════════ -->
+    <div class="div-panel poly" id="panel-polymarket">
+
+        <div class="agent-count poly"><span>6</span> specialized agents in an adversarial prediction pipeline</div>
+
+        <!-- Stage 1: Intelligence -->
+        <div class="team-label poly">Stage 1: Intelligence Gathering</div>
+        <div class="agent-grid">
+            <div class="agent agent-lead" style="border-color:rgba(139,92,246,.12)">
+                <img src="/static/avatars/nadia_petrova.png" alt="Nadia Petrova" style="border-color:rgba(139,92,246,.3)">
+                <div>
+                    <h3>Nadia Petrova</h3>
+                    <div class="role" style="color:#a78bfa">Intelligence Analyst</div>
+                    <p>Nadia opens every prediction market analysis with a comprehensive intelligence briefing. She researches historical precedent, current political and economic conditions, expert polling data, and public sentiment to establish the factual foundation upon which all subsequent analysis is built. Her briefing covers key facts, timelines, stakeholder motivations, and any asymmetric information that could influence the outcome probability.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stage 2: Adversarial Debate -->
+        <div class="team-label poly">Stage 2: Adversarial Debate</div>
+        <div class="agent-grid">
+            <div class="agent" style="border-color:rgba(34,197,94,.12)">
+                <img src="/static/avatars/lena_torres.png" alt="Lena Torres" style="border-color:rgba(34,197,94,.3)">
+                <h3>Lena Torres</h3>
+                <div class="role" style="color:#4ade80">YES Advocate</div>
+                <p>Constructs the strongest possible case for a YES outcome. Lena identifies catalysts, favorable precedents, momentum indicators, and structural advantages that increase the probability of the event occurring. She builds her argument with specific evidence and quantifiable data points, forcing the pipeline to seriously consider the bullish scenario.</p>
+            </div>
+            <div class="agent" style="border-color:rgba(239,68,68,.12)">
+                <img src="/static/avatars/ryan_ashford.png" alt="Ryan Ashford" style="border-color:rgba(239,68,68,.3)">
+                <h3>Ryan Ashford</h3>
+                <div class="role" style="color:#f87171">NO Advocate</div>
+                <p>Systematically dismantles the YES thesis by identifying barriers, historical failure rates, structural impediments, and overlooked risks. Ryan stress-tests every assumption, challenges base rate neglect, and presents the strongest possible case for the event not occurring. His role ensures the pipeline never suffers from confirmation bias.</p>
+            </div>
+        </div>
+
+        <!-- Stage 3: Contrarian Challenge -->
+        <div class="team-label poly">Stage 3: Contrarian Stress Test</div>
+        <div class="agent-grid">
+            <div class="agent agent-lead" style="border-color:rgba(251,191,36,.12)">
+                <img src="/static/avatars/derek_harmon.png" alt="Derek Harmon" style="border-color:rgba(251,191,36,.3)">
+                <div>
+                    <h3>Derek Harmon</h3>
+                    <div class="role" style="color:#fbbf24">Contrarian Analyst</div>
+                    <p>After both sides present their cases, Derek challenges the emerging consensus by identifying cognitive biases, blind spots, and scenarios neither advocate addressed. He probes for anchoring bias, recency effects, narrative fallacies, and groupthink. Derek's role is to ensure the final probability estimate accounts for tail risks and unconventional outcomes that the market may be mispricing.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stage 4: Probability Synthesis -->
+        <div class="team-label poly">Stage 4: Probability Synthesis</div>
+        <div class="agent-grid">
+            <div class="agent agent-lead" style="border-color:rgba(6,182,212,.12)">
+                <img src="/static/avatars/anika_patel.png" alt="Dr. Anika Patel" style="border-color:rgba(6,182,212,.3)">
+                <div>
+                    <h3>Dr. Anika Patel</h3>
+                    <div class="role" style="color:#22d3ee">Probability Synthesizer</div>
+                    <p>Dr. Patel integrates all arguments, evidence, and contrarian challenges into a calibrated probability estimate. She weighs the strength of each advocate's case, applies Bayesian reasoning to incorporate base rates, and adjusts for the biases Derek identified. Her output is a single consensus probability that represents the pipeline's best assessment of the event's likelihood.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stage 5: Edge Calculation -->
+        <div class="team-label poly">Stage 5: Edge Calculation &amp; Recommendation</div>
+        <div class="agent-grid">
+            <div class="agent agent-lead" style="border-color:rgba(245,158,11,.12)">
+                <img src="/static/avatars/marco_chen.png" alt="Marco Chen" style="border-color:rgba(245,158,11,.3)">
+                <div>
+                    <h3>Marco Chen</h3>
+                    <div class="role" style="color:#f59e0b">Edge Calculator</div>
+                    <p>Marco compares the pipeline's consensus probability against the current market price to calculate the edge. If the AI's probability diverges significantly from the market's implied odds, Marco flags it as a trading opportunity. He quantifies the expected value of each position, accounts for market liquidity and timing risk, and issues the final recommendation: Strong Buy YES, Buy YES, Hold, Buy NO, or Strong Buy NO.</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
 </div>
+{% endblock %}
 
+{% block extra_js %}
+<script>
+function switchDivision(panel) {
+    // Update tabs
+    document.querySelectorAll('.div-tab').forEach(t => t.classList.remove('active'));
+    document.querySelector(`.div-tab[data-panel="${panel}"]`).classList.add('active');
+    // Update panels
+    document.querySelectorAll('.div-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('panel-' + panel).classList.add('active');
+}
+</script>
 {% endblock %}
