@@ -72,6 +72,23 @@
 .sim-cta{display:inline-flex;align-items:center;gap:8px;padding:12px 28px;border-radius:12px;background:linear-gradient(135deg,rgba(6,182,212,.12),rgba(59,130,246,.12));border:1px solid rgba(6,182,212,.25);color:#22d3ee;font-size:.82rem;font-weight:600;text-decoration:none;transition:all .2s;width:fit-content}
 .sim-cta:hover{background:linear-gradient(135deg,rgba(6,182,212,.2),rgba(59,130,246,.2));transform:translateY(-1px)}
 
+/* ── DAYTRADER ───────────────────────────────────────────────── */
+.dt-section{padding:0 0 6rem}
+.dt-card{max-width:1100px;margin:0 auto;background:linear-gradient(135deg,rgba(245,158,11,.03),rgba(251,191,36,.05));border:1px solid rgba(245,158,11,.12);border-radius:24px;overflow:hidden;position:relative;display:grid;grid-template-columns:1fr 1fr;gap:0}
+.dt-card::before{content:'';position:absolute;top:-1px;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(245,158,11,.4),transparent)}
+.dt-chart{position:relative;overflow:hidden;min-height:340px;order:2}
+.dt-chart img{width:100%;height:100%;object-fit:cover;display:block;opacity:.85}
+.dt-chart::after{content:'';position:absolute;inset:0;background:linear-gradient(270deg,transparent 60%,#0a0e17)}
+.dt-body{padding:48px 44px;display:flex;flex-direction:column;justify-content:center;order:1}
+.dt-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.2);color:#f59e0b;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:1.25rem;width:fit-content}
+.dt-body h2{font-size:1.8rem;font-weight:800;color:#f1f5f9;margin:0 0 1rem;letter-spacing:-.02em}
+.dt-body>p{font-size:.88rem;color:#94a3b8;line-height:1.85;margin:0 0 1.5rem}
+.dt-features{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.5rem}
+.dt-feat{display:flex;align-items:center;gap:8px;font-size:.76rem;color:#cbd5e1;font-weight:500}
+.dt-feat svg{flex-shrink:0;color:#f59e0b}
+.dt-cta{display:inline-flex;align-items:center;gap:8px;padding:12px 28px;border-radius:12px;background:linear-gradient(135deg,rgba(245,158,11,.12),rgba(251,191,36,.12));border:1px solid rgba(245,158,11,.25);color:#f59e0b;font-size:.82rem;font-weight:600;text-decoration:none;transition:all .2s;width:fit-content}
+.dt-cta:hover{background:linear-gradient(135deg,rgba(245,158,11,.2),rgba(251,191,36,.2));transform:translateY(-1px)}
+
 /* ── PIPELINE PREVIEW ────────────────────────────────────────── */
 .pipeline-preview{padding:5rem 0}
 .pp-header{text-align:center;margin-bottom:3rem}
@@ -91,6 +108,9 @@
     .sim-card{grid-template-columns:1fr}
     .sim-chart{min-height:200px}
     .sim-body{padding:32px 24px}
+    .dt-card{grid-template-columns:1fr}
+    .dt-chart{min-height:200px;order:1}
+    .dt-body{padding:32px 24px;order:2}
     .hero{padding:6rem 1.5rem 4rem;min-height:100vh}
     .stats-bar{grid-template-columns:repeat(3,1fr)}
     .cap-wrap{grid-template-columns:1fr}
@@ -274,6 +294,31 @@
                     <div class="sim-feat"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> P&amp;L tracking</div>
                 </div>
                 <a href="/login" class="sim-cta">Access SimTrader <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- DayTrader -->
+<section class="dt-section">
+    <div class="section-wrap">
+        <div class="dt-card">
+            <div class="dt-body">
+                <div class="dt-badge"><svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg> Intraday Analysis</div>
+                <h2>DayTrader</h2>
+                <p>Real-time intraday intelligence built for speed. DayTrader scans momentum shifts, volume spikes, VWAP deviations, and order flow imbalances across your watchlist, then runs a compressed analytical pipeline to generate actionable entry and exit signals within minutes, not hours.</p>
+                <div class="dt-features">
+                    <div class="dt-feat"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Real-time momentum</div>
+                    <div class="dt-feat"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> VWAP analysis</div>
+                    <div class="dt-feat"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Volume profiling</div>
+                    <div class="dt-feat"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Entry/Exit signals</div>
+                    <div class="dt-feat"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Order flow scanning</div>
+                    <div class="dt-feat"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Compressed pipeline</div>
+                </div>
+                <a href="/login" class="dt-cta">Access DayTrader <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></a>
+            </div>
+            <div class="dt-chart">
+                <img src="/static/images/daytrader-hero.png" alt="DayTrader real-time dashboard">
             </div>
         </div>
     </div>
