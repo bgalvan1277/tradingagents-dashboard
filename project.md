@@ -179,7 +179,7 @@ Trading Agents/
 - **Quick Think Model:** `deepseek-v4-flash` ($0.07/M input, $0.14/M output)
 - **Base URL:** `https://api.deepseek.com`
 - **Cost Caps:** $10/day, $100/month
-- **Cost Metering:** LangChain `get_openai_callback` captures tokens per run, writes to `cost_log` table
+- **Cost Metering:** `TokenTracker` monkey-patches the OpenAI SDK to intercept API responses, capturing tokens per run and writing to `cost_log` table
 
 ---
 

@@ -186,6 +186,7 @@ def run_analysis_sync(ticker_symbol: str, trade_date: str) -> Tuple[dict, str, d
     """
     import asyncio
     from app.services.colonel_wolfe import run_intelligence_sweep
+    from app.services.token_tracker import TokenTracker
 
     # Phase 0: Colonel Wolfe's Intelligence Sweep
     logger.info("Phase 0: Col. Wolfe intelligence sweep for %s", ticker_symbol)
@@ -203,38 +204,22 @@ def run_analysis_sync(ticker_symbol: str, trade_date: str) -> Tuple[dict, str, d
     config = DEFAULT_CONFIG.copy()
     config.update(build_ta_config())
 
-    usage = {"input_tokens": 0, "output_tokens": 0, "total_tokens": 0, "cost_usd": Decimal("0")}
-
     ta = TradingAgentsGraph(debug=False, config=config)
 
-    # Try to capture token usage via LangChain's OpenAI callback
+    # Track token usage by intercepting OpenAI-compatible API responses
+    tracker = TokenTracker(model_name=settings.deep_think_model)
     try:
-        from langchain_community.callbacks.openai_info import get_openai_callback
-        with get_openai_callback() as cb:
+        with tracker:
             state, decision = ta.propagate(ticker_symbol, trade_date)
-            usage["input_tokens"] = cb.prompt_tokens
-            usage["output_tokens"] = cb.completion_tokens
-            usage["total_tokens"] = cb.total_tokens
-            # Use callback cost if available, otherwise estimate
-            if cb.total_cost > 0:
-                usage["cost_usd"] = Decimal(str(round(cb.total_cost, 6)))
-            else:
-                usage["cost_usd"] = _estimate_cost(
-                    settings.deep_think_model,
-                    cb.prompt_tokens,
-                    cb.completion_tokens,
-                )
-            logger.info(
-                "LLM usage for %s: %d in / %d out / $%.6f",
-                ticker_symbol, cb.prompt_tokens, cb.completion_tokens,
-                float(usage["cost_usd"]),
-            )
-    except ImportError:
-        logger.warning("LangChain callback not available, running without cost tracking")
-        state, decision = ta.propagate(ticker_symbol, trade_date)
+        usage = tracker.to_usage_dict()
+        logger.info(
+            "LLM usage for %s: %d in / %d out / %d calls / $%.6f",
+            ticker_symbol, usage["input_tokens"], usage["output_tokens"],
+            tracker.call_count, float(usage["cost_usd"]),
+        )
     except Exception as e:
-        logger.warning("Cost callback failed, running without tracking: %s", e)
-        state, decision = ta.propagate(ticker_symbol, trade_date)
+        logger.error("Analysis failed for %s: %s", ticker_symbol, e)
+        raise
 
     # Inject the intelligence briefing into the state for storage
     state["intelligence_briefing"] = intel_briefing
