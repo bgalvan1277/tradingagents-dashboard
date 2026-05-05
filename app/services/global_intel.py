@@ -42,23 +42,23 @@ def _set_cached(key: str, val: object):
 
 RSS_FEEDS = {
     "markets": [
-        {"name": "Reuters Business", "url": "https://feeds.reuters.com/reuters/businessNews", "icon": "reuters"},
+        {"name": "Google Finance", "url": "https://news.google.com/rss/topics/CAAqJggKIiBDQkFTRWdvSUwyMHZNRGx6TVdZU0FtVnVHZ0pWVXlnQVAB?hl=en-US&gl=US&ceid=US:en", "icon": "google"},
         {"name": "CNBC Top News", "url": "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=100003114", "icon": "cnbc"},
         {"name": "MarketWatch Top", "url": "https://feeds.marketwatch.com/marketwatch/topstories", "icon": "mw"},
-        {"name": "Yahoo Finance", "url": "https://finance.yahoo.com/news/rssindex", "icon": "yahoo"},
+        {"name": "Investing.com", "url": "https://www.investing.com/rss/news.rss", "icon": "inv"},
     ],
     "macro": [
-        {"name": "Reuters Economy", "url": "https://feeds.reuters.com/news/economy", "icon": "reuters"},
+        {"name": "Google Economy", "url": "https://news.google.com/rss/topics/CAAqJggKIiBDQkFTRWdvSUwyMHZNRGRqTVhZU0FtVnVHZ0pWVXlnQVAB?hl=en-US&gl=US&ceid=US:en", "icon": "google"},
         {"name": "CNBC Economy", "url": "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=20910258", "icon": "cnbc"},
         {"name": "MarketWatch Economy", "url": "https://feeds.marketwatch.com/marketwatch/marketpulse", "icon": "mw"},
     ],
     "geopolitics": [
-        {"name": "Reuters World", "url": "https://feeds.reuters.com/Reuters/worldNews", "icon": "reuters"},
+        {"name": "Google World", "url": "https://news.google.com/rss/topics/CAAqJggKIiBDQkFTRWdvSUwyMHZNRGx1YlY4U0FtVnVHZ0pWVXlnQVAB?hl=en-US&gl=US&ceid=US:en", "icon": "google"},
         {"name": "BBC World", "url": "https://feeds.bbci.co.uk/news/world/rss.xml", "icon": "bbc"},
         {"name": "Al Jazeera", "url": "https://www.aljazeera.com/xml/rss/all.xml", "icon": "alj"},
     ],
     "tech": [
-        {"name": "Reuters Tech", "url": "https://feeds.reuters.com/reuters/technologyNews", "icon": "reuters"},
+        {"name": "Google Tech", "url": "https://news.google.com/rss/topics/CAAqJggKIiBDQkFTRWdvSUwyMHZNRGRqTVhZU0FtVnVHZ0pWVXlnQVAB/sections/CAQiS0NCQVNNZ29JTDIwdk1EZGpNWFlTQW1WdUdnSlZVeUlPQ0FRYUNnb0lMMjB2TURKdGN6QXFEUW9MRWdsTmIySnBiR1VnUVhCd0tBQSouCAAqKAgAKiQICiIgQ0JBU0Vnb0lMMjB2TURkak1YWVNBbVZ1R2dKVlV5Z0FQAVAB?hl=en-US&gl=US&ceid=US:en", "icon": "google"},
         {"name": "CNBC Tech", "url": "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=19854910", "icon": "cnbc"},
     ],
 }
@@ -70,7 +70,7 @@ async def _parse_rss_feed(client: httpx.AsyncClient, feed: dict) -> list[dict]:
     try:
         resp = await client.get(
             feed["url"],
-            headers={"User-Agent": "TradingAgents/1.0"},
+            headers={"User-Agent": "Mozilla/5.0 (compatible; TradingAgents/1.0)"},
             follow_redirects=True,
         )
         if resp.status_code != 200:
@@ -133,7 +133,7 @@ async def fetch_news_feeds(category: str = "all") -> dict[str, list[dict]]:
     results = {}
     categories = RSS_FEEDS if category == "all" else {category: RSS_FEEDS.get(category, [])}
 
-    async with httpx.AsyncClient(timeout=10) as client:
+    async with httpx.AsyncClient(timeout=15) as client:
         for cat_name, feeds in categories.items():
             tasks = [_parse_rss_feed(client, feed) for feed in feeds]
             feed_results = await asyncio.gather(*tasks, return_exceptions=True)
@@ -323,18 +323,18 @@ async def fetch_gdelt_events(limit: int = 15) -> list[dict]:
     events = []
     try:
         # GDELT Events API - recent events with high impact
-        async with httpx.AsyncClient(timeout=12) as client:
+        async with httpx.AsyncClient(timeout=20) as client:
             resp = await client.get(
                 "https://api.gdeltproject.org/api/v2/doc/doc",
                 params={
-                    "query": "economy OR sanctions OR military OR trade war OR tariff OR central bank OR geopolitical",
+                    "query": "economy OR sanctions OR military OR trade war OR tariff OR central bank",
                     "mode": "artlist",
                     "maxrecords": str(limit),
                     "format": "json",
                     "sort": "datedesc",
-                    "timespan": "48h",
+                    "timespan": "72h",
                 },
-                headers={"User-Agent": "TradingAgents/1.0"},
+                headers={"User-Agent": "Mozilla/5.0 (compatible; TradingAgents/1.0)"},
             )
             if resp.status_code == 200:
                 data = resp.json()
