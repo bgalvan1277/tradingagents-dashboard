@@ -213,13 +213,28 @@ def run_analysis_sync(ticker_symbol: str, trade_date: str) -> Tuple[dict, str, d
     agent state so all downstream analysts have access to it.
     """
     import asyncio
+    import concurrent.futures
     from app.services.colonel_wolfe import run_intelligence_sweep
     from app.services.token_tracker import TokenTracker
 
     # Phase 0: Colonel Wolfe's Intelligence Sweep
     logger.info("Phase 0: Col. Wolfe intelligence sweep for %s", ticker_symbol)
     try:
-        intel_briefing = asyncio.run(run_intelligence_sweep(ticker_symbol))
+        # Detect whether an event loop is already running. If so, we cannot
+        # use asyncio.run() (it raises RuntimeError). Instead, run the
+        # coroutine inside a brand-new thread that has its own event loop.
+        try:
+            loop = asyncio.get_running_loop()
+            # Event loop IS running (e.g. called from daily_cron.py's
+            # asyncio.run()). Spin up a new thread with its own loop.
+            with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
+                intel_briefing = pool.submit(
+                    asyncio.run, run_intelligence_sweep(ticker_symbol)
+                ).result()
+        except RuntimeError:
+            # No running event loop (e.g. called from _process_run_in_thread).
+            # Safe to use asyncio.run() directly.
+            intel_briefing = asyncio.run(run_intelligence_sweep(ticker_symbol))
         logger.info("Intelligence briefing compiled: %d chars", len(intel_briefing))
     except Exception as e:
         logger.error("Intelligence sweep failed for %s: %s", ticker_symbol, e)
