@@ -107,10 +107,14 @@ async def _parse_rss_feed(client: httpx.AsyncClient, feed: dict) -> list[dict]:
             desc = item.findtext("description", "").strip()
             pub_date = item.findtext("pubDate", "").strip()
 
-            # Clean description (strip HTML tags)
+            # Clean description (strip HTML tags and entities)
             if desc:
                 import re
+                import html as html_mod
                 desc = re.sub(r"<[^>]+>", "", desc).strip()
+                desc = html_mod.unescape(desc)
+                # Collapse multiple spaces
+                desc = re.sub(r"\s+", " ", desc).strip()
                 if len(desc) > 200:
                     desc = desc[:197] + "..."
 
@@ -349,48 +353,62 @@ async def fetch_fred_snapshot() -> dict:
 # ── GDELT GEOPOLITICAL PULSE ──────────────────────────────────────────────────
 
 async def fetch_gdelt_events(limit: int = 15) -> list[dict]:
-    """Fetch recent high-impact geopolitical events from GDELT."""
+    """Fetch recent geopolitical/economic news from Google News RSS as GDELT fallback."""
     cache_key = "gdelt_events"
     cached = _get_cached(cache_key)
     if cached is not None:
         return cached
 
     events = []
+    # Use Google News geopolitics RSS since GDELT API is unreliable
+    geo_feeds = [
+        "https://news.google.com/rss/search?q=geopolitical+risk+economy+sanctions&hl=en-US&gl=US&ceid=US:en",
+        "https://news.google.com/rss/search?q=trade+war+tariff+military+tensions&hl=en-US&gl=US&ceid=US:en",
+    ]
     try:
-        # GDELT Events API - recent events with high impact
-        async with httpx.AsyncClient(timeout=20) as client:
-            resp = await client.get(
-                "https://api.gdeltproject.org/api/v2/doc/doc",
-                params={
-                    "query": "economy OR sanctions OR military OR trade war OR tariff OR central bank",
-                    "mode": "artlist",
-                    "maxrecords": str(limit),
-                    "format": "json",
-                    "sort": "datedesc",
-                    "timespan": "72h",
-                },
-                headers={"User-Agent": "Mozilla/5.0 (compatible; TradingAgents/1.0)"},
-            )
-            if resp.status_code == 200 and resp.text.strip():
+        async with httpx.AsyncClient(timeout=15) as client:
+            for feed_url in geo_feeds:
                 try:
-                    data = resp.json()
-                except Exception:
-                    logger.warning("GDELT returned non-JSON body")
-                    data = {}
-                articles = data.get("articles", [])
-                for art in articles[:limit]:
-                    events.append({
-                        "title": art.get("title", ""),
-                        "url": art.get("url", ""),
-                        "source": art.get("domain", ""),
-                        "language": art.get("language", "English"),
-                        "seendate": art.get("seendate", ""),
-                        "socialimage": art.get("socialimage", ""),
-                    })
+                    resp = await client.get(
+                        feed_url,
+                        headers={"User-Agent": "Mozilla/5.0 (compatible; TradingAgents/1.0)"},
+                        follow_redirects=True,
+                    )
+                    if resp.status_code == 200:
+                        root = ElementTree.fromstring(resp.text)
+                        for item in root.findall(".//item")[:8]:
+                            title = item.findtext("title", "").strip()
+                            link = item.findtext("link", "").strip()
+                            if not link:
+                                link_el = item.find("link")
+                                if link_el is not None:
+                                    link = (link_el.get("href", "") or link_el.tail or "").strip()
+                            source = item.findtext("source", "").strip()
+                            if title:
+                                events.append({
+                                    "title": title,
+                                    "url": link or "#",
+                                    "source": source or "Google News",
+                                })
+                except Exception as e:
+                    logger.warning("Geo feed failed: %s", e)
+                if len(events) >= limit:
+                    break
     except Exception as e:
-        logger.warning("GDELT events fetch failed: %s", e)
+        logger.warning("Geopolitical events fetch failed: %s", e)
 
-    _set_cached(cache_key, events)
+    # Deduplicate
+    seen = set()
+    deduped = []
+    for ev in events:
+        key = ev["title"].lower()[:50]
+        if key not in seen:
+            seen.add(key)
+            deduped.append(ev)
+    events = deduped[:limit]
+
+    if events:
+        _set_cached(cache_key, events)
     return events
 
 
