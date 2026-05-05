@@ -232,23 +232,28 @@ async def screen_tickers(symbols: list[str]) -> list[dict]:
 
 # ── BRIEFING: Full trade plan via LLM ─────────────────────────────────────────
 
-TRADE_PLAN_PROMPT = """You are an expert day trader and technical analyst. I'm giving you a comprehensive intelligence briefing on a stock ticker. Your job is to produce a structured day-trade plan.
+TRADE_PLAN_PROMPT = """You are an expert INTRADAY day trader. You trade the opening bell, capture moves within hours, and are FLAT (no positions) by market close. You never hold overnight.
 
-IMPORTANT RULES:
-- This is for INTRADAY trading only. Positions will be opened and closed within the same trading day.
-- Give specific price levels, not vague ranges. Use the technical data provided.
-- Be realistic about targets. A good day trade captures 1-5% moves, not moonshots.
-- Always include a stop loss. Risk management is non-negotiable.
-- If the setup is bad, say so. Don't force a trade. "No trade" is a valid recommendation.
-- Consider the broader macro environment from the FRED data.
-- Factor in options flow, insider activity, and sentiment when setting bias.
-- Position sizing should assume a $100,000 account with max 10% risk per trade.
+I'm giving you an intelligence briefing on a stock. Produce a SAME-DAY trade plan.
+
+CRITICAL RULES:
+- THIS IS PURELY INTRADAY. You enter after the open and exit BEFORE 4:00 PM the same day. No exceptions.
+- "LONG" means you BUY now and SELL later today. "SHORT" means you SHORT now and COVER later today.
+- Never suggest "waiting days" or "watching for a pullback over the coming week." Everything happens TODAY.
+- Focus on: opening range breakout/breakdown, VWAP, pre-market levels, first 30-minute candle, intraday support/resistance.
+- Give EXACT price levels based on today's pre-market, yesterday's close, and recent intraday structure.
+- Targets should be realistic intraday moves (0.5%-5% depending on the stock's ATR).
+- If there's no good intraday setup TODAY, say "NO TRADE" with confidence 0. Don't force it.
+- Position sizing assumes $100,000 account, max 5% risk per trade.
+- Stop losses should be TIGHT (within 1-2% of entry for most stocks).
+- Strategy must include specific timing: "Enter within first 15 minutes if X happens" or "Wait for VWAP test at 10:30 AM."
+- Exit strategy must include a hard time stop: "Close all remaining by 3:30 PM regardless."
 
 Return your analysis as valid JSON with this exact structure:
 {{
     "direction": "LONG" or "SHORT" or "NO TRADE",
     "confidence": <integer 0-100>,
-    "thesis": "<one sentence explaining why this trade>",
+    "thesis": "<one sentence: why this specific intraday setup works TODAY>",
     "entry_low": <float>,
     "entry_high": <float>,
     "stop_loss": <float>,
@@ -264,11 +269,11 @@ Return your analysis as valid JSON with this exact structure:
     "position_size_dollars": <float>,
     "key_supports": [<float>, <float>, <float>],
     "key_resistances": [<float>, <float>, <float>],
-    "catalysts": ["<string>", "<string>", ...],
-    "warnings": ["<string>", "<string>", ...],
-    "strategy": "<2-4 sentence action plan with specific instructions>",
-    "best_entry_time": "<string, e.g. 'First 30 minutes' or 'After 10:30 AM pullback'>",
-    "exit_strategy": "<string describing when/how to exit>"
+    "catalysts": ["<string>", "<string>"],
+    "warnings": ["<string>", "<string>"],
+    "strategy": "<2-4 sentence INTRADAY action plan with specific times and price triggers. Example: 'If price breaks above $X in the first 15 minutes on volume, enter long. Scale out 1/3 at target 1, 1/3 at target 2. Trail stop on remainder.'>",
+    "best_entry_time": "<specific intraday window, e.g. '9:35-9:45 AM on opening range breakout' or 'After 10:30 AM VWAP retest'>",
+    "exit_strategy": "<specific exit rules including a hard time stop, e.g. 'Scale out at targets. Move stop to breakeven after T1 hit. Close all by 3:30 PM regardless of P&L.'>"
 }}
 
 Return ONLY the JSON object. No markdown, no explanation, no code blocks.
