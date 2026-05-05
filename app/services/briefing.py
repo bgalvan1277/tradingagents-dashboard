@@ -150,6 +150,17 @@ def _score_ticker_sync(symbol: str) -> dict:
             score += 5
             signals.append(f"Short {short_pct*100:.0f}% of float — elevated")
 
+        # ── Float size (low float = explosive moves) ──
+        float_shares = info.get("floatShares", 0)
+        shares_outstanding = info.get("sharesOutstanding", 0)
+        float_val = float_shares or shares_outstanding
+        if float_val and float_val < 20e6:
+            score += 8
+            signals.append(f"Float {float_val/1e6:.1f}M — low float, explosive potential")
+        elif float_val and float_val < 50e6:
+            score += 4
+            signals.append(f"Float {float_val/1e6:.1f}M — mid float")
+
         # ── Market cap filter (too large = low volatility) ──
         mcap = info.get("marketCap", 0)
         if mcap and mcap < 2e9:
@@ -158,6 +169,19 @@ def _score_ticker_sync(symbol: str) -> dict:
         elif mcap and mcap > 500e9:
             score -= 5
             signals.append("Mega-cap — lower intraday range")
+
+        # ── Pre-market gap (check if market is open or pre-market) ──
+        pre_price = info.get("preMarketPrice")
+        prev_close_info = info.get("previousClose") or info.get("regularMarketPreviousClose")
+        pre_gap_pct = None
+        if pre_price and prev_close_info:
+            pre_gap_pct = round((pre_price / prev_close_info - 1) * 100, 2)
+            if abs(pre_gap_pct) > 3:
+                score += 10
+                signals.append(f"Pre-market gap {pre_gap_pct:+.1f}% — gapper alert")
+            elif abs(pre_gap_pct) > 1.5:
+                score += 5
+                signals.append(f"Pre-market gap {pre_gap_pct:+.1f}%")
 
         # Clamp score
         score = max(0, min(100, score))
@@ -181,6 +205,8 @@ def _score_ticker_sync(symbol: str) -> dict:
             "atr_pct": round(atr_pct, 1),
             "vol_ratio": round(vol_ratio, 1),
             "market_cap": mcap,
+            "float_shares": float_val,
+            "pre_gap_pct": pre_gap_pct,
             "signals": signals[:6],  # Top 6 signals
         }
 

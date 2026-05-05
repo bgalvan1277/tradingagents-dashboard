@@ -84,12 +84,78 @@
 .tp-actions .act-sim:hover{background:rgba(34,197,94,.15)}
 .loading-spinner{display:inline-block;width:18px;height:18px;border:2px solid rgba(6,182,212,.2);border-top-color:#22d3ee;border-radius:50%;animation:spin .6s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
+/* Morning Routine Guide */
+.mr-guide{margin-top:1.5rem;margin-bottom:2rem}
+.mr-toggle{display:flex;align-items:center;gap:10px;background:rgba(15,23,42,.55);backdrop-filter:blur(16px);border:1px solid rgba(71,85,105,.25);border-radius:16px;padding:16px 22px;cursor:pointer;transition:all .25s;width:100%}
+.mr-toggle:hover{border-color:rgba(6,182,212,.25);background:rgba(15,23,42,.7)}
+.mr-toggle h3{font-size:.95rem;font-weight:700;color:#f1f5f9;margin:0;flex:1}
+.mr-toggle .mr-sub{font-size:.72rem;color:#64748b;margin:0}
+.mr-chevron{width:20px;height:20px;color:#475569;transition:transform .25s}
+.mr-toggle[aria-expanded="true"] .mr-chevron{transform:rotate(180deg)}
+.mr-body{display:none;margin-top:0;border:1px solid rgba(71,85,105,.25);border-top:none;border-radius:0 0 16px 16px;background:rgba(15,23,42,.45);padding:24px;backdrop-filter:blur(16px)}
+.mr-body.open{display:block}
+.mr-items{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.mr-item{display:flex;gap:14px;padding:14px;border-radius:12px;background:rgba(15,23,42,.5);border:1px solid rgba(71,85,105,.15);transition:all .2s}
+.mr-item:hover{border-color:rgba(6,182,212,.2);background:rgba(15,23,42,.7)}
+.mr-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+.mr-item-title{font-size:.82rem;font-weight:700;color:#e2e8f0;margin:0 0 4px}
+.mr-item-desc{font-size:.72rem;color:#94a3b8;line-height:1.5;margin:0}
 </style>
 
 <div class="bf-hero">
     <p style="font-size:.7rem;font-weight:700;color:rgba(6,182,212,.7);text-transform:uppercase;letter-spacing:.12em;margin-bottom:10px">Day Trader</p>
     <h1>Day Trade Briefing</h1>
     <p>Scan for opportunities, then generate an actionable trade plan with specific entry points, stop losses, and targets. Powered by Col. Wolfe intelligence + DeepSeek AI.</p>
+</div>
+
+<!-- ══════ MORNING ROUTINE GUIDE ══════ -->
+<div class="mr-guide">
+    <button class="mr-toggle" onclick="var b=this.nextElementSibling;b.classList.toggle('open');this.setAttribute('aria-expanded',b.classList.contains('open'))" aria-expanded="false">
+        <div>
+            <h3>📋 The Morning Routine — What to Look For</h3>
+            <p class="mr-sub">5 key signals professional day traders scan for every morning before the bell</p>
+        </div>
+        <svg class="mr-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+    </button>
+    <div class="mr-body">
+        <div class="mr-items">
+            <div class="mr-item">
+                <div class="mr-icon" style="background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.15)">⚡</div>
+                <div>
+                    <p class="mr-item-title">Pre-Market Gappers <span style="font-size:.65rem;color:#475569;font-weight:400">(4:00–9:30 AM)</span></p>
+                    <p class="mr-item-desc">Stocks gapping up/down >3% on volume. This is the #1 filter. A gap with volume means institutions are moving, creating momentum you can ride at the open.</p>
+                </div>
+            </div>
+            <div class="mr-item">
+                <div class="mr-icon" style="background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.15)">📊</div>
+                <div>
+                    <p class="mr-item-title">Relative Volume <span style="font-size:.65rem;color:#475569;font-weight:400">(VOL column)</span></p>
+                    <p class="mr-item-desc">The single best indicator. A stock trading 2-5x its normal volume means something is happening. Volume precedes price. No volume = no trade.</p>
+                </div>
+            </div>
+            <div class="mr-item">
+                <div class="mr-icon" style="background:rgba(6,182,212,.1);border:1px solid rgba(6,182,212,.15)">📰</div>
+                <div>
+                    <p class="mr-item-title">News Catalyst</p>
+                    <p class="mr-item-desc">Earnings, FDA approvals, upgrades/downgrades, insider buys. Volume without a catalyst is less trustworthy. Always know WHY a stock is moving.</p>
+                </div>
+            </div>
+            <div class="mr-item">
+                <div class="mr-icon" style="background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.15)">🔬</div>
+                <div>
+                    <p class="mr-item-title">Float Size <span style="font-size:.65rem;color:#475569;font-weight:400">(<20M shares)</span></p>
+                    <p class="mr-item-desc">Low float stocks move faster. Small supply + high demand = explosive moves. Stocks with <20M float can make 20-50% moves in a single session.</p>
+                </div>
+            </div>
+            <div class="mr-item">
+                <div class="mr-icon" style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.15)">📏</div>
+                <div>
+                    <p class="mr-item-title">ATR — Average True Range <span style="font-size:.65rem;color:#475569;font-weight:400">(ATR% column)</span></p>
+                    <p class="mr-item-desc">You want stocks that actually move. A stock with 1% daily range isn't worth day trading. Look for ATR >3% for meaningful intraday profit potential.</p>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- ══════ TICKER INPUT + SCREENER ══════ -->
@@ -145,6 +211,8 @@
                     <th>RSI</th>
                     <th>ATR%</th>
                     <th>Vol</th>
+                    <th>Float</th>
+                    <th>Gap</th>
                     <th>Signals</th>
                     <th></th>
                 </tr>
@@ -164,6 +232,16 @@
                     <td style="font-family:'JetBrains Mono',monospace">{{ t.rsi }}</td>
                     <td style="font-family:'JetBrains Mono',monospace">{{ t.atr_pct }}%</td>
                     <td style="font-family:'JetBrains Mono',monospace">{{ t.vol_ratio }}x</td>
+                    <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem">
+                        {% if t.float_shares and t.float_shares > 0 %}
+                        <span style="color:{% if t.float_shares < 20000000 %}#4ade80{% elif t.float_shares < 50000000 %}#fbbf24{% else %}#94a3b8{% endif %}">{{ "%.0f"|format(t.float_shares / 1000000) }}M</span>
+                        {% else %}—{% endif %}
+                    </td>
+                    <td style="font-family:'JetBrains Mono',monospace;font-size:.78rem">
+                        {% if t.pre_gap_pct is not none %}
+                        <span style="color:{% if t.pre_gap_pct > 0 %}#4ade80{% else %}#f87171{% endif %}">{{ "%+.1f"|format(t.pre_gap_pct) }}%</span>
+                        {% else %}<span style="color:#475569">—</span>{% endif %}
+                    </td>
                     <td>
                         <div class="sc-signals">
                             {% for sig in t.signals[:3] %}
