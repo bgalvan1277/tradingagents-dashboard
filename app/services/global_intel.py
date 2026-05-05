@@ -74,16 +74,36 @@ async def _parse_rss_feed(client: httpx.AsyncClient, feed: dict) -> list[dict]:
             follow_redirects=True,
         )
         if resp.status_code != 200:
-            logger.debug("RSS feed %s returned %d", feed["name"], resp.status_code)
+            logger.warning("RSS feed %s returned %d", feed["name"], resp.status_code)
             return items
 
         root = ElementTree.fromstring(resp.text)
-        # Handle both RSS 2.0 and Atom
-        ns = {"atom": "http://www.w3.org/2005/Atom", "media": "http://search.yahoo.com/mrss/"}
 
-        for item in root.findall(".//item")[:8]:
+        # Try RSS 2.0 items first
+        rss_items = root.findall(".//item")
+        # Fall back to Atom entries
+        if not rss_items:
+            ns = {"atom": "http://www.w3.org/2005/Atom"}
+            rss_items = root.findall(".//atom:entry", ns)
+
+        logger.info("RSS feed %s: found %d items", feed["name"], len(rss_items))
+
+        for item in rss_items[:8]:
             title = item.findtext("title", "").strip()
+
+            # Extract link - try multiple approaches
             link = item.findtext("link", "").strip()
+            if not link:
+                # Google News and some feeds put URL in link tail text
+                link_el = item.find("link")
+                if link_el is not None:
+                    link = (link_el.get("href", "") or link_el.tail or "").strip()
+            if not link:
+                # Try guid as fallback
+                link = item.findtext("guid", "").strip()
+                if link and not link.startswith("http"):
+                    link = ""
+
             desc = item.findtext("description", "").strip()
             pub_date = item.findtext("pubDate", "").strip()
 
@@ -108,18 +128,19 @@ async def _parse_rss_feed(client: httpx.AsyncClient, feed: dict) -> list[dict]:
                     except ValueError:
                         continue
 
-            if title and link:
+            if title:
                 items.append({
                     "title": title,
-                    "link": link,
+                    "link": link or "#",
                     "description": desc or "",
                     "source": feed["name"],
                     "icon": feed["icon"],
                     "pub_date": pub_date,
                     "timestamp": parsed_time,
                 })
+        logger.info("RSS feed %s: parsed %d valid items", feed["name"], len(items))
     except Exception as e:
-        logger.warning("Failed to parse RSS feed %s: %s", feed["name"], e)
+        logger.error("Failed to parse RSS feed %s: %s", feed["name"], e, exc_info=True)
     return items
 
 
@@ -133,28 +154,36 @@ async def fetch_news_feeds(category: str = "all") -> dict[str, list[dict]]:
     results = {}
     categories = RSS_FEEDS if category == "all" else {category: RSS_FEEDS.get(category, [])}
 
-    async with httpx.AsyncClient(timeout=15) as client:
-        for cat_name, feeds in categories.items():
-            tasks = [_parse_rss_feed(client, feed) for feed in feeds]
-            feed_results = await asyncio.gather(*tasks, return_exceptions=True)
+    try:
+        async with httpx.AsyncClient(timeout=15) as client:
+            for cat_name, feeds in categories.items():
+                tasks = [_parse_rss_feed(client, feed) for feed in feeds]
+                feed_results = await asyncio.gather(*tasks, return_exceptions=True)
 
-            all_items = []
-            for result in feed_results:
-                if isinstance(result, list):
-                    all_items.extend(result)
+                all_items = []
+                for i, result in enumerate(feed_results):
+                    if isinstance(result, list):
+                        all_items.extend(result)
+                    elif isinstance(result, Exception):
+                        logger.error("Feed %s failed: %s", feeds[i]["name"], result)
 
-            # Sort by timestamp (newest first), then deduplicate by title
-            all_items.sort(key=lambda x: x.get("timestamp") or datetime.min, reverse=True)
-            seen_titles = set()
-            deduped = []
-            for item in all_items:
-                title_key = item["title"].lower()[:60]
-                if title_key not in seen_titles:
-                    seen_titles.add(title_key)
-                    deduped.append(item)
-            results[cat_name] = deduped[:20]
+                # Sort by timestamp (newest first), then deduplicate by title
+                all_items.sort(key=lambda x: x.get("timestamp") or datetime.min, reverse=True)
+                seen_titles = set()
+                deduped = []
+                for item in all_items:
+                    title_key = item["title"].lower()[:60]
+                    if title_key not in seen_titles:
+                        seen_titles.add(title_key)
+                        deduped.append(item)
+                results[cat_name] = deduped[:20]
+                logger.info("Category '%s': %d items after dedup", cat_name, len(deduped))
+    except Exception as e:
+        logger.error("fetch_news_feeds failed: %s", e, exc_info=True)
 
-    _set_cached(cache_key, results)
+    # Only cache if we got results
+    if any(len(v) > 0 for v in results.values()):
+        _set_cached(cache_key, results)
     return results
 
 
