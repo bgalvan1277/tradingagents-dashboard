@@ -16,7 +16,7 @@ load_dotenv(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file_
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
-from app.routes import login, dashboard, portfolio, ticker, watchlist, history, run, status, about, intelligence, public, simtrader, briefing, crypto, polymarket, polymarket_api
+from app.routes import login, dashboard, portfolio, ticker, watchlist, history, run, status, about, intelligence, public, simtrader, briefing, crypto, polymarket, polymarket_api, global_news
 
 app = FastAPI(
     title="TradingAgents Dashboard",
@@ -42,6 +42,7 @@ app.include_router(simtrader.router)
 app.include_router(briefing.router)
 app.include_router(polymarket.router)
 app.include_router(polymarket_api.router)
+app.include_router(global_news.router)
 
 # Serve static files (avatars, etc.)
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
