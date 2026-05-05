@@ -360,23 +360,90 @@ const aEl=document.getElementById('action-text');
 if(vEl){
     const raw=`{{ (details.final_trade_decision or '') | replace('\\', '\\\\') | replace('`', '\\`') | replace('\n', '\\n') }}`;
     const lines=raw.split('\n');
-    // Extract action line for the hero display
+
+    // ── Extract a meaningful action sentence from the full analysis ──
+    // Look for actionable sections: "Actionable Execution", "Decisive Action Plan",
+    // "Portfolio Directive", "Action:", "Recommended Action", etc.
     let actionText='';
     const bodyLines=[];
     let skipIntro=true;
+    const actionHeadings=[
+        'actionable execution','decisive action plan','decisive action',
+        'portfolio directive','recommended action','action plan',
+        'immediate action','position action','trade action'
+    ];
+    let inActionSection=false;
+
     for(const line of lines){
-        const trimmed=line.replace(/\*\*/g,'').trim();
-        if(trimmed.toLowerCase().startsWith('action:')){
-            actionText=trimmed.replace(/^action:\s*/i,'');
+        const trimmed=line.replace(/\*\*/g,'').replace(/^#+\s*/,'').trim();
+        const lower=trimmed.toLowerCase();
+
+        // Direct "Action: ..." prefix line
+        if(lower.startsWith('action:')){
+            const candidate=trimmed.replace(/^action:\s*/i,'').trim();
+            if(candidate.length>15 && !candidate.toLowerCase().startsWith('final trading decision'))
+                actionText=candidate;
             continue;
         }
+
+        // Check if this line is an actionable section heading
+        if(!actionText && actionHeadings.some(h=>lower.includes(h))){
+            inActionSection=true;
+            // Don't add the heading itself to action text
+            if(trimmed.toLowerCase().startsWith('decision:'))continue;
+            bodyLines.push(line);
+            continue;
+        }
+
+        // If we're inside an actionable section, grab the first real sentence
+        if(inActionSection && !actionText){
+            const cleaned=trimmed.replace(/^[-•*]\s*/,'').trim();
+            if(cleaned.length>15){
+                // Strip trailing markdown artifacts
+                actionText=cleaned.replace(/\*+$/,'').trim();
+                inActionSection=false;
+            }
+            bodyLines.push(line);
+            continue;
+        }
+
+        // Reset action section flag on empty lines or new headings
+        if(inActionSection && (trimmed==='' || /^#{1,3}\s/.test(line))){
+            inActionSection=false;
+        }
+
         if(trimmed.toLowerCase().startsWith('decision:'))continue;
+        // Skip redundant "Final Trading Decision: ..." lines
+        if(lower.startsWith('final trading decision'))continue;
         if(trimmed===''&&skipIntro)continue;
         if(trimmed==='---'){skipIntro=false;continue;}
         skipIntro=false;
         bodyLines.push(line);
     }
-    if(aEl)aEl.textContent=actionText||'{{ run.one_line_thesis or "" }}';
+
+    // Fallback chain: actionText -> one_line_thesis (only if it's not redundant)
+    if(!actionText){
+        const thesis='{{ run.one_line_thesis or "" }}'.replace(/\*+$/,'').trim();
+        if(thesis && !thesis.toLowerCase().startsWith('final trading decision')){
+            actionText=thesis;
+        }
+    }
+    // Last resort: scan for first bold sentence that isn't a heading
+    if(!actionText){
+        for(const line of lines){
+            const m=line.match(/\*\*(.+?)\*\*/);
+            if(m){
+                const candidate=m[1].trim();
+                if(candidate.length>20 && !candidate.toLowerCase().startsWith('final trading decision')
+                   && !candidate.toLowerCase().includes('rating')
+                   && !candidate.match(/^#{1,3}\s/)){
+                    actionText=candidate;
+                    break;
+                }
+            }
+        }
+    }
+    if(aEl)aEl.textContent=actionText||'Analysis complete';
     vEl.innerHTML='<p>'+renderMd(bodyLines.join('\n'))+'</p>';
 }
 </script>

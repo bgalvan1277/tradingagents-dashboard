@@ -42,26 +42,54 @@ def extract_one_line_thesis(final_decision: str) -> str:
     """Extract a one-line thesis from the PM's decision text.
 
     Looks for common patterns in the structured output: a line starting with
-    "Thesis:", "Summary:", "Rationale:", or the first substantive sentence.
+    "Thesis:", "Summary:", "Rationale:", or actionable section headings like
+    "Actionable Execution", "Decisive Action Plan", "Portfolio Directive".
+    Falls back to the first substantive sentence that isn't a redundant label.
     """
     if not final_decision:
         return ""
 
     lines = final_decision.strip().split("\n")
+
+    # Pass 1: Look for labeled thesis/summary/rationale lines
     for line in lines:
         stripped = line.strip().lstrip("*#- ")
         lower = stripped.lower()
-        # Look for labeled thesis lines
         for prefix in ["thesis:", "summary:", "rationale:", "recommendation:"]:
             if lower.startswith(prefix):
                 thesis = stripped[len(prefix):].strip().lstrip("*: ")
-                if len(thesis) > 10:
+                if len(thesis) > 10 and not thesis.lower().startswith("final trading decision"):
                     return thesis[:300]
 
-    # Fallback: first line longer than 20 chars that isn't a header
+    # Pass 2: Look for actionable section headings and grab the first sentence after
+    action_headings = [
+        "actionable execution", "decisive action plan", "decisive action",
+        "portfolio directive", "recommended action", "action plan",
+        "immediate action", "position action", "trade action",
+    ]
+    in_action_section = False
     for line in lines:
         stripped = line.strip().lstrip("*#- ")
-        if len(stripped) > 20 and not stripped.startswith("Rating"):
+        lower = stripped.lower()
+        if any(h in lower for h in action_headings):
+            in_action_section = True
+            continue
+        if in_action_section:
+            cleaned = stripped.lstrip("*#-•· ").rstrip("*")
+            if len(cleaned) > 15 and not cleaned.lower().startswith("final trading decision"):
+                return cleaned[:300]
+            if stripped == "" or stripped.startswith("#"):
+                in_action_section = False
+
+    # Pass 3: Fallback to first substantive line that isn't redundant
+    for line in lines:
+        stripped = line.strip().lstrip("*#- ")
+        if (
+            len(stripped) > 20
+            and not stripped.startswith("Rating")
+            and not stripped.lower().startswith("final trading decision")
+            and not stripped.lower().startswith("decision:")
+        ):
             return stripped[:300]
 
     return final_decision[:300]
