@@ -168,7 +168,13 @@ async def fetch_news_feeds(category: str = "all") -> dict[str, list[dict]]:
                         logger.error("Feed %s failed: %s", feeds[i]["name"], result)
 
                 # Sort by timestamp (newest first), then deduplicate by title
-                all_items.sort(key=lambda x: x.get("timestamp") or datetime.min, reverse=True)
+                # Strip tz info to avoid naive vs aware comparison errors
+                def _sort_key(x):
+                    ts = x.get("timestamp")
+                    if ts is None:
+                        return datetime.min
+                    return ts.replace(tzinfo=None) if ts.tzinfo else ts
+                all_items.sort(key=_sort_key, reverse=True)
                 seen_titles = set()
                 deduped = []
                 for item in all_items:
@@ -365,8 +371,12 @@ async def fetch_gdelt_events(limit: int = 15) -> list[dict]:
                 },
                 headers={"User-Agent": "Mozilla/5.0 (compatible; TradingAgents/1.0)"},
             )
-            if resp.status_code == 200:
-                data = resp.json()
+            if resp.status_code == 200 and resp.text.strip():
+                try:
+                    data = resp.json()
+                except Exception:
+                    logger.warning("GDELT returned non-JSON body")
+                    data = {}
                 articles = data.get("articles", [])
                 for art in articles[:limit]:
                     events.append({
