@@ -372,7 +372,10 @@ def _parse_trade_plan(content: str, ticker: str) -> dict:
     """Parse LLM response into a clean trade plan dict.
 
     Handles various response formats and provides safe defaults.
+    Uses multi-pass cleanup to handle common LLM JSON formatting issues.
     """
+    import re
+
     # Strip markdown code blocks if present
     content = content.strip()
     if content.startswith("```"):
@@ -381,26 +384,57 @@ def _parse_trade_plan(content: str, ticker: str) -> dict:
         content = "\n".join(lines[1:-1] if lines[-1].strip() == "```" else lines[1:])
         content = content.strip()
 
-    try:
-        plan = json.loads(content)
-    except json.JSONDecodeError:
-        # Try to find JSON in the response
-        start = content.find("{")
-        end = content.rfind("}") + 1
+    def _clean_json(text: str) -> str:
+        """Fix common LLM JSON quirks."""
+        # Remove trailing commas before } or ]
+        text = re.sub(r",\s*([}\]])", r"\1", text)
+        # Remove single-line comments
+        text = re.sub(r"//[^\n]*", "", text)
+        # Replace single quotes with double quotes (carefully)
+        # Only if the text doesn't already use double quotes properly
+        if '"' not in text and "'" in text:
+            text = text.replace("'", '"')
+        # Remove any trailing text after the last }
+        last_brace = text.rfind("}")
+        if last_brace >= 0:
+            text = text[:last_brace + 1]
+        return text.strip()
+
+    def _try_parse(text: str) -> dict | None:
+        """Attempt JSON parse with progressive cleanup."""
+        # Pass 1: Try raw
+        try:
+            return json.loads(text)
+        except json.JSONDecodeError:
+            pass
+        # Pass 2: Try cleaned
+        cleaned = _clean_json(text)
+        try:
+            return json.loads(cleaned)
+        except json.JSONDecodeError:
+            pass
+        # Pass 3: Extract JSON object from surrounding text
+        start = text.find("{")
+        end = text.rfind("}") + 1
         if start >= 0 and end > start:
+            extracted = text[start:end]
             try:
-                plan = json.loads(content[start:end])
+                return json.loads(extracted)
             except json.JSONDecodeError:
-                logger.warning("Could not parse trade plan JSON for %s", ticker)
-                return {
-                    "error": "Could not parse LLM response into a trade plan",
-                    "raw_response": content[:2000],
-                }
-        else:
-            return {
-                "error": "LLM did not return valid JSON",
-                "raw_response": content[:2000],
-            }
+                cleaned_extract = _clean_json(extracted)
+                try:
+                    return json.loads(cleaned_extract)
+                except json.JSONDecodeError:
+                    pass
+        return None
+
+    plan = _try_parse(content)
+    if plan is None:
+        logger.warning("Could not parse trade plan JSON for %s", ticker)
+        return {
+            "error": "Could not parse LLM response into a trade plan",
+            "raw_response": content[:2000],
+        }
 
     # Validate required fields and provide defaults
     defaults = {
